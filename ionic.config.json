@@ -1,0 +1,7 @@
+{
+  "name": "birthday-buddy",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
