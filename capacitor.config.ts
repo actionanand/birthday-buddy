@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'birthday-buddy',
+  appId: 'com.actionanand.birthdaybuddy.app',
+  appName: 'Birthday Buddy',
   webDir: 'www'
 };
 
