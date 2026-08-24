@@ -11,6 +11,8 @@
     "build:gh": "ng build --base-href /birthday-buddy/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "copy-error-page": "cp www/index.html www/404.html",
+    "precommit:dummy": "echo 'This is a dummy print message!'",
     "precommit": "run-s format:fix lint",
     "format:fix": "pretty-quick --staged",
     "format:check": "prettier --config ./.prettierrc --list-different \"src/{app,environments,assets}/**/*{.ts,.js,.json,.css,.scss}\"",
