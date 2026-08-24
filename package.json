@@ -1,15 +1,24 @@
 {
   "name": "birthday-buddy",
   "version": "0.0.1",
-  "author": "Ionic Framework",
+  "author": "Anand Raja",
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "develop": "ng serve --port 3036",
     "build": "ng build",
+    "build:gh": "ng build --base-href /birthday-buddy/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "copy-error-page": "cp www/index.html www/404.html",
+    "precommit:dummy": "echo 'This is a dummy print message!'",
+    "precommit": "run-s format:fix lint",
+    "format:fix": "pretty-quick --staged",
+    "format:check": "prettier --config ./.prettierrc --list-different \"src/{app,environments,assets}/**/*{.ts,.js,.json,.css,.scss}\"",
+    "format:all": "prettier --config ./.prettierrc --write \"src/{app,environments,assets}/**/*{.ts,.js,.json,.css,.scss}\"",
+    "lint": "ng lint",
+    "prepare": "husky"
   },
   "private": true,
   "dependencies": {
@@ -35,13 +44,21 @@
     "@angular/compiler-cli": "22.0.1",
     "@angular/language-service": "22.0.1",
     "@capacitor/cli": "8.5.0",
+    "@eslint/js": "^10.0.1",
     "@ionic/angular-toolkit": "^13.0.0",
     "angular-eslint": "22.0.0",
-    "eslint": "^9.16.0",
+    "eslint": "^10.3.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.9.6",
+    "pretty-quick": "^4.2.2",
     "typescript": "~6.0.0",
-    "typescript-eslint": "^8.61.0",
+    "typescript-eslint": "8.60.1",
     "vitest": "^4.0.8"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "engines": {
+    "node": ">=22.22.3 || >=24.15.0 || >=26.0.0"
+  }
 }
