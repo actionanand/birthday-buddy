@@ -1,4 +1,4 @@
-# birthday-buddy
+# Birthday Buddy
 
 This project was generated using Ionic CLI version 7.2.1 for Angular version 22.0.1 with Ionic Angular version 9.0.0.
 
