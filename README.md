@@ -10,7 +10,7 @@ To start a local development server, run:
 npm run develop
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:3035/`. The application will automatically reload whenever you modify any of the source files.
+Once the server is running, open your browser and navigate to `http://localhost:3036/`. The application will automatically reload whenever you modify any of the source files.
 
 ## Cloning Guide
 

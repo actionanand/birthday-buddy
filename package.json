@@ -6,7 +6,9 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "develop": "ng serve --port 3036",
     "build": "ng build",
+    "build:gh": "ng build --base-href /birthday-buddy/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "precommit": "run-s format:fix lint",
@@ -53,5 +55,8 @@
     "typescript-eslint": "8.60.1",
     "vitest": "^4.0.8"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "engines": {
+    "node": ">=22.22.3 || >=24.15.0 || >=26.0.0"
+  }
 }
