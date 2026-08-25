@@ -10,20 +10,20 @@
  */
 
 /* Core CSS required for Ionic components to work properly */
-@import "@ionic/angular/css/core.css";
+@import '@ionic/angular/css/core.css';
 
 /* Basic CSS for apps built with Ionic */
-@import "@ionic/angular/css/normalize.css";
-@import "@ionic/angular/css/structure.css";
-@import "@ionic/angular/css/typography.css";
-@import "@ionic/angular/css/display.css";
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
 
 /* Optional CSS utils that can be commented out */
-@import "@ionic/angular/css/padding.css";
-@import "@ionic/angular/css/float-elements.css";
-@import "@ionic/angular/css/text-alignment.css";
-@import "@ionic/angular/css/text-transformation.css";
-@import "@ionic/angular/css/flex-utils.css";
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
 
 /**
  * Ionic Dark Mode
@@ -34,4 +34,228 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+@import '@ionic/angular/css/palettes/dark.class.css';
+
+html {
+  background: var(--app-background);
+}
+body {
+  color: var(--app-text-primary);
+}
+ion-toolbar {
+  --border-color: var(--app-border);
+}
+ion-tab-bar {
+  border-top: 1px solid var(--app-border);
+  padding: 0.25rem 0 max(0.25rem, env(safe-area-inset-bottom));
+}
+ion-tab-button {
+  --color-selected: var(--ion-color-primary);
+  min-height: 56px;
+}
+ion-card {
+  border: 1px solid var(--app-border);
+  border-radius: 20px;
+  box-shadow: var(--app-shadow);
+}
+ion-list[inset='true'],
+.form-card {
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+  border-radius: 18px;
+}
+ion-searchbar {
+  --background: var(--app-surface-secondary) !important;
+  --border-radius: 15px !important;
+}
+ion-button {
+  min-height: 44px;
+  text-transform: none;
+  font-weight: 650;
+  --border-radius: 14px;
+}
+ion-fab-button {
+  --box-shadow: 0 10px 26px rgba(var(--ion-color-primary-rgb), 0.3);
+}
+.page-shell,
+.form-shell,
+.settings-shell {
+  width: min(100%, 760px);
+  margin-inline: auto;
+  padding: 1rem 1rem calc(6rem + env(safe-area-inset-bottom));
+}
+.form-shell {
+  width: min(100%, 620px);
+}
+.settings-shell {
+  width: min(100%, 680px);
+}
+.form-section {
+  margin-top: 2rem;
+}
+.form-help,
+.result-count {
+  margin: 0.7rem 1rem 1.2rem;
+  color: var(--app-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+.form-error {
+  display: block;
+  margin: 1rem;
+}
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.8rem 0.4rem 0.7rem;
+}
+.section-heading h2 {
+  margin: 0.15rem 0 0;
+  font: 700 1.45rem/1.15 var(--app-font-display);
+}
+.eyebrow,
+.settings-kicker {
+  color: var(--ion-color-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.settings-kicker {
+  display: block;
+  margin: 2rem 1rem 0.5rem;
+}
+.brand-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font: 700 1.15rem/1 var(--app-font-display);
+}
+.brand-title img {
+  border-radius: 10px;
+}
+.occasion-card {
+  margin: 0.7rem 0;
+  cursor: pointer;
+}
+.occasion-card ion-card-content {
+  padding: 0.2rem;
+}
+.occasion-card ion-item {
+  --background: transparent;
+}
+.occasion-card ion-label p {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: normal;
+}
+.occasion-card ion-badge {
+  max-width: 6.5rem;
+  white-space: normal;
+  text-align: center;
+}
+.profile-hero,
+.photo-editor {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.2rem;
+  border-radius: 24px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+}
+.profile-hero h1 {
+  margin: 0;
+  font: 750 2rem/1.1 var(--app-font-display);
+}
+.profile-hero p {
+  color: var(--app-text-secondary);
+  margin: 0.35rem 0 0;
+}
+.photo-editor {
+  flex-direction: column;
+  text-align: center;
+  margin-bottom: 1.4rem;
+}
+.callout,
+.calendar-panel {
+  padding: 1.3rem;
+  border-radius: 22px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+}
+.calendar-panel ion-datetime {
+  margin: auto;
+  --background: transparent;
+}
+.privacy-footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 1rem;
+  color: var(--app-text-secondary);
+  line-height: 1.5;
+}
+.privacy-footer ion-icon {
+  flex: 0 0 auto;
+  font-size: 1.25rem;
+  color: var(--ion-color-primary);
+}
+.native-time {
+  min-height: 44px;
+  border: 0;
+  color: var(--app-text-primary);
+  background: transparent;
+  font: inherit;
+}
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.skeleton-stack {
+  display: grid;
+  gap: 0.8rem;
+}
+.skeleton-card {
+  height: 92px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, var(--app-surface-secondary), var(--app-surface), var(--app-surface-secondary));
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ion-color-primary) 70%, white);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+@media (min-width: 800px) {
+  .page-shell,
+  .form-shell,
+  .settings-shell {
+    padding-top: 1.5rem;
+  }
+}

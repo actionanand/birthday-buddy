@@ -2,12 +2,49 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'home',
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    path: 'tabs',
+    loadComponent: () => import('./features/tabs/tabs.page').then(module => module.TabsPage),
+    children: [
+      { path: 'home', loadComponent: () => import('./features/home/home.page').then(module => module.HomePage) },
+      {
+        path: 'upcoming',
+        loadComponent: () => import('./features/upcoming/upcoming.page').then(module => module.UpcomingPage),
+      },
+      {
+        path: 'people',
+        loadComponent: () => import('./features/people/people.page').then(module => module.PeoplePage),
+      },
+      {
+        path: 'calendar',
+        loadComponent: () => import('./features/calendar/calendar.page').then(module => module.CalendarPage),
+      },
+      { path: '', pathMatch: 'full', redirectTo: 'home' },
+    ],
   },
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
+    path: 'person/new',
+    loadComponent: () => import('./features/people/person-editor.page').then(module => module.PersonEditorPage),
   },
+  {
+    path: 'person/:id/edit',
+    loadComponent: () => import('./features/people/person-editor.page').then(module => module.PersonEditorPage),
+  },
+  {
+    path: 'person/:id',
+    loadComponent: () => import('./features/people/person-detail.page').then(module => module.PersonDetailPage),
+  },
+  {
+    path: 'occasion/new',
+    loadComponent: () => import('./features/occasions/occasion-editor.page').then(module => module.OccasionEditorPage),
+  },
+  {
+    path: 'occasion/:id/edit',
+    loadComponent: () => import('./features/occasions/occasion-editor.page').then(module => module.OccasionEditorPage),
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings.page').then(module => module.SettingsPage),
+  },
+  { path: '', pathMatch: 'full', redirectTo: 'tabs/home' },
+  { path: '**', redirectTo: 'tabs/home' },
 ];
