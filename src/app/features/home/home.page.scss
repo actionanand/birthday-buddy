@@ -1,0 +1,32 @@
+.welcome {
+  position: relative;
+  overflow: hidden;
+  padding: 1.6rem;
+  margin: 0.75rem 0 2rem;
+  border-radius: 28px;
+  background: linear-gradient(135deg, var(--app-hero-start), var(--app-hero-end));
+  box-shadow: var(--app-shadow);
+}
+.welcome::after {
+  content: '';
+  position: absolute;
+  width: 9rem;
+  height: 9rem;
+  border-radius: 50%;
+  right: -3rem;
+  top: -4rem;
+  background: color-mix(in srgb, var(--ion-color-primary) 12%, transparent);
+}
+.welcome h1 {
+  margin: 0.2rem 0 0.4rem;
+  font: 750 clamp(1.85rem, 8vw, 2.7rem)/1.05 var(--app-font-display);
+  letter-spacing: -0.035em;
+}
+.welcome p:not(.eyebrow) {
+  max-width: 28rem;
+  color: var(--app-text-secondary);
+  line-height: 1.55;
+}
+.welcome ion-button {
+  margin-top: 0.5rem;
+}
