@@ -4,15 +4,15 @@ Birthday Buddy uses Capacitor to package the Angular application for Android. Th
 
 ## Build files
 
-| File                                  | Purpose                                                                                                                                 |
-| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `capacitor.config.ts`                 | App identity, web output, notification icon and splash behavior                                                                         |
-| `android-version.json`                | Monotonic Android `versionCode` and public `versionName`                                                                                |
-| `scripts/bump-android-version.js`     | Increments the code and optionally the semantic version                                                                                 |
-| `scripts/patch-android.mjs`           | Adds minimum permissions, selective/full contact access, Android Keystore security, biometrics, release shrinking and branded resources |
-| `scripts/generate-keystore.mjs`       | Creates a long-lived PKCS12 release keystore                                                                                            |
-| `.github/workflows/android-build.yml` | Checks, generates, builds, signs, verifies, uploads and commits APK/AAB releases                                                        |
-| `src/assets/birthday-buddy.png`       | Canonical launcher, splash, in-app brand and Play Store artwork source                                                                  |
+| File                                  | Purpose                                                                                                                    |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `capacitor.config.ts`                 | App identity, web output, notification icon and splash behavior                                                            |
+| `android-version.json`                | Monotonic Android `versionCode` and public `versionName`                                                                   |
+| `scripts/bump-android-version.js`     | Increments the code and optionally the semantic version                                                                    |
+| `scripts/patch-android.mjs`           | Adds contacts, document backup, Keystore security, recurring notification, privacy, splash, system-bar and release patches |
+| `scripts/generate-keystore.mjs`       | Creates a long-lived PKCS12 release keystore                                                                               |
+| `.github/workflows/android-build.yml` | Checks, generates, builds, signs, verifies, uploads and commits APK/AAB releases                                           |
+| `src/assets/birthday-buddy.png`       | Canonical launcher, splash, in-app brand and Play Store artwork source                                                     |
 
 ## Required packages
 
@@ -50,11 +50,12 @@ If `android/` does not exist, `npx cap sync android` reports a missing platform.
 - Application ID: `com.actionanand.birthdaybuddy.app`
 - Display name: `Birthday Buddy`
 - Canonical art: `src/assets/birthday-buddy.png`
-- Notification channel art: `ic_stat_birthday_buddy`
+- Notification channel: `occasion-reminders`
+- Notification status-bar art: `ic_stat_birthday_buddy`
 - Minimum Android SDK: 24
 - Target Android SDK: 36
 
-CI scales the source art to 72% of each launcher canvas so adaptive-icon masks do not clip the artwork. It also creates a centered splash asset and a 512×512 `releases/playstore-icon.png`.
+CI scales the source art to 72% of each launcher canvas so adaptive-icon masks do not clip the artwork. It also creates a 168dp centered launch image and a 512×512 `releases/playstore-icon.png`. The notification drawable is a white monochrome silhouette, which Android tints correctly against both light and dark status bars. Day/night themes set matching status and navigation bar colors and icon appearance; the launch theme intentionally stays light to match the splash artwork.
 
 ## Versioning
 
@@ -80,6 +81,7 @@ The Android workflow runs only from `main-android`:
 - Every build creates both a release APK and a Google Play AAB.
 - Signed files are named `releases/BirthdayBuddy-<version>.apk` and `.aab`.
 - Missing or invalid signing secrets produce clearly named `-unsigned` fallbacks.
+- Workflow logs and the Actions summary label signed outputs with `✅` and unsigned fallbacks with `⚠️`.
 - R8/resource shrinking is enabled and `BirthdayBuddy-<version>-mapping.txt` is retained for Play Console deobfuscation.
 - The complete `releases/` output is committed to `main-android` and uploaded as a 30-day Actions artifact.
 
@@ -115,20 +117,29 @@ Never commit `.jks`, `.keystore`, Base64 key text or passwords. Keep a secure of
 
 ## Android permissions and privacy
 
-The generated manifest requests only the capabilities in scope:
+The final merged Android manifest uses these capabilities:
 
+- `INTERNET` loads the packaged Capacitor WebView through its local HTTPS origin; Birthday Buddy does not send personal records to a server.
 - `READ_CONTACTS` is requested at runtime only after **Sync Contacts**. The selective picker is used for choosing one contact.
 - `POST_NOTIFICATIONS` is requested only when an occasion with active reminders is saved.
 - Camera access is requested only after **Take Photo**.
 - Android Photo Picker is used by the Capacitor Camera plugin for an existing image; broad media/storage permission is not requested.
-- `RECEIVE_BOOT_COMPLETED` supports Capacitor Local Notifications reconciliation.
+- `RECEIVE_BOOT_COMPLETED` lets Capacitor Local Notifications restore pending recurring reminders after reboot.
+- `WAKE_LOCK` lets the notification receiver finish delivery while the device is idle.
+- `VIBRATE` supports the standard vibration behavior of the occasion-reminder channel.
+- `USE_BIOMETRIC` is used only when the user enables biometric unlock.
+- The Local Notifications dependency declares `SCHEDULE_EXACT_ALARM`, but the app patch removes it from the merged manifest. Birthday Buddy deliberately schedules idle-safe inexact reminders, matching Life Leaf and avoiding Android's special exact-alarm access screen.
 - `WRITE_CONTACTS`, calendar, SMS, call-log, location, microphone and phone-state permissions are never requested.
 
 The native contact plugin reads only lookup key, display name, thumbnail, birthdays and anniversaries. Imported thumbnails are returned as app-owned image data and persisted with the person. Sync is preview-first and the application database remains the source of truth.
 
 PIN records on Android are encrypted with an AES-GCM key stored in Android Keystore. Biometric unlock uses a separate authentication-bound Keystore key that is invalidated after biometric enrollment changes. Browser PIN verifiers use PBKDF2-SHA-256 and IndexedDB. Backups exclude PIN and biometric secrets.
 
-Android Auto Backup is disabled by the patch so private WebView/SQLite data is not silently copied to cloud storage. The password-encrypted `.ocbackup` export is the explicit migration path.
+Android Auto Backup and device-transfer extraction are disabled by the patch so private WebView/SQLite data is not silently copied to cloud storage. The password-encrypted `.ocbackup` export is the explicit migration path. On Android, export uses `ACTION_CREATE_DOCUMENT` and import uses `ACTION_OPEN_DOCUMENT`, so the user chooses the destination/source through the system picker without broad storage permission. Backup restoration reloads the local store, then startup reconciliation recreates notification schedules from restored reminders.
+
+## Notification lifecycle
+
+Each enabled reminder is registered as an annual calendar schedule on the private `occasion-reminders` Android channel. Delivery is allowed while idle but is intentionally inexact, so Android may defer it slightly under battery restrictions. Capacitor's native receivers persist and restore pending schedules after locked boot, normal boot and supported quick-boot events. The Birthday Buddy receiver invokes the same restore path after app replacement, device-time changes and timezone changes, matching Life Leaf's Android lifecycle coverage. Birthday Buddy also reconciles schedules on startup, foreground resume, reminder edits/deletes and after backup restore. Tapping a notification opens the related person, with Upcoming as a safe fallback when the record no longer exists.
 
 ## Troubleshooting
 

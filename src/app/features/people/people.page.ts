@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import {
   AlertController,
+  IonBadge,
   IonButton,
   IonButtons,
   IonCheckbox,
@@ -28,6 +29,7 @@ import {
 import { OCCASION_LABELS } from '../../core/models/domain.models';
 import { BirthdayStoreService } from '../../core/services/birthday-store.service';
 import { ContactSyncService } from '../../core/services/contact-sync.service';
+import { ReminderSchedulerService } from '../../core/services/reminder-scheduler.service';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { PersonAvatarComponent } from '../../shared/components/person-avatar/person-avatar.component';
 
@@ -35,6 +37,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
   selector: 'app-people',
   imports: [
     RouterLink,
+    IonBadge,
     IonButton,
     IonButtons,
     IonCheckbox,
@@ -91,7 +94,11 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
                 ><ion-item [routerLink]="['/person', person.id]" detail="true"
                   ><app-person-avatar slot="start" [name]="person.name" [photoPath]="person.photoPath" /><ion-label
                     ><h2>{{ person.name }}</h2>
-                    <p>{{ occasionSummary(person.id) }}</p></ion-label
+                    <p>{{ occasionSummary(person.id) }}</p>
+                    <ion-badge [color]="sourceColor(person.source)">
+                      <ion-icon [name]="sourceIcon(person.source)" aria-hidden="true"></ion-icon>
+                      {{ sourceLabel(person.source) }}
+                    </ion-badge></ion-label
                   >
                   @if (person.favorite) {
                     <ion-icon slot="end" name="heart" color="primary" aria-label="Favorite"></ion-icon>
@@ -132,8 +139,12 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
             </p>
             @if (!sync.candidates().length) {
               <app-empty-state
-                title="Everything is up to date"
-                message="No new birthdays, anniversaries, or changes were found."
+                [title]="sync.availabilityChanges() ? 'Contact status updated' : 'Everything is up to date'"
+                [message]="
+                  sync.availabilityChanges()
+                    ? sync.availabilityChanges() + ' linked contact status changed. Your saved occasions were kept.'
+                    : 'No new birthdays, anniversaries, or changes were found.'
+                "
                 icon="checkmark-circle-outline" />
             } @else {
               <ion-list>
@@ -187,13 +198,14 @@ export class PeoplePage {
   readonly OCCASION_LABELS = OCCASION_LABELS;
   private readonly router = inject(Router);
   private readonly alerts = inject(AlertController);
+  private readonly scheduler = inject(ReminderSchedulerService);
   private readonly toasts = inject(ToastController);
   readonly query = signal('');
   readonly previewOpen = signal(false);
   readonly filtered = computed(() => {
     const query = this.query().trim().toLocaleLowerCase();
     return this.store
-      .people()
+      .activePeople()
       .filter(person => !query || person.name.toLocaleLowerCase().includes(query))
       .sort((a, b) => Number(b.favorite) - Number(a.favorite) || a.name.localeCompare(b.name));
   });
@@ -262,19 +274,24 @@ export class PeoplePage {
   async confirmDelete(id: string, name: string): Promise<void> {
     const alert = await this.alerts.create({
       header: `Delete ${name}?`,
-      message: `This removes ${name}, all occasions and all reminders from this app. The Android Contact will not be deleted.`,
+      message: `${name} and all linked occasions will move to Trash for 30 days. The Android contact will not be changed.`,
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Move to Trash',
           role: 'destructive',
           handler: () => {
-            void this.store.deletePerson(id).then(() => this.toast('Person deleted'));
+            void this.movePersonToTrash(id);
           },
         },
       ],
     });
     await alert.present();
+  }
+  private async movePersonToTrash(id: string): Promise<void> {
+    for (const occasion of this.store.occasionsFor(id)) await this.scheduler.cancelOccasion(occasion.id);
+    await this.store.deletePerson(id);
+    await this.toast('Moved to Trash');
   }
   candidateLabel(kind: string): string {
     return (
@@ -285,9 +302,25 @@ export class PeoplePage {
           NAME_CHANGE: 'Name changed in Contacts',
           PHOTO_CHANGE: 'Profile picture changed',
           DATE_CONFLICT: 'Date differs from app',
+          EVENT_LINK_CHANGE: 'Contact occasion link updated',
         } as Record<string, string>
       )[kind] ?? kind
     );
+  }
+  sourceLabel(source: string): string {
+    if (source === 'ANDROID_CONTACT_DELETED') return 'Contact deleted';
+    if (source === 'ANDROID_CONTACT') return 'Contact synced';
+    return 'Created in app';
+  }
+  sourceColor(source: string): 'medium' | 'primary' | 'warning' {
+    if (source === 'ANDROID_CONTACT_DELETED') return 'warning';
+    if (source === 'ANDROID_CONTACT') return 'primary';
+    return 'medium';
+  }
+  sourceIcon(source: string): string {
+    if (source === 'ANDROID_CONTACT_DELETED') return 'alert-circle-outline';
+    if (source === 'ANDROID_CONTACT') return 'sync-outline';
+    return 'person-outline';
   }
   private async toast(message: string): Promise<void> {
     const toast = await this.toasts.create({ message, duration: 1800, position: 'bottom' });

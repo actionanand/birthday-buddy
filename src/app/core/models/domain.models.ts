@@ -1,4 +1,4 @@
-export type PersonSource = 'MANUAL' | 'ANDROID_CONTACT';
+export type PersonSource = 'MANUAL' | 'ANDROID_CONTACT' | 'ANDROID_CONTACT_DELETED';
 export type PhotoSource = 'ANDROID_CONTACT' | 'MANUAL' | 'INITIALS';
 export type OccasionSource = 'MANUAL' | 'ANDROID_CONTACT';
 export type OccasionType =
@@ -22,6 +22,8 @@ export interface Person {
   photoSource: PhotoSource;
   photoUserModified: boolean;
   contactAvailable: boolean;
+  trashedAt?: string;
+  deleteAfter?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -38,6 +40,10 @@ export interface Occasion {
   androidEventReference?: string;
   userModified: boolean;
   enabled: boolean;
+  trashedAt?: string;
+  deleteAfter?: string;
+  enabledBeforeTrash?: boolean;
+  trashedWithPerson?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -118,7 +124,8 @@ export interface AndroidContactSummary {
   events: AndroidContactEvent[];
 }
 
-export type SyncCandidateKind = 'NEW_PERSON' | 'NEW_OCCASION' | 'NAME_CHANGE' | 'PHOTO_CHANGE' | 'DATE_CONFLICT';
+export type SyncCandidateKind =
+  'NEW_PERSON' | 'NEW_OCCASION' | 'NAME_CHANGE' | 'PHOTO_CHANGE' | 'DATE_CONFLICT' | 'EVENT_LINK_CHANGE';
 
 export interface ContactSyncCandidate {
   id: string;
@@ -152,6 +159,8 @@ export const REMINDER_PRESETS: ReadonlyArray<{ label: string; choice: ReminderCh
   { label: '1 day before', choice: { unit: 'DAY', value: 1 } },
   { label: 'On the day', choice: { unit: 'ON_DAY', value: 0 } },
 ];
+
+export const TRASH_RETENTION_DAYS = 30;
 
 export const DEFAULT_SETTINGS: AppSettings = {
   id: 'settings',

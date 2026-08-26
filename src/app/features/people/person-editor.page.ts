@@ -137,14 +137,19 @@ export class PersonEditorPage {
     }
     this.saving.set(true);
     const existing = this.personId ? this.store.person(this.personId) : undefined;
+    const photoChanged = Boolean(existing && this.photo() !== existing.photoPath);
     const person = await this.store.savePerson({
       ...existing,
       id: this.personId ?? undefined,
       name: this.form.controls.name.value,
       favorite: this.form.controls.favorite.value,
       photoPath: this.photo(),
-      photoSource: this.photo() ? 'MANUAL' : 'INITIALS',
-      photoUserModified: Boolean(existing && this.photo() !== existing.photoPath),
+      photoSource: photoChanged
+        ? this.photo()
+          ? 'MANUAL'
+          : 'INITIALS'
+        : (existing?.photoSource ?? (this.photo() ? 'MANUAL' : 'INITIALS')),
+      photoUserModified: photoChanged ? true : (existing?.photoUserModified ?? false),
     });
     this.saving.set(false);
     const toast = await this.toasts.create({ message: existing ? 'Person updated' : 'Person added', duration: 1600 });

@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
   AlertController,
+  IonBadge,
   IonBackButton,
   IonButton,
   IonButtons,
@@ -32,6 +33,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
   selector: 'app-person-detail',
   imports: [
     RouterLink,
+    IonBadge,
     IonBackButton,
     IonButton,
     IonButtons,
@@ -69,13 +71,22 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
             <app-person-avatar [name]="person.name" [photoPath]="person.photoPath" size="large" />
             <div>
               <h1>{{ person.name }}</h1>
-              <p>{{ person.source === 'ANDROID_CONTACT' ? 'Linked to Android Contacts' : 'Saved locally' }}</p>
+              @if (person.source === 'ANDROID_CONTACT') {
+                <ion-badge color="primary"><ion-icon name="sync-outline"></ion-icon>Contact synced</ion-badge>
+              } @else if (person.source === 'ANDROID_CONTACT_DELETED') {
+                <ion-badge color="warning"
+                  ><ion-icon name="alert-circle-outline"></ion-icon>Synced contact deleted</ion-badge
+                >
+              } @else {
+                <ion-badge color="medium"><ion-icon name="person-outline"></ion-icon>Created in app</ion-badge>
+              }
             </div>
           </section>
           @if (!person.contactAvailable) {
             <ion-card color="warning"
               ><ion-card-content
-                >Android contact is no longer available. Your local data is safe.</ion-card-content
+                >The linked Android contact was deleted. Birthday Buddy kept this person's name, photo, occasions, and
+                reminders locally. You can edit it, unlink it, or move it to Trash.</ion-card-content
               ></ion-card
             >
           }
@@ -116,7 +127,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
               }
             </ion-list>
           }
-          @if (person.source === 'ANDROID_CONTACT') {
+          @if (person.source !== 'MANUAL') {
             <ion-button expand="block" fill="outline" (click)="unlink(person.id)"
               ><ion-icon slot="start" name="unlink-outline"></ion-icon>Unlink from Contacts</ion-button
             >
@@ -143,11 +154,11 @@ export class PersonDetailPage {
   async deleteOccasion(id: string, label: string): Promise<void> {
     const alert = await this.alerts.create({
       header: `Delete ${label}?`,
-      message: 'This removes the occasion and its reminders from this app.',
+      message: 'This occasion will move to Trash for 30 days. Its reminders will stop until it is restored.',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Move to Trash',
           role: 'destructive',
           handler: () => {
             void this.scheduler.cancelOccasion(id).then(() => this.store.deleteOccasion(id));
@@ -177,12 +188,11 @@ export class PersonDetailPage {
   async deletePerson(id: string, name: string): Promise<void> {
     const alert = await this.alerts.create({
       header: `Delete ${name}?`,
-      message:
-        'This removes the person, all occasions, and all reminders from this app. Android Contacts will not be changed.',
+      message: 'This person and all occasions will move to Trash for 30 days. Android Contacts will not be changed.',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Move to Trash',
           role: 'destructive',
           handler: () => {
             void this.removePerson(id);

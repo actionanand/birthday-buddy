@@ -1,5 +1,5 @@
 import { Service, inject } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { Directory, Encoding, Filesystem } from '@capacitor/filesystem';
 import { AppSettings, ContactSyncIgnore, Occasion, OccasionReminder, Person } from '../models/domain.models';
 import { BirthdayStoreService } from './birthday-store.service';
@@ -25,6 +25,13 @@ interface EncryptedBackup {
   iv: string;
   ciphertext: string;
 }
+
+interface BirthdayBuddyFilesPlugin {
+  exportFile(options: { filename: string; mimeType: string; contents: string }): Promise<{ saved: boolean }>;
+  pickFile(options: { mimeType: string; extension: string }): Promise<{ contents?: string }>;
+}
+
+const NativeFiles = registerPlugin<BirthdayBuddyFilesPlugin>('BirthdayBuddyFiles');
 
 @Service()
 export class BackupService {
@@ -64,7 +71,14 @@ export class BackupService {
     };
     const contents = JSON.stringify(backup);
     const filename = `occasion-backup-${createdAt.slice(0, 10)}.ocbackup`;
-    if (Capacitor.isNativePlatform()) {
+    if (Capacitor.getPlatform() === 'android') {
+      const result = await NativeFiles.exportFile({
+        filename,
+        mimeType: 'application/octet-stream',
+        contents,
+      });
+      if (!result.saved) throw new Error('Backup export was cancelled.');
+    } else if (Capacitor.isNativePlatform()) {
       await Filesystem.writeFile({
         path: filename,
         data: contents,
@@ -81,6 +95,15 @@ export class BackupService {
       URL.revokeObjectURL(url);
     }
     return filename;
+  }
+
+  async pickBackup(): Promise<string | undefined> {
+    if (Capacitor.getPlatform() !== 'android') return undefined;
+    const result = await NativeFiles.pickFile({
+      mimeType: 'application/octet-stream',
+      extension: '.ocbackup',
+    });
+    return result.contents;
   }
 
   async preview(contents: string, password: string): Promise<BackupPayload> {

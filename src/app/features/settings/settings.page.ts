@@ -1,8 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import {
   AlertController,
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonCheckbox,
@@ -30,7 +32,9 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
 @Component({
   selector: 'app-settings',
   imports: [
+    RouterLink,
     IonBackButton,
+    IonBadge,
     IonButton,
     IonButtons,
     IonCheckbox,
@@ -143,7 +147,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 ><ion-icon slot="start" name="sync-outline"></ion-icon
                 ><ion-label
                   ><h2>Sync Contacts Now</h2>
-                  <p>Review changes before applying</p></ion-label
+                  <p>Update linked names, photos, dates, and contact status</p></ion-label
                 ></ion-item
               >
               @for (ignore of store.ignores(); track ignore.id) {
@@ -213,13 +217,22 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
         <section>
           <p class="settings-kicker">Your data</p>
           <ion-list inset="true"
+            ><ion-item button="true" detail="true" routerLink="/trash"
+              ><ion-icon slot="start" name="trash-outline"></ion-icon
+              ><ion-label
+                ><h2>Trash</h2>
+                <p>Deleted items are kept for 30 days</p></ion-label
+              >
+              @if (store.trashCount()) {
+                <ion-badge slot="end" color="danger">{{ store.trashCount() }}</ion-badge>
+              }</ion-item
             ><ion-item button="true" detail="true" (click)="createBackup()"
               ><ion-icon slot="start" name="cloud-download-outline"></ion-icon
               ><ion-label
                 ><h2>Create encrypted backup</h2>
                 <p>People, pictures, occasions and settings</p></ion-label
               ></ion-item
-            ><ion-item button="true" detail="true" (click)="restoreInput.click()"
+            ><ion-item button="true" detail="true" (click)="chooseRestore(restoreInput)"
               ><ion-icon slot="start" name="cloud-upload-outline"></ion-icon
               ><ion-label
                 ><h2>Restore backup</h2>
@@ -280,20 +293,24 @@ export class SettingsPage {
     const alert = await this.alerts.create({
       header: 'Sync Contacts',
       message:
-        'Contact access is used only to find birthdays and anniversaries. Contacts stay on this device and are never uploaded. Open the People page afterward to review changes.',
+        'Contact access is used only to update linked names, photos, birthdays, anniversaries, and contact status. Changes are stored on this device and are never uploaded.',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
           text: 'Allow Contact Access',
           handler: () => {
-            void this.contacts
-              .scanContacts()
-              .then(() => this.toast(`${this.contacts.candidates().length} changes ready to review`));
+            void this.syncAndApplyContacts();
           },
         },
       ],
     });
     await alert.present();
+  }
+  private async syncAndApplyContacts(): Promise<void> {
+    const candidates = await this.contacts.scanContacts();
+    const changes = candidates.length + this.contacts.availabilityChanges();
+    await this.contacts.apply(candidates);
+    await this.toast(changes ? `${changes} contact changes synced` : 'Contacts are up to date');
   }
   async configurePin(changing = false): Promise<void> {
     const inputs = [
@@ -422,9 +439,26 @@ export class SettingsPage {
     }
   }
   async restoreBackup(event: Event): Promise<void> {
-    const file = (event.target as HTMLInputElement).files?.[0];
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
     if (!file) return;
     const contents = await file.text();
+    input.value = '';
+    await this.requestBackupPassword(contents);
+  }
+  async chooseRestore(input: HTMLInputElement): Promise<void> {
+    if (Capacitor.getPlatform() !== 'android') {
+      input.click();
+      return;
+    }
+    try {
+      const contents = await this.backup.pickBackup();
+      if (contents) await this.requestBackupPassword(contents);
+    } catch (error: unknown) {
+      await this.toast(error instanceof Error ? error.message : 'Backup could not be opened');
+    }
+  }
+  private async requestBackupPassword(contents: string): Promise<void> {
     const passwordAlert = await this.alerts.create({
       header: 'Unlock backup',
       inputs: [{ name: 'password', type: 'password', placeholder: 'Backup password' }],

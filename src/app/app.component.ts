@@ -1,9 +1,13 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, OnDestroy, effect, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { App } from '@capacitor/app';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
+import { ActionPerformed, LocalNotifications } from '@capacitor/local-notifications';
 import { IonApp, IonRouterOutlet } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   add,
+  alertCircleOutline,
   archiveOutline,
   calendarClearOutline,
   calendarOutline,
@@ -20,8 +24,10 @@ import {
   keyOutline,
   lockClosedOutline,
   notificationsOutline,
+  personOutline,
   peopleOutline,
   removeCircleOutline,
+  refreshOutline,
   settingsOutline,
   shieldCheckmarkOutline,
   syncOutline,
@@ -40,17 +46,25 @@ import { LockScreenComponent } from './shared/components/lock-screen/lock-screen
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet, LockScreenComponent],
 })
-export class AppComponent {
+export class AppComponent implements OnDestroy {
   readonly store = inject(BirthdayStoreService);
   readonly security = inject(PinService);
   private readonly scheduler = inject(ReminderSchedulerService);
   private readonly contacts = inject(ContactSyncService);
+  private readonly router = inject(Router);
   private readonly darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
   private backgroundedAt?: number;
+  private appStateListener?: PluginListenerHandle;
+  private notificationActionListener?: PluginListenerHandle;
+  private readonly darkModeChanged = (): void => {
+    if (this.store.settings().theme === 'SYSTEM')
+      document.documentElement.classList.toggle('ion-palette-dark', this.darkMedia.matches);
+  };
 
   constructor() {
     addIcons({
       add,
+      alertCircleOutline,
       archiveOutline,
       calendarClearOutline,
       calendarOutline,
@@ -67,8 +81,10 @@ export class AppComponent {
       keyOutline,
       lockClosedOutline,
       notificationsOutline,
+      personOutline,
       peopleOutline,
       removeCircleOutline,
+      refreshOutline,
       settingsOutline,
       shieldCheckmarkOutline,
       syncOutline,
@@ -85,18 +101,21 @@ export class AppComponent {
       );
       document.documentElement.classList.toggle('force-light', theme === 'LIGHT');
     });
-    this.darkMedia.addEventListener('change', () => {
-      if (this.store.settings().theme === 'SYSTEM')
-        document.documentElement.classList.toggle('ion-palette-dark', this.darkMedia.matches);
-    });
+    this.darkMedia.addEventListener('change', this.darkModeChanged);
   }
 
   private async initialize(): Promise<void> {
     await this.store.initialize();
     await this.security.initialize();
+    if (Capacitor.isNativePlatform()) {
+      this.notificationActionListener = await LocalNotifications.addListener(
+        'localNotificationActionPerformed',
+        action => void this.openNotification(action),
+      );
+    }
     await this.scheduler.reconcileAll(false);
     await this.contacts.automaticScanIfDue();
-    await App.addListener('appStateChange', ({ isActive }) => {
+    this.appStateListener = await App.addListener('appStateChange', ({ isActive }) => {
       if (!isActive) {
         this.backgroundedAt = Date.now();
         if (this.store.settings().lockOnBackground && this.store.settings().autoLockMinutes === 0) this.security.lock();
@@ -112,5 +131,33 @@ export class AppComponent {
         this.security.lock();
       void this.scheduler.reconcileAll(false);
     });
+  }
+
+  ngOnDestroy(): void {
+    this.darkMedia.removeEventListener('change', this.darkModeChanged);
+    void this.appStateListener?.remove();
+    void this.notificationActionListener?.remove();
+  }
+
+  private async openNotification(action: ActionPerformed): Promise<void> {
+    const extra: unknown = action.notification.extra;
+    if (!extra || typeof extra !== 'object') {
+      await this.router.navigate(['/tabs/upcoming']);
+      return;
+    }
+    const personId = Reflect.get(extra, 'personId');
+    const occasionId = Reflect.get(extra, 'occasionId');
+    if (typeof personId === 'string' && this.store.person(personId)) {
+      await this.router.navigate(['/person', personId]);
+      return;
+    }
+    if (typeof occasionId === 'string') {
+      const occasion = this.store.occasion(occasionId);
+      if (occasion && this.store.person(occasion.personId)) {
+        await this.router.navigate(['/person', occasion.personId]);
+        return;
+      }
+    }
+    await this.router.navigate(['/tabs/upcoming']);
   }
 }

@@ -19,3 +19,10 @@
   color: var(--ion-color-primary);
   font-size: 1.25rem;
 }
+ion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+  font-weight: 600;
+}
