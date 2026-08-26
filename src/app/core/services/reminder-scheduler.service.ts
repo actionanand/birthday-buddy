@@ -9,15 +9,28 @@ import { RepositoryProviderService } from './repository-provider.service';
 
 @Service()
 export class ReminderSchedulerService {
+  private readonly channelId = 'occasion-reminders';
   private readonly store = inject(BirthdayStoreService);
   private readonly dates = inject(OccasionDateService);
   private readonly repositories = inject(RepositoryProviderService);
 
   async reconcileAll(requestPermission = false): Promise<'scheduled' | 'denied' | 'web'> {
     if (!Capacitor.isNativePlatform()) return 'web';
+    await this.ensureAndroidChannel();
     const active = this.store
       .enabledOccasions()
       .filter(occasion => this.store.remindersFor(occasion.id).some(reminder => reminder.enabled));
+    const activeIds = new Set(active.map(occasion => occasion.id));
+    const staleSchedules = (await this.repositories.notificationSchedules.list()).filter(
+      schedule => !activeIds.has(schedule.occasionId),
+    );
+    if (staleSchedules.length) {
+      await LocalNotifications.cancel({
+        notifications: staleSchedules.map(schedule => ({ id: schedule.notificationId })),
+      });
+      for (const occasionId of new Set(staleSchedules.map(schedule => schedule.occasionId)))
+        await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
+    }
     if (active.length === 0) return 'scheduled';
     const permission = requestPermission
       ? await LocalNotifications.requestPermissions()
@@ -29,6 +42,7 @@ export class ReminderSchedulerService {
 
   async rescheduleOccasion(occasionId: string, requestPermission = true): Promise<'scheduled' | 'denied' | 'web'> {
     if (!Capacitor.isNativePlatform()) return 'web';
+    await this.ensureAndroidChannel();
     const occasion = this.store.occasion(occasionId);
     const person = occasion ? this.store.person(occasion.personId) : undefined;
     if (!occasion || !person) return 'scheduled';
@@ -51,22 +65,37 @@ export class ReminderSchedulerService {
     for (const reminder of reminders) {
       const scheduledAt = this.subtractOffset(occurrence, reminder);
       scheduledAt.setHours(reminder.hour, reminder.minute, 0, 0);
-      if (scheduledAt.getTime() <= Date.now()) continue;
+      const nextFire = this.nextAnnualFire(scheduledAt);
       const notificationId = stableNotificationId(reminder.id);
       const message = this.notificationText(person, occasion, reminder, this.store.settings().notificationPrivacy);
       notifications.push({
         id: notificationId,
         title: message.title,
         body: message.body,
-        schedule: { at: scheduledAt, allowWhileIdle: true },
-        extra: { occasionId },
+        smallIcon: 'ic_stat_birthday_buddy',
+        iconColor: '#397153',
+        channelId: Capacitor.getPlatform() === 'android' ? this.channelId : undefined,
+        autoCancel: true,
+        foreground: true,
+        isExactNotification: false,
+        schedule: {
+          on: {
+            month: scheduledAt.getMonth() + 1,
+            day: scheduledAt.getDate(),
+            hour: reminder.hour,
+            minute: reminder.minute,
+            second: 0,
+          },
+          allowWhileIdle: true,
+        },
+        extra: { occasionId, personId: person.id },
       });
       schedules.push({
         id: createId(),
         occasionId,
         reminderId: reminder.id,
         notificationId,
-        scheduledAt: scheduledAt.toISOString(),
+        scheduledAt: nextFire.toISOString(),
         createdAt: new Date().toISOString(),
       });
     }
@@ -94,6 +123,36 @@ export class ReminderSchedulerService {
       result.setDate(Math.min(day, new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate()));
     }
     return result;
+  }
+
+  private async ensureAndroidChannel(): Promise<void> {
+    if (Capacitor.getPlatform() !== 'android') return;
+    await LocalNotifications.createChannel({
+      id: this.channelId,
+      name: 'Occasion reminders',
+      description: 'Birthday, anniversary, and occasion reminders',
+      importance: 3,
+      visibility: 0,
+      lights: true,
+      lightColor: '#397153',
+      vibration: true,
+    });
+  }
+
+  private nextAnnualFire(scheduledAt: Date): Date {
+    const next = new Date(scheduledAt);
+    while (next.getTime() <= Date.now()) {
+      const month = next.getMonth();
+      const day = next.getDate();
+      let year = next.getFullYear() + 1;
+      let candidate = new Date(year, month, day, next.getHours(), next.getMinutes(), 0, 0);
+      while (candidate.getMonth() !== month || candidate.getDate() !== day) {
+        year += 1;
+        candidate = new Date(year, month, day, next.getHours(), next.getMinutes(), 0, 0);
+      }
+      next.setTime(candidate.getTime());
+    }
+    return next;
   }
 
   private notificationText(

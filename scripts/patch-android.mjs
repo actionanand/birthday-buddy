@@ -12,16 +12,23 @@ if (!existsSync(androidRoot)) {
 
 const packagePath = path.join(androidRoot, 'app', 'src', 'main', 'java', 'com', 'actionanand', 'birthdaybuddy', 'app');
 const resPath = path.join(androidRoot, 'app', 'src', 'main', 'res');
+const stylesPath = path.join(resPath, 'values', 'styles.xml');
+const nightStylesPath = path.join(resPath, 'values-night', 'styles.xml');
+const xmlPath = path.join(resPath, 'xml');
 await mkdir(packagePath, { recursive: true });
 await mkdir(path.join(resPath, 'drawable'), { recursive: true });
 await mkdir(path.join(resPath, 'drawable-nodpi'), { recursive: true });
 await mkdir(path.join(resPath, 'values-night'), { recursive: true });
+await mkdir(xmlPath, { recursive: true });
 
 const manifestPath = path.join(androidRoot, 'app', 'src', 'main', 'AndroidManifest.xml');
 let manifest = await readFile(manifestPath, 'utf8');
+if (!manifest.includes('xmlns:tools='))
+  manifest = manifest.replace(/<manifest([^>]*)>/, '<manifest$1 xmlns:tools="http://schemas.android.com/tools">');
 const permissions = [
   'android.permission.READ_CONTACTS',
   'android.permission.CAMERA',
+  'android.permission.USE_BIOMETRIC',
   'android.permission.POST_NOTIFICATIONS',
   'android.permission.RECEIVE_BOOT_COMPLETED',
 ]
@@ -29,9 +36,25 @@ const permissions = [
   .map(permission => `    <uses-permission android:name="${permission}" />`)
   .join('\n');
 if (permissions) manifest = manifest.replace('<application', `${permissions}\n\n    <application`);
-manifest = manifest.replace(/android:allowBackup="[^"]*"/, 'android:allowBackup="false"');
+if (!manifest.includes('SCHEDULE_EXACT_ALARM" tools:node="remove"'))
+  manifest = manifest.replace(
+    '<application',
+    '    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" tools:node="remove" />\n\n    <application',
+  );
+manifest = manifest
+  .replace(/android:allowBackup="[^"]*"/g, 'android:allowBackup="false"')
+  .replace(/android:fullBackupContent="[^"]*"/g, 'android:fullBackupContent="false"');
 if (!manifest.includes('android:usesCleartextTraffic='))
   manifest = manifest.replace('<application', '<application android:usesCleartextTraffic="false"');
+const notificationRestoreReceiver = `        <receiver android:name=".BirthdayBuddyNotificationRestoreReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>`;
+if (!manifest.includes('BirthdayBuddyNotificationRestoreReceiver'))
+  manifest = manifest.replace('</application>', `${notificationRestoreReceiver}\n    </application>`);
 await writeFile(manifestPath, manifest, 'utf8');
 
 const gradlePath = path.join(androidRoot, 'app', 'build.gradle');
@@ -41,8 +64,19 @@ if (!gradle.includes('androidx.biometric:biometric'))
     /dependencies\s*\{/,
     'dependencies {\n    implementation "androidx.biometric:biometric:1.1.0"',
   );
-gradle = gradle.replace(/minifyEnabled\s+false/, 'minifyEnabled true\n            shrinkResources true');
+gradle = gradle
+  .replace(/minifyEnabled\s+false/, 'minifyEnabled true')
+  .replace(
+    /getDefaultProguardFile\(['"]proguard-android\.txt['"]\)/g,
+    "getDefaultProguardFile('proguard-android-optimize.txt')",
+  );
+if (!gradle.includes('shrinkResources true'))
+  gradle = gradle.replace(/minifyEnabled\s+true/, 'minifyEnabled true\n            shrinkResources true');
 await writeFile(gradlePath, gradle, 'utf8');
+if (!/minifyEnabled\s+true/.test(gradle) || !gradle.includes('shrinkResources true'))
+  throw new Error(`Could not enable R8 release optimization in ${gradlePath}.`);
+if (!/getDefaultProguardFile\(['"]proguard-android-optimize\.txt['"]\)/.test(gradle))
+  throw new Error(`The optimized default ProGuard configuration is missing from ${gradlePath}.`);
 
 await writeFile(
   path.join(packagePath, 'MainActivity.java'),
@@ -55,8 +89,99 @@ public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(BirthdayBuddyContactsPlugin.class);
+    registerPlugin(BirthdayBuddyFilesPlugin.class);
     registerPlugin(BirthdayBuddySecurityPlugin.class);
     super.onCreate(savedInstanceState);
+  }
+}
+`,
+  'utf8',
+);
+
+await writeFile(
+  path.join(packagePath, 'BirthdayBuddyFilesPlugin.java'),
+  `package com.actionanand.birthdaybuddy.app;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.ActivityCallback;
+import com.getcapacitor.annotation.CapacitorPlugin;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+
+@CapacitorPlugin(name = "BirthdayBuddyFiles")
+public class BirthdayBuddyFilesPlugin extends Plugin {
+  @PluginMethod
+  public void exportFile(PluginCall call) {
+    String filename = call.getString("filename");
+    String mimeType = call.getString("mimeType", "application/octet-stream");
+    if (filename == null || call.getString("contents") == null) { call.reject("Filename and contents are required."); return; }
+    Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType(mimeType);
+    intent.putExtra(Intent.EXTRA_TITLE, filename);
+    startActivityForResult(call, intent, "fileCreated");
+  }
+
+  @ActivityCallback
+  private void fileCreated(PluginCall call, androidx.activity.result.ActivityResult result) {
+    if (call == null) return;
+    JSObject response = new JSObject();
+    if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) {
+      response.put("saved", false); call.resolve(response); return;
+    }
+    try (OutputStream output = getContext().getContentResolver().openOutputStream(result.getData().getData())) {
+      if (output == null) throw new IllegalStateException("The selected file could not be opened.");
+      output.write(call.getString("contents", "").getBytes(StandardCharsets.UTF_8));
+      response.put("saved", true); call.resolve(response);
+    } catch (Exception error) { call.reject("The backup could not be saved.", error); }
+  }
+
+  @PluginMethod
+  public void pickFile(PluginCall call) {
+    Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType(call.getString("mimeType", "application/octet-stream"));
+    startActivityForResult(call, intent, "filePicked");
+  }
+
+  @ActivityCallback
+  private void filePicked(PluginCall call, androidx.activity.result.ActivityResult result) {
+    if (call == null) return;
+    if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) { call.resolve(); return; }
+    Uri uri = result.getData().getData();
+    try (InputStream input = getContext().getContentResolver().openInputStream(uri); ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+      if (input == null) throw new IllegalStateException("The selected file could not be opened.");
+      byte[] buffer = new byte[8192]; int count;
+      while ((count = input.read(buffer)) > 0) output.write(buffer, 0, count);
+      JSObject response = new JSObject(); response.put("contents", output.toString(StandardCharsets.UTF_8.name())); call.resolve(response);
+    } catch (Exception error) { call.reject("The backup could not be opened.", error); }
+  }
+}
+`,
+  'utf8',
+);
+
+await writeFile(
+  path.join(packagePath, 'BirthdayBuddyNotificationRestoreReceiver.java'),
+  `package com.actionanand.birthdaybuddy.app;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver;
+
+public class BirthdayBuddyNotificationRestoreReceiver extends BroadcastReceiver {
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    new LocalNotificationRestoreReceiver().onReceive(context, intent);
   }
 }
 `,
@@ -86,8 +211,8 @@ import com.getcapacitor.annotation.Permission;
 import com.getcapacitor.annotation.PermissionCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 @CapacitorPlugin(name = "BirthdayBuddyContacts", permissions = { @Permission(alias = "contacts", strings = { Manifest.permission.READ_CONTACTS }) })
 public class BirthdayBuddyContactsPlugin extends Plugin {
@@ -126,9 +251,13 @@ public class BirthdayBuddyContactsPlugin extends Plugin {
   private void readAll(PluginCall call) {
     try {
       JSArray contacts = new JSArray();
+      JSArray lookupKeys = new JSArray();
+      Set<String> linkedLookupKeys = new HashSet<>();
+      JSArray linkedValues = call.getArray("linkedLookupKeys");
+      if (linkedValues != null) for (int index = 0; index < linkedValues.length(); index++) linkedLookupKeys.add(linkedValues.optString(index));
       Cursor cursor = getContext().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.LOOKUP_KEY, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.PHOTO_THUMBNAIL_URI }, null, null, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " COLLATE NOCASE");
-      if (cursor != null) { while (cursor.moveToNext()) { JSObject contact = contact(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3)); if (((JSArray) contact.get("events")).length() > 0) contacts.put(contact); } cursor.close(); }
-      JSObject response = new JSObject(); response.put("contacts", contacts); call.resolve(response);
+      if (cursor != null) { while (cursor.moveToNext()) { String lookupKey = cursor.getString(1); lookupKeys.put(lookupKey); JSObject contact = contact(cursor.getString(0), lookupKey, cursor.getString(2), cursor.getString(3)); if (((JSArray) contact.get("events")).length() > 0 || linkedLookupKeys.contains(lookupKey)) contacts.put(contact); } cursor.close(); }
+      JSObject response = new JSObject(); response.put("contacts", contacts); response.put("lookupKeys", lookupKeys); call.resolve(response);
     } catch (Exception error) { call.reject("Contacts could not be scanned.", error); }
   }
 
@@ -146,8 +275,8 @@ public class BirthdayBuddyContactsPlugin extends Plugin {
   private JSArray readEvents(String contactId, String lookupKey) {
     JSArray events = new JSArray();
     String selection = ContactsContract.Data.CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "=?";
-    Cursor cursor = getContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.CommonDataKinds.Event.START_DATE, ContactsContract.CommonDataKinds.Event.TYPE }, selection, new String[] { contactId, ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE }, null);
-    if (cursor != null) { while (cursor.moveToNext()) { String raw = cursor.getString(0); int type = cursor.getInt(1); String label = type == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY ? "BIRTHDAY" : type == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY ? "WEDDING_ANNIVERSARY" : null; int[] date = parseDate(raw); if (label != null && date != null) { JSObject event = new JSObject(); event.put("reference", lookupKey + ":" + type + ":" + raw); event.put("type", label); event.put("month", date[1]); event.put("day", date[2]); if (date[0] > 0) event.put("year", date[0]); events.put(event); } } cursor.close(); }
+    Cursor cursor = getContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.Data._ID, ContactsContract.CommonDataKinds.Event.START_DATE, ContactsContract.CommonDataKinds.Event.TYPE }, selection, new String[] { contactId, ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE }, null);
+    if (cursor != null) { while (cursor.moveToNext()) { String dataId = cursor.getString(0); String raw = cursor.getString(1); int type = cursor.getInt(2); String label = type == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY ? "BIRTHDAY" : type == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY ? "WEDDING_ANNIVERSARY" : null; int[] date = parseDate(raw); if (label != null && date != null) { JSObject event = new JSObject(); event.put("reference", lookupKey + ":event:" + dataId); event.put("type", label); event.put("month", date[1]); event.put("day", date[2]); if (date[0] > 0) event.put("year", date[0]); events.put(event); } } cursor.close(); }
     return events;
   }
 
@@ -226,8 +355,69 @@ await copyFile(
   path.join(resPath, 'drawable-nodpi', 'birthday_buddy_splash_logo.png'),
 );
 await writeFile(
-  path.join(resPath, 'values-night', 'styles.xml'),
-  `<?xml version="1.0" encoding="utf-8"?><resources><style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#397153</item><item name="android:windowBackground">#121c17</item></style><style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar"><item name="windowActionModeOverlay">true</item><item name="android:windowNoTitle">true</item><item name="android:windowBackground">#121c17</item></style><style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen"><item name="android:background">#121c17</item></style></resources>`,
+  path.join(resPath, 'drawable', 'birthday_buddy_splash_icon.xml'),
+  `<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="168dp"
+        android:height="168dp"
+        android:gravity="center"
+        android:drawable="@drawable/birthday_buddy_splash_logo" />
+</layer-list>
+`,
   'utf8',
 );
-console.log('Applied Birthday Buddy Android contacts, Keystore security, notification, privacy and release patches.');
+await writeFile(
+  path.join(xmlPath, 'data_extraction_rules.xml'),
+  `<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+  <cloud-backup><exclude domain="root" path="." /></cloud-backup>
+  <device-transfer><exclude domain="root" path="." /></device-transfer>
+</data-extraction-rules>
+`,
+  'utf8',
+);
+await writeFile(
+  path.join(xmlPath, 'backup_rules.xml'),
+  `<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content><exclude domain="root" path="." /></full-backup-content>
+`,
+  'utf8',
+);
+
+const ensureThemes = async (filePath, dark) => {
+  await mkdir(path.dirname(filePath), { recursive: true });
+  let styles = existsSync(filePath)
+    ? await readFile(filePath, 'utf8')
+    : '<?xml version="1.0" encoding="utf-8"?>\n<resources>\n</resources>\n';
+  const background = dark ? '#121C17' : '#F6F3EC';
+  const body = `    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">${background}</item>
+        <item name="android:statusBarColor">${background}</item>
+        <item name="android:navigationBarColor">${background}</item>
+        <item name="android:windowLightStatusBar">${dark ? 'false' : 'true'}</item>
+        <item name="android:windowLightNavigationBar">${dark ? 'false' : 'true'}</item>
+    </style>
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#F6F3EC</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/birthday_buddy_splash_icon</item>
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <item name="android:statusBarColor">#F6F3EC</item>
+        <item name="android:navigationBarColor">#F6F3EC</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+    </style>`;
+  styles = styles.replace(/\s*<style name="AppTheme\.NoActionBar"[\s\S]*?<\/style>/g, '');
+  styles = styles.replace(/\s*<style name="AppTheme\.NoActionBarLaunch"[\s\S]*?<\/style>/g, '');
+  styles = styles.replace('</resources>', `${body}\n</resources>`);
+  await writeFile(filePath, styles, 'utf8');
+};
+await ensureThemes(stylesPath, false);
+await ensureThemes(nightStylesPath, true);
+
+console.log(
+  'Applied Birthday Buddy Android contacts, document backup, Keystore security, recurring notification, 168dp splash, privacy, system-bar and release patches.',
+);

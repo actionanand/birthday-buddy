@@ -66,7 +66,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
       ></ion-header
     ><ion-content
       ><main class="form-shell">
-        @if (!store.people().length) {
+        @if (!store.activePeople().length) {
           <section class="callout">
             <h2>Add someone first</h2>
             <p>An occasion belongs to a person. Create a person, then return here.</p>
@@ -81,7 +81,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 interface="action-sheet"
                 [formControl]="form.controls.personId"
                 required>
-                @for (person of store.people(); track person.id) {
+                @for (person of store.activePeople(); track person.id) {
                   <ion-select-option [value]="person.id">{{ person.name }}</ion-select-option>
                 }
               </ion-select></ion-item
@@ -390,11 +390,11 @@ export class OccasionEditorPage {
     const label = occasion.customTypeName || OCCASION_LABELS[occasion.type];
     const alert = await this.alerts.create({
       header: `Delete ${label}?`,
-      message: 'This removes the occasion and its reminders from this app.',
+      message: 'This occasion will move to Trash for 30 days. Its reminders will stop until it is restored.',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
-          text: 'Delete',
+          text: 'Move to Trash',
           role: 'destructive',
           handler: () => {
             void this.remove(occasion.id, occasion.personId);

@@ -45,6 +45,10 @@ export const routes: Routes = [
     path: 'settings',
     loadComponent: () => import('./features/settings/settings.page').then(module => module.SettingsPage),
   },
+  {
+    path: 'trash',
+    loadComponent: () => import('./features/trash/trash.page').then(module => module.TrashPage),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'tabs/home' },
   { path: '**', redirectTo: 'tabs/home' },
 ];

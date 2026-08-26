@@ -7,7 +7,10 @@ import { ReminderSchedulerService } from './reminder-scheduler.service';
 
 interface NativeContactsPlugin {
   pickContact(): Promise<{ contact?: AndroidContactSummary }>;
-  readContacts(): Promise<{ contacts: AndroidContactSummary[] }>;
+  readContacts(options: { linkedLookupKeys: string[] }): Promise<{
+    contacts: AndroidContactSummary[];
+    lookupKeys?: string[];
+  }>;
   permissionStatus(): Promise<{ granted: boolean }>;
 }
 
@@ -19,6 +22,7 @@ export class ContactSyncService {
   private readonly scheduler = inject(ReminderSchedulerService);
   readonly candidates = signal<ContactSyncCandidate[]>([]);
   readonly syncing = signal(false);
+  readonly availabilityChanges = signal(0);
 
   get available(): boolean {
     return Capacitor.getPlatform() === 'android';
@@ -27,6 +31,7 @@ export class ContactSyncService {
   async pickContact(): Promise<ContactSyncCandidate[]> {
     if (!this.available) return [];
     const result = await NativeContacts.pickContact();
+    this.availabilityChanges.set(0);
     const candidates = result.contact ? this.compare([result.contact]) : [];
     this.candidates.set(candidates);
     return candidates;
@@ -36,7 +41,13 @@ export class ContactSyncService {
     if (!this.available) return [];
     this.syncing.set(true);
     try {
-      const result = await NativeContacts.readContacts();
+      const linkedLookupKeys = this.store
+        .activePeople()
+        .flatMap(person => (person.androidContactLookupKey ? [person.androidContactLookupKey] : []));
+      const result = await NativeContacts.readContacts({ linkedLookupKeys });
+      this.availabilityChanges.set(
+        await this.syncAvailability(result.lookupKeys ?? result.contacts.map(contact => contact.lookupKey)),
+      );
       const candidates = this.compare(result.contacts);
       this.candidates.set(candidates);
       await this.store.updateSettings({ ...this.store.settings(), lastContactSyncAt: new Date().toISOString() });
@@ -54,15 +65,19 @@ export class ContactSyncService {
       if (elapsed < 86_400_000) return;
     }
     const permission = await NativeContacts.permissionStatus();
-    if (permission.granted) await this.scanContacts();
+    if (permission.granted) {
+      const candidates = await this.scanContacts();
+      await this.apply(candidates, false);
+    }
   }
 
-  async apply(candidates = this.candidates()): Promise<void> {
-    for (const candidate of candidates.filter(item => item.selected)) {
+  async apply(candidates = this.candidates(), requestNotificationPermission = true): Promise<void> {
+    const selectedCandidates = candidates.filter(item => item.selected);
+    for (const candidate of selectedCandidates) {
       const contact = candidate.contact;
       let person = candidate.personId ? this.store.person(candidate.personId) : undefined;
       if (candidate.kind === 'NEW_PERSON') {
-        person = this.store.people().find(item => item.androidContactLookupKey === contact.lookupKey);
+        person = this.store.activePeople().find(item => item.androidContactLookupKey === contact.lookupKey);
         person ??= await this.store.savePerson({
           name: contact.displayName,
           favorite: false,
@@ -105,6 +120,7 @@ export class ContactSyncService {
               day: candidate.event.day,
               month: candidate.event.month,
               year: candidate.event.year,
+              androidEventReference: candidate.event.reference,
               userModified: false,
             },
             reminders,
@@ -113,8 +129,23 @@ export class ContactSyncService {
           );
         }
       }
+      if (candidate.kind === 'EVENT_LINK_CHANGE' && candidate.occasionId && candidate.event) {
+        const occasion = this.store.occasion(candidate.occasionId);
+        if (occasion) {
+          const reminders = this.store
+            .remindersFor(occasion.id)
+            .map(reminder => ({ unit: reminder.offsetUnit, value: reminder.offsetValue }));
+          const first = this.store.remindersFor(occasion.id)[0];
+          await this.store.saveOccasion(
+            { ...occasion, androidEventReference: candidate.event.reference },
+            reminders,
+            first?.hour ?? 8,
+            first?.minute ?? 0,
+          );
+        }
+      }
     }
-    await this.scheduler.reconcileAll(true);
+    if (selectedCandidates.length) await this.scheduler.reconcileAll(requestNotificationPermission);
     this.candidates.set([]);
   }
 
@@ -126,30 +157,45 @@ export class ContactSyncService {
         ignores.some(ignore => ignore.ignoreType === 'CONTACT' && ignore.androidContactLookupKey === contact.lookupKey)
       )
         continue;
-      const person = this.store.people().find(item => item.androidContactLookupKey === contact.lookupKey);
+      const person = this.store.activePeople().find(item => item.androidContactLookupKey === contact.lookupKey);
       if (!person) {
         for (const event of contact.events)
           result.push(this.candidate('NEW_PERSON', contact, undefined, undefined, event));
         continue;
       }
       if (person.name !== contact.displayName) result.push(this.candidate('NAME_CHANGE', contact, person.id));
-      if (contact.photoData && person.photoPath !== contact.photoData)
+      if (
+        !person.photoUserModified &&
+        person.photoPath !== contact.photoData &&
+        (person.photoSource === 'ANDROID_CONTACT' || Boolean(contact.photoData))
+      )
         result.push(this.candidate('PHOTO_CHANGE', contact, person.id));
       for (const event of contact.events) {
         if (
           ignores.some(
             ignore =>
-              ignore.androidEventReference === event.reference && ignore.androidContactLookupKey === contact.lookupKey,
+              ignore.ignoreType === 'OCCASION' &&
+              ignore.androidContactLookupKey === contact.lookupKey &&
+              (ignore.androidEventReference === event.reference || ignore.eventType === event.type),
           )
         )
           continue;
-        const occasion = this.store
+        const importedOfType = this.store
           .occasionsFor(person.id)
-          .find(item => item.androidEventReference === event.reference);
+          .filter(item => item.source === 'ANDROID_CONTACT' && item.type === event.type);
+        const occasion =
+          importedOfType.find(item => item.androidEventReference === event.reference) ??
+          importedOfType.find(
+            item => item.day === event.day && item.month === event.month && item.year === event.year,
+          ) ??
+          (importedOfType.length === 1 && contact.events.filter(item => item.type === event.type).length === 1
+            ? importedOfType[0]
+            : undefined);
         if (!occasion) result.push(this.candidate('NEW_OCCASION', contact, person.id, undefined, event));
         else if (occasion.day !== event.day || occasion.month !== event.month || occasion.year !== event.year) {
           result.push(this.candidate('DATE_CONFLICT', contact, person.id, occasion.id, event));
-        }
+        } else if (occasion.androidEventReference !== event.reference)
+          result.push(this.candidate('EVENT_LINK_CHANGE', contact, person.id, occasion.id, event));
       }
     }
     return result;
@@ -169,8 +215,9 @@ export class ContactSyncService {
       personId,
       occasionId,
       event,
-      selected: kind === 'NEW_PERSON' || kind === 'NEW_OCCASION',
-      resolution: 'KEEP_APP',
+      selected: true,
+      resolution:
+        kind === 'NAME_CHANGE' || kind === 'PHOTO_CHANGE' || kind === 'DATE_CONFLICT' ? 'USE_CONTACT' : 'KEEP_APP',
     };
   }
 
@@ -192,5 +239,19 @@ export class ContactSyncService {
       settings.defaultReminderHour,
       settings.defaultReminderMinute,
     );
+  }
+
+  private async syncAvailability(lookupKeys: string[]): Promise<number> {
+    const availableLookupKeys = new Set(lookupKeys);
+    let changes = 0;
+    for (const person of this.store.activePeople()) {
+      if (!person.androidContactLookupKey || person.source === 'MANUAL') continue;
+      const available = availableLookupKeys.has(person.androidContactLookupKey);
+      const source = available ? 'ANDROID_CONTACT' : 'ANDROID_CONTACT_DELETED';
+      if (person.contactAvailable === available && person.source === source) continue;
+      await this.store.savePerson({ ...person, source, contactAvailable: available });
+      changes += 1;
+    }
+    return changes;
   }
 }
