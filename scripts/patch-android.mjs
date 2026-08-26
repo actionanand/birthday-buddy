@@ -15,6 +15,7 @@ const resPath = path.join(androidRoot, 'app', 'src', 'main', 'res');
 const stylesPath = path.join(resPath, 'values', 'styles.xml');
 const nightStylesPath = path.join(resPath, 'values-night', 'styles.xml');
 const xmlPath = path.join(resPath, 'xml');
+const proguardPath = path.join(androidRoot, 'app', 'proguard-rules.pro');
 await mkdir(packagePath, { recursive: true });
 await mkdir(path.join(resPath, 'drawable'), { recursive: true });
 await mkdir(path.join(resPath, 'drawable-nodpi'), { recursive: true });
@@ -77,6 +78,31 @@ if (!/minifyEnabled\s+true/.test(gradle) || !gradle.includes('shrinkResources tr
   throw new Error(`Could not enable R8 release optimization in ${gradlePath}.`);
 if (!/getDefaultProguardFile\(['"]proguard-android-optimize\.txt['"]\)/.test(gradle))
   throw new Error(`The optimized default ProGuard configuration is missing from ${gradlePath}.`);
+
+const tinkAnnotationComment = `
+
+# Google Tink references these JSR-305 and Error Prone annotations as build-time metadata. Android
+# does not ship the annotation classes, and Tink does not require them at runtime.
+`;
+const tinkAnnotationRules = [
+  '-dontwarn javax.annotation.Nullable',
+  '-dontwarn javax.annotation.concurrent.GuardedBy',
+  '-dontwarn com.google.errorprone.annotations.CanIgnoreReturnValue',
+  '-dontwarn com.google.errorprone.annotations.CheckReturnValue',
+  '-dontwarn com.google.errorprone.annotations.Immutable',
+  '-dontwarn com.google.errorprone.annotations.RestrictedApi',
+];
+let proguardRules = existsSync(proguardPath) ? await readFile(proguardPath, 'utf8') : '';
+if (!proguardRules.includes('# Google Tink references these JSR-305 and Error Prone annotations'))
+  proguardRules = `${proguardRules.trimEnd()}${tinkAnnotationComment}`;
+for (const annotationRule of tinkAnnotationRules) {
+  if (!proguardRules.includes(annotationRule)) proguardRules = `${proguardRules.trimEnd()}\n${annotationRule}\n`;
+}
+await writeFile(proguardPath, `${proguardRules.trimEnd()}\n`, 'utf8');
+for (const annotationRule of tinkAnnotationRules) {
+  if (!proguardRules.includes(annotationRule))
+    throw new Error(`Required R8 rule was not written to ${proguardPath}: ${annotationRule}`);
+}
 
 await writeFile(
   path.join(packagePath, 'MainActivity.java'),
