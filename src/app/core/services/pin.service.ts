@@ -15,7 +15,7 @@ interface SecureSecretsPlugin {
   enableBiometric(options: { secret: string }): Promise<void>;
   authenticateBiometric(): Promise<{ secret?: string }>;
   disableBiometric(): Promise<void>;
-  biometricStatus(): Promise<{ enabled: boolean }>;
+  biometricStatus(): Promise<{ enabled: boolean; available: boolean }>;
 }
 const SecureSecrets = registerPlugin<SecureSecretsPlugin>('BirthdayBuddySecurity');
 
@@ -25,14 +25,14 @@ export class PinService {
   readonly configured = signal(false);
   readonly unlocked = signal(true);
   readonly biometricEnabled = signal(false);
+  readonly biometricAvailable = signal(false);
   private readonly iterations = 210_000;
 
   async initialize(): Promise<void> {
     const record = await this.readRecord();
     this.configured.set(Boolean(record));
     this.unlocked.set(!record);
-    if (record && Capacitor.isNativePlatform())
-      this.biometricEnabled.set((await SecureSecrets.biometricStatus()).enabled);
+    if (record && Capacitor.isNativePlatform()) await this.refreshBiometricStatus();
   }
 
   async setPin(pin: string): Promise<void> {
@@ -40,9 +40,11 @@ export class PinService {
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const verifier = await this.hash(pin, salt, this.iterations);
     const record: PinRecord = { id: 'security-pin', salt: this.toBase64(salt), verifier, iterations: this.iterations };
+    if (Capacitor.isNativePlatform()) await SecureSecrets.disableBiometric();
     await this.writeRecord(record);
     this.configured.set(true);
     this.unlocked.set(true);
+    this.biometricEnabled.set(false);
   }
 
   async verify(pin: string): Promise<boolean> {
@@ -69,20 +71,49 @@ export class PinService {
   }
 
   async enableBiometric(pin: string): Promise<void> {
-    if (!Capacitor.isNativePlatform() || !(await this.verify(pin)))
-      throw new Error('Confirm the configured PIN first.');
+    if (!Capacitor.isNativePlatform()) throw new Error('Biometric unlock is only available in the Android app.');
+    if (!(await this.refreshBiometricStatus()))
+      throw new Error('No enrolled strong biometric is available on this device.');
+    if (!(await this.verify(pin))) throw new Error('The current PIN is incorrect.');
     await SecureSecrets.enableBiometric({ secret: pin });
-    this.biometricEnabled.set(true);
+    const status = await SecureSecrets.biometricStatus();
+    this.biometricAvailable.set(status.available);
+    this.biometricEnabled.set(status.enabled);
+    if (!status.enabled) throw new Error('Biometric unlock could not be saved. Please try again.');
   }
 
   async unlockWithBiometric(): Promise<boolean> {
-    const result = await SecureSecrets.authenticateBiometric();
-    return result.secret ? this.verify(result.secret) : false;
+    if (!Capacitor.isNativePlatform() || !this.biometricEnabled()) return false;
+    try {
+      const result = await SecureSecrets.authenticateBiometric();
+      return result.secret ? this.verify(result.secret) : false;
+    } catch {
+      await this.refreshBiometricStatus();
+      return false;
+    }
   }
 
   async disableBiometric(): Promise<void> {
     if (Capacitor.isNativePlatform()) await SecureSecrets.disableBiometric();
     this.biometricEnabled.set(false);
+  }
+
+  async refreshBiometricStatus(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) {
+      this.biometricAvailable.set(false);
+      this.biometricEnabled.set(false);
+      return false;
+    }
+    try {
+      const status = await SecureSecrets.biometricStatus();
+      this.biometricAvailable.set(status.available);
+      this.biometricEnabled.set(status.enabled);
+      return status.available;
+    } catch {
+      this.biometricAvailable.set(false);
+      this.biometricEnabled.set(false);
+      return false;
+    }
   }
 
   private async readRecord(): Promise<PinRecord | undefined> {
