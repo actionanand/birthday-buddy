@@ -14,6 +14,19 @@ export class ReminderSchedulerService {
   private readonly dates = inject(OccasionDateService);
   private readonly repositories = inject(RepositoryProviderService);
 
+  async notificationPermissionGranted(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) return true;
+    return (await LocalNotifications.checkPermissions()).display === 'granted';
+  }
+
+  async requestNotificationPermission(): Promise<boolean> {
+    if (!Capacitor.isNativePlatform()) return true;
+    await this.ensureAndroidChannel();
+    const granted = (await LocalNotifications.requestPermissions()).display === 'granted';
+    if (granted) await this.reconcileAll(false);
+    return granted;
+  }
+
   async reconcileAll(requestPermission = false): Promise<'scheduled' | 'denied' | 'web'> {
     if (!Capacitor.isNativePlatform()) return 'web';
     await this.ensureAndroidChannel();

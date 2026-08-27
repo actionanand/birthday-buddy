@@ -121,8 +121,8 @@ The final merged Android manifest uses these capabilities:
 
 - `INTERNET` loads the packaged Capacitor WebView through its local HTTPS origin; Birthday Buddy does not send personal records to a server.
 - `READ_CONTACTS` is requested at runtime only after **Sync Contacts**. The selective picker is used for choosing one contact.
-- `POST_NOTIFICATIONS` is requested only when an occasion with active reminders is saved.
-- Camera access is requested only after **Take Photo**.
+- `POST_NOTIFICATIONS` is introduced with an in-app explanation after the app is ready and unlocked, then requested through Android only if the user chooses **Allow notifications**. Choosing **Not now** defers the explanation until a later app launch; saving an enabled reminder can also request it.
+- Camera access is optional and requested only after **Take Photo** in the person editor. It lets the user capture a new profile picture for a person; Birthday Buddy does not access the camera in the background.
 - Android Photo Picker is used by the Capacitor Camera plugin for an existing image; broad media/storage permission is not requested.
 - `RECEIVE_BOOT_COMPLETED` lets Capacitor Local Notifications restore pending recurring reminders after reboot.
 - `WAKE_LOCK` lets the notification receiver finish delivery while the device is idle.
