@@ -457,21 +457,130 @@ public class BirthdayBuddySecurityPlugin extends Plugin {
   private static final String STORE = "birthday_buddy_secure";
   private static final String STORAGE_ALIAS = "birthday_buddy_storage_key";
   private static final String BIOMETRIC_ALIAS = "birthday_buddy_biometric_key";
+  private BiometricPrompt biometricPrompt;
   private SharedPreferences preferences() { return getContext().getSharedPreferences(STORE, android.content.Context.MODE_PRIVATE); }
 
-  @PluginMethod public void biometricStatus(PluginCall call) { JSObject result = new JSObject(); result.put("enabled", preferences().contains("biometric_secret") && preferences().contains("biometric_iv")); call.resolve(result); }
+  @PluginMethod public void biometricStatus(PluginCall call) {
+    try {
+      boolean available = biometricAvailable();
+      boolean configured = preferences().contains("biometric_secret") && preferences().contains("biometric_iv");
+      boolean keyPresent = hasKey(BIOMETRIC_ALIAS);
+      if (configured && !keyPresent) {
+        preferences().edit().remove("biometric_secret").remove("biometric_iv").commit();
+        configured = false;
+      }
+      JSObject result = new JSObject();
+      result.put("available", available);
+      result.put("enabled", configured && keyPresent);
+      call.resolve(result);
+    } catch (Exception error) { call.reject("Biometric status could not be checked.", error); }
+  }
 
   @PluginMethod public void set(PluginCall call) { try { String key = call.getString("key"); String value = call.getString("value"); if (key == null || value == null) { call.reject("Key and value are required."); return; } Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.ENCRYPT_MODE, storageKey()); byte[] encrypted = cipher.doFinal(value.getBytes(StandardCharsets.UTF_8)); preferences().edit().putString(key, Base64.encodeToString(encrypted, Base64.NO_WRAP)).putString(key + "_iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP)).apply(); call.resolve(); } catch (Exception error) { call.reject("Secret could not be stored.", error); } }
   @PluginMethod public void get(PluginCall call) { try { String key = call.getString("key"); String encrypted = preferences().getString(key, null); String iv = preferences().getString(key + "_iv", null); JSObject result = new JSObject(); if (encrypted != null && iv != null) { Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.DECRYPT_MODE, loadKey(STORAGE_ALIAS), new GCMParameterSpec(128, Base64.decode(iv, Base64.DEFAULT))); result.put("value", new String(cipher.doFinal(Base64.decode(encrypted, Base64.DEFAULT)), StandardCharsets.UTF_8)); } call.resolve(result); } catch (Exception error) { call.reject("Secret could not be read.", error); } }
   @PluginMethod public void remove(PluginCall call) { String key = call.getString("key"); if (key != null) preferences().edit().remove(key).remove(key + "_iv").apply(); call.resolve(); }
-  @PluginMethod public void enableBiometric(PluginCall call) { try { String secret = call.getString("secret"); if (secret == null) { call.reject("Secret is required."); return; } Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.ENCRYPT_MODE, biometricKey()); authenticate("Enable biometric unlock", cipher, call, () -> { try { byte[] encrypted = cipher.doFinal(secret.getBytes(StandardCharsets.UTF_8)); preferences().edit().putString("biometric_secret", Base64.encodeToString(encrypted, Base64.NO_WRAP)).putString("biometric_iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP)).apply(); call.resolve(); } catch (Exception error) { call.reject("Biometric secret could not be saved.", error); } }); } catch (Exception error) { call.reject("Biometric unlock is unavailable.", error); } }
-  @PluginMethod public void authenticateBiometric(PluginCall call) { try { String encrypted = preferences().getString("biometric_secret", null); String iv = preferences().getString("biometric_iv", null); if (encrypted == null || iv == null) { call.reject("Biometric unlock is not configured."); return; } Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding"); cipher.init(Cipher.DECRYPT_MODE, loadKey(BIOMETRIC_ALIAS), new GCMParameterSpec(128, Base64.decode(iv, Base64.DEFAULT))); authenticate("Unlock Birthday Buddy", cipher, call, () -> { try { JSObject result = new JSObject(); result.put("secret", new String(cipher.doFinal(Base64.decode(encrypted, Base64.DEFAULT)), StandardCharsets.UTF_8)); call.resolve(result); } catch (Exception error) { call.reject("Biometric secret could not be opened.", error); } }); } catch (Exception error) { call.reject("Biometric authentication failed.", error); } }
-  @PluginMethod public void disableBiometric(PluginCall call) { try { preferences().edit().remove("biometric_secret").remove("biometric_iv").apply(); KeyStore store = KeyStore.getInstance("AndroidKeyStore"); store.load(null); if (store.containsAlias(BIOMETRIC_ALIAS)) store.deleteEntry(BIOMETRIC_ALIAS); call.resolve(); } catch (Exception error) { call.reject("Biometric unlock could not be disabled.", error); } }
+  @PluginMethod public void enableBiometric(PluginCall call) {
+    String secret = call.getString("secret");
+    if (secret == null || secret.isEmpty()) { call.reject("Secret is required."); return; }
+    if (!biometricAvailable()) { call.reject("No enrolled strong biometric is available on this device."); return; }
+    try {
+      preferences().edit().remove("biometric_secret").remove("biometric_iv").commit();
+      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+      cipher.init(Cipher.ENCRYPT_MODE, biometricKey());
+      byte[] plaintext = secret.getBytes(StandardCharsets.UTF_8);
+      authenticate("Enable biometric unlock", cipher, call, () -> {
+        try {
+          byte[] encrypted = cipher.doFinal(plaintext);
+          boolean saved = preferences().edit()
+            .putString("biometric_secret", Base64.encodeToString(encrypted, Base64.NO_WRAP))
+            .putString("biometric_iv", Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
+            .commit();
+          java.util.Arrays.fill(plaintext, (byte) 0);
+          if (saved) call.resolve(); else call.reject("Biometric secret could not be saved.");
+        } catch (Exception error) {
+          java.util.Arrays.fill(plaintext, (byte) 0);
+          call.reject("Biometric secret could not be saved.", error);
+        }
+      }, () -> java.util.Arrays.fill(plaintext, (byte) 0));
+    } catch (Exception error) { call.reject("Biometric unlock is unavailable.", error); }
+  }
+  @PluginMethod public void authenticateBiometric(PluginCall call) {
+    try {
+      String encrypted = preferences().getString("biometric_secret", null);
+      String iv = preferences().getString("biometric_iv", null);
+      if (encrypted == null || iv == null) { call.reject("Biometric unlock is not configured."); return; }
+      if (!biometricAvailable()) { call.reject("No enrolled strong biometric is available on this device."); return; }
+      Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+      cipher.init(Cipher.DECRYPT_MODE, loadKey(BIOMETRIC_ALIAS), new GCMParameterSpec(128, Base64.decode(iv, Base64.DEFAULT)));
+      authenticate("Unlock Birthday Buddy", cipher, call, () -> {
+        try {
+          byte[] raw = cipher.doFinal(Base64.decode(encrypted, Base64.DEFAULT));
+          JSObject result = new JSObject();
+          result.put("secret", new String(raw, StandardCharsets.UTF_8));
+          java.util.Arrays.fill(raw, (byte) 0);
+          call.resolve(result);
+        } catch (Exception error) { call.reject("Biometric secret could not be opened.", error); }
+      }, () -> {});
+    } catch (Exception error) {
+      preferences().edit().remove("biometric_secret").remove("biometric_iv").commit();
+      call.reject("Biometric authentication failed. Enable biometric unlock again.", error);
+    }
+  }
+  @PluginMethod public void disableBiometric(PluginCall call) {
+    try {
+      preferences().edit().remove("biometric_secret").remove("biometric_iv").commit();
+      KeyStore store = KeyStore.getInstance("AndroidKeyStore");
+      store.load(null);
+      if (store.containsAlias(BIOMETRIC_ALIAS)) store.deleteEntry(BIOMETRIC_ALIAS);
+      call.resolve();
+    } catch (Exception error) { call.reject("Biometric unlock could not be disabled.", error); }
+  }
 
   private SecretKey storageKey() throws Exception { try { return loadKey(STORAGE_ALIAS); } catch (Exception ignored) { KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore"); generator.init(new KeyGenParameterSpec.Builder(STORAGE_ALIAS, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT).setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build()); return generator.generateKey(); } }
   private SecretKey biometricKey() throws Exception { KeyStore store = KeyStore.getInstance("AndroidKeyStore"); store.load(null); if (store.containsAlias(BIOMETRIC_ALIAS)) store.deleteEntry(BIOMETRIC_ALIAS); KeyGenerator generator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore"); KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder(BIOMETRIC_ALIAS, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT).setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).setUserAuthenticationRequired(true).setInvalidatedByBiometricEnrollment(true); if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) builder.setUserAuthenticationParameters(0, KeyProperties.AUTH_BIOMETRIC_STRONG); else builder.setUserAuthenticationValidityDurationSeconds(-1); generator.init(builder.build()); return generator.generateKey(); }
   private SecretKey loadKey(String alias) throws Exception { KeyStore store = KeyStore.getInstance("AndroidKeyStore"); store.load(null); SecretKey key = (SecretKey) store.getKey(alias, null); if (key == null) throw new IllegalStateException("Secure key is missing."); return key; }
-  private void authenticate(String title, Cipher cipher, PluginCall call, Runnable success) { FragmentActivity activity = (FragmentActivity) getActivity(); Executor executor = androidx.core.content.ContextCompat.getMainExecutor(getContext()); BiometricPrompt prompt = new BiometricPrompt(activity, executor, new BiometricPrompt.AuthenticationCallback() { @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) { success.run(); } @Override public void onAuthenticationError(int code, CharSequence message) { call.reject(message.toString()); } }); BiometricPrompt.PromptInfo info = new BiometricPrompt.PromptInfo.Builder().setTitle(title).setSubtitle("Confirm your identity on this device").setNegativeButtonText("Use PIN").setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG).build(); prompt.authenticate(info, new BiometricPrompt.CryptoObject(cipher)); }
+  private boolean biometricAvailable() { return BiometricManager.from(getContext()).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS; }
+  private boolean hasKey(String alias) throws Exception { KeyStore store = KeyStore.getInstance("AndroidKeyStore"); store.load(null); return store.containsAlias(alias); }
+  private void authenticate(String title, Cipher cipher, PluginCall call, Runnable success, Runnable failure) {
+    if (getActivity() == null) { failure.run(); call.reject("Biometric unlock is unavailable."); return; }
+    getActivity().runOnUiThread(() -> {
+      try {
+        if (!(getActivity() instanceof FragmentActivity)) { failure.run(); call.reject("Biometric unlock is unavailable."); return; }
+        FragmentActivity activity = (FragmentActivity) getActivity();
+        if (biometricPrompt != null) { failure.run(); call.reject("Biometric authentication is already in progress."); return; }
+        if (!activity.getLifecycle().getCurrentState().isAtLeast(androidx.lifecycle.Lifecycle.State.RESUMED)) {
+          failure.run();
+          call.reject("Birthday Buddy is not ready for biometric authentication. Please try again.");
+          return;
+        }
+        Executor executor = androidx.core.content.ContextCompat.getMainExecutor(getContext());
+        biometricPrompt = new BiometricPrompt(activity, executor, new BiometricPrompt.AuthenticationCallback() {
+          @Override public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+            super.onAuthenticationSucceeded(result);
+            biometricPrompt = null;
+            success.run();
+          }
+          @Override public void onAuthenticationError(int code, CharSequence message) {
+            super.onAuthenticationError(code, message);
+            biometricPrompt = null;
+            failure.run();
+            call.reject(message.toString());
+          }
+        });
+        BiometricPrompt.PromptInfo info = new BiometricPrompt.PromptInfo.Builder()
+          .setTitle(title)
+          .setSubtitle("Confirm your identity on this device")
+          .setNegativeButtonText("Use PIN")
+          .setAllowedAuthenticators(BiometricManager.Authenticators.BIOMETRIC_STRONG)
+          .build();
+        biometricPrompt.authenticate(info, new BiometricPrompt.CryptoObject(cipher));
+      } catch (Exception error) {
+        biometricPrompt = null;
+        failure.run();
+        call.reject("Biometric authentication could not start.", error);
+      }
+    });
+  }
 }
 `,
   'utf8',

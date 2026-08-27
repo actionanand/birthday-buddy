@@ -23,9 +23,9 @@ import { PinService } from '../../../core/services/pin.service';
         @if (error()) {
           <ion-note color="danger" role="alert">{{ error() }}</ion-note>
         }
-        <ion-button expand="block" (click)="unlock()" [disabled]="pin.invalid">Unlock</ion-button>
+        <ion-button expand="block" (click)="unlock()" [disabled]="pin.invalid || busy()">Unlock</ion-button>
         @if (security.biometricEnabled()) {
-          <ion-button expand="block" fill="clear" (click)="biometric()"
+          <ion-button expand="block" fill="clear" (click)="biometric()" [disabled]="busy()"
             ><ion-icon slot="start" name="finger-print-outline"></ion-icon>Use biometrics</ion-button
           >
         }
@@ -82,13 +82,27 @@ export class LockScreenComponent {
     validators: [Validators.required, Validators.pattern(/^\d{4,8}$/)],
   });
   readonly error = signal('');
+  readonly busy = signal(false);
   async unlock(): Promise<void> {
-    if (await this.security.verify(this.pin.value)) {
-      this.pin.reset();
-      this.error.set('');
-    } else this.error.set('That PIN is not correct.');
+    if (this.busy()) return;
+    this.busy.set(true);
+    try {
+      if (await this.security.verify(this.pin.value)) {
+        this.pin.reset();
+        this.error.set('');
+      } else this.error.set('That PIN is not correct.');
+    } finally {
+      this.busy.set(false);
+    }
   }
   async biometric(): Promise<void> {
-    if (!(await this.security.unlockWithBiometric())) this.error.set('Biometric unlock failed. Enter your PIN.');
+    if (this.busy()) return;
+    this.busy.set(true);
+    this.error.set('');
+    try {
+      if (!(await this.security.unlockWithBiometric())) this.error.set('Biometric unlock failed. Enter your PIN.');
+    } finally {
+      this.busy.set(false);
+    }
   }
 }

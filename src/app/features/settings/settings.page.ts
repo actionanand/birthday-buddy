@@ -1,4 +1,4 @@
-import { Component, inject, signal, viewChild } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
@@ -189,7 +189,8 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                   ><ion-toggle
                     justify="space-between"
                     [checked]="security.biometricEnabled()"
-                    (ionChange)="biometricChanged($any($event.detail.checked))"
+                    [disabled]="biometricBusy()"
+                    (ionChange)="biometricChanged($any($event.detail.checked), $any($event.target))"
                     ><ion-icon slot="start" name="finger-print-outline"></ion-icon>Biometric unlock</ion-toggle
                   ></ion-item
                 >
@@ -260,85 +261,52 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
     ><ion-modal
       cssClass="backup-password-modal"
       [isOpen]="passwordDialogOpen()"
-      [backdropDismiss]="!passwordDialogBusy()"
-      (didDismiss)="closePasswordDialog()"
+      [backdropDismiss]="true"
+      (didDismiss)="passwordDialogDidDismiss()"
       ><ng-template
         ><ion-header
           ><ion-toolbar
-            ><ion-title>{{
-              restorePreview()
-                ? 'Restore backup'
-                : passwordDialogMode() === 'EXPORT'
-                  ? 'Create encrypted backup'
-                  : 'Unlock backup'
-            }}</ion-title
+            ><ion-title>{{ passwordDialogMode() === 'EXPORT' ? 'Create encrypted backup' : 'Unlock backup' }}</ion-title
             ><ion-buttons slot="end"
-              ><ion-button [disabled]="passwordDialogBusy()" (click)="closePasswordDialog()"
-                >Cancel</ion-button
-              ></ion-buttons
+              ><ion-button (click)="cancelPasswordDialog()">Cancel</ion-button></ion-buttons
             ></ion-toolbar
           ></ion-header
         ><ion-content>
-          @if (restorePreview(); as preview) {
-            <section class="restore-choice" aria-labelledby="restore-choice-title">
-              <h2 id="restore-choice-title">Choose how to restore</h2>
-              <p>
-                This backup contains {{ preview.people.length }} people and {{ preview.occasions.length }} occasions.
-              </p>
-              <ion-button expand="block" (click)="confirmRestore('MERGE')" [disabled]="passwordDialogBusy()">
-                Merge with existing data
-              </ion-button>
-              <p>Merge keeps existing people and adds anything that is missing.</p>
-              <ion-button
-                expand="block"
-                color="danger"
-                (click)="confirmRestore('REPLACE')"
-                [disabled]="passwordDialogBusy()">
-                Replace all local data
-              </ion-button>
-              <p>Replace permanently clears current people and occasions before restoring this backup.</p>
-              <ion-button expand="block" fill="clear" (click)="closePasswordDialog()" [disabled]="passwordDialogBusy()">
-                Cancel
-              </ion-button>
-            </section>
-          } @else {
-            <form class="backup-password-form" (ngSubmit)="submitPasswordDialog()" novalidate>
-              <p>
-                {{
-                  passwordDialogMode() === 'EXPORT'
-                    ? 'Use at least 8 characters. Birthday Buddy cannot recover this password.'
-                    : 'Enter the password used when this backup was created.'
-                }}
-              </p>
-              <ion-input
-                label="Backup password"
-                labelPlacement="stacked"
-                fill="outline"
-                autocomplete="current-password"
-                [type]="passwordVisible() ? 'text' : 'password'"
-                [formControl]="backupPassword"
-                [disabled]="passwordDialogBusy()"
-                ><ion-button
-                  class="password-visibility-button"
-                  slot="end"
-                  type="button"
-                  fill="clear"
-                  [attr.aria-label]="passwordVisible() ? 'Hide backup password' : 'Show backup password'"
-                  [attr.title]="passwordVisible() ? 'Hide password' : 'Show password'"
-                  (click)="passwordVisible.update(visible => !visible)"
-                  ><ion-icon
-                    slot="icon-only"
-                    [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
-                    aria-hidden="true"></ion-icon></ion-button
-              ></ion-input>
-              @if (passwordDialogError()) {
-                <p class="backup-password-error" role="alert">{{ passwordDialogError() }}</p>
-              }
-              <ion-button type="submit" expand="block" [disabled]="passwordDialogBusy()">
-                {{ passwordDialogMode() === 'EXPORT' ? 'Create Backup' : 'Continue' }}
-              </ion-button>
-            </form>
-          }
+          <form class="backup-password-form" (ngSubmit)="submitPasswordDialog()" novalidate>
+            <p>
+              {{
+                passwordDialogMode() === 'EXPORT'
+                  ? 'Use at least 8 characters. Birthday Buddy cannot recover this password.'
+                  : 'Enter the password used when this backup was created.'
+              }}
+            </p>
+            <ion-input
+              label="Backup password"
+              labelPlacement="stacked"
+              fill="outline"
+              autocomplete="current-password"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              [formControl]="backupPassword"
+              ><ion-button
+                class="password-visibility-button"
+                slot="end"
+                type="button"
+                fill="clear"
+                [attr.aria-label]="passwordVisible() ? 'Hide backup password' : 'Show backup password'"
+                [attr.title]="passwordVisible() ? 'Hide password' : 'Show password'"
+                (click)="passwordVisible.update(visible => !visible)"
+                ><ion-icon
+                  slot="icon-only"
+                  [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
+                  aria-hidden="true"></ion-icon></ion-button
+            ></ion-input>
+            @if (passwordDialogError()) {
+              <p class="backup-password-error" role="alert">{{ passwordDialogError() }}</p>
+            }
+            <ion-button type="submit" expand="block">
+              {{ passwordDialogMode() === 'EXPORT' ? 'Create Backup' : 'Continue' }}
+            </ion-button>
+          </form>
         </ion-content></ng-template
       ></ion-modal
     >`,
@@ -361,19 +329,6 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
       margin-top: 1.15rem;
       min-width: 44px;
     }
-    .restore-choice {
-      display: grid;
-      gap: 0.75rem;
-      padding: 1.25rem;
-    }
-    .restore-choice h2,
-    .restore-choice p {
-      margin: 0;
-    }
-    .restore-choice p {
-      color: var(--app-text-secondary);
-      line-height: 1.5;
-    }
   `,
 })
 export class SettingsPage {
@@ -389,15 +344,14 @@ export class SettingsPage {
   readonly native = Capacitor.isNativePlatform();
   readonly settings = this.store.settings;
   readonly busy = signal(false);
+  readonly biometricBusy = signal(false);
   readonly passwordDialogOpen = signal(false);
-  readonly passwordDialogBusy = signal(false);
   readonly passwordDialogMode = signal<'EXPORT' | 'RESTORE'>('EXPORT');
   readonly passwordVisible = signal(false);
   readonly passwordDialogError = signal('');
-  readonly restorePreview = signal<BackupPayload | undefined>(undefined);
   readonly backupPassword = new FormControl('', { nonNullable: true });
-  private readonly passwordModal = viewChild(IonModal);
-  private pendingRestoreContents?: string;
+  private passwordResolver?: (password: string | undefined) => void;
+  private passwordResult?: string;
   key(choice: ReminderChoice): string {
     return `${choice.unit}:${choice.value}`;
   }
@@ -527,33 +481,49 @@ export class SettingsPage {
     });
     await alert.present();
   }
-  async biometricChanged(enabled: boolean): Promise<void> {
-    if (!enabled) {
-      await this.security.disableBiometric();
-      return;
+  async biometricChanged(enabled: boolean, toggle: IonToggle): Promise<void> {
+    // IonToggle changes its own visual state before an asynchronous native prompt succeeds.
+    // Keep it aligned with the persisted state until the whole operation has completed.
+    toggle.checked = this.security.biometricEnabled();
+    if (this.biometricBusy()) return;
+    this.biometricBusy.set(true);
+    try {
+      if (!enabled) {
+        await this.security.disableBiometric();
+        toggle.checked = false;
+        await this.toast('Biometric unlock disabled');
+        return;
+      }
+      if (!(await this.security.refreshBiometricStatus())) {
+        await this.toast('No enrolled strong biometric is available on this device.');
+        return;
+      }
+      const alert = await this.alerts.create({
+        header: 'Enable biometric unlock',
+        message: 'Enter your current PIN, then confirm your identity with Android.',
+        inputs: [{ name: 'pin', type: 'password', placeholder: 'Current PIN', attributes: { inputmode: 'numeric' } }],
+        buttons: [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Continue', role: 'confirm' },
+        ],
+      });
+      await alert.present();
+      const result = await alert.onDidDismiss<{ values?: { pin?: string } }>();
+      if (result.role !== 'confirm') return;
+
+      await this.security.enableBiometric(result.data?.values?.pin ?? '');
+      toggle.checked = true;
+      await this.toast('Biometric unlock enabled');
+    } catch (error: unknown) {
+      toggle.checked = this.security.biometricEnabled();
+      await this.toast(error instanceof Error ? error.message : 'Biometrics could not be enabled');
+    } finally {
+      this.biometricBusy.set(false);
     }
-    const alert = await this.alerts.create({
-      header: 'Enable biometric unlock',
-      message: 'Confirm your PIN first. Your secret is protected by Android Keystore.',
-      inputs: [{ name: 'pin', type: 'password', placeholder: 'PIN', attributes: { inputmode: 'numeric' } }],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Continue',
-          handler: (values: { pin?: string }) => {
-            void this.security
-              .enableBiometric(values.pin ?? '')
-              .catch((error: unknown) =>
-                this.toast(error instanceof Error ? error.message : 'Biometrics could not be enabled'),
-              );
-          },
-        },
-      ],
-    });
-    await alert.present();
   }
   async createBackup(): Promise<void> {
-    this.openPasswordDialog('EXPORT');
+    const password = await this.askForBackupPassword('EXPORT');
+    if (password) await this.exportBackup(password);
   }
   private async exportBackup(password: string): Promise<void> {
     const loading = await this.loaders.create({ message: 'Encrypting backup…' });
@@ -588,83 +558,66 @@ export class SettingsPage {
     }
   }
   private async requestBackupPassword(contents: string): Promise<void> {
-    this.pendingRestoreContents = contents;
-    this.openPasswordDialog('RESTORE');
+    const password = await this.askForBackupPassword('RESTORE');
+    if (!password) return;
+    try {
+      const payload = await this.backup.preview(contents, password);
+      await this.chooseRestoreMode(payload);
+    } catch (error: unknown) {
+      await this.toast(error instanceof Error ? error.message : 'The backup could not be opened.');
+    }
   }
-  openPasswordDialog(mode: 'EXPORT' | 'RESTORE'): void {
+  private askForBackupPassword(mode: 'EXPORT' | 'RESTORE'): Promise<string | undefined> {
     this.passwordDialogMode.set(mode);
     this.backupPassword.setValue('');
     this.passwordVisible.set(false);
     this.passwordDialogError.set('');
-    this.restorePreview.set(undefined);
+    this.passwordResult = undefined;
     this.passwordDialogOpen.set(true);
+    return new Promise(resolve => {
+      this.passwordResolver = resolve;
+    });
   }
 
-  closePasswordDialog(): void {
-    if (this.passwordDialogBusy()) return;
+  cancelPasswordDialog(): void {
+    this.passwordResult = undefined;
     this.passwordDialogOpen.set(false);
+  }
+
+  passwordDialogDidDismiss(): void {
+    const resolver = this.passwordResolver;
+    const result = this.passwordResult;
+    this.passwordResolver = undefined;
+    this.passwordResult = undefined;
     this.backupPassword.setValue('');
     this.passwordVisible.set(false);
     this.passwordDialogError.set('');
-    this.restorePreview.set(undefined);
-    if (this.passwordDialogMode() === 'RESTORE') this.pendingRestoreContents = undefined;
+    resolver?.(result);
   }
 
-  async submitPasswordDialog(): Promise<void> {
+  submitPasswordDialog(): void {
     const password = this.backupPassword.value;
     if (password.length < 8) {
       this.passwordDialogError.set('Enter a password with at least 8 characters.');
       return;
     }
-    this.passwordDialogBusy.set(true);
-    this.passwordDialogError.set('');
-    const mode = this.passwordDialogMode();
-    const contents = this.pendingRestoreContents;
-    try {
-      if (mode === 'RESTORE') {
-        if (!contents) {
-          this.passwordDialogError.set('Choose a backup file again.');
-          return;
-        }
-        this.restorePreview.set(await this.backup.preview(contents, password));
-        this.pendingRestoreContents = undefined;
-        this.backupPassword.setValue('');
-        this.passwordVisible.set(false);
-        return;
-      }
-      await this.dismissPasswordModal();
-      await this.exportBackup(password);
-    } catch (error: unknown) {
-      this.passwordDialogError.set(error instanceof Error ? error.message : 'The backup could not be opened.');
-    } finally {
-      this.passwordDialogBusy.set(false);
-      if (mode === 'EXPORT') this.resetPasswordDialog();
-    }
-  }
-
-  async confirmRestore(mode: 'MERGE' | 'REPLACE'): Promise<void> {
-    const payload = this.restorePreview();
-    if (!payload || this.passwordDialogBusy()) return;
-    this.passwordDialogBusy.set(true);
-    await this.dismissPasswordModal();
-    this.passwordDialogBusy.set(false);
-    this.resetPasswordDialog();
-    await this.restoreFromBackup(payload, mode);
-  }
-
-  private async dismissPasswordModal(): Promise<void> {
-    const modal = this.passwordModal();
-    const dismissed = modal?.onDidDismiss();
+    this.passwordResult = password;
     this.passwordDialogOpen.set(false);
-    if (dismissed) await dismissed;
   }
 
-  private resetPasswordDialog(): void {
-    this.backupPassword.setValue('');
-    this.passwordVisible.set(false);
-    this.passwordDialogError.set('');
-    this.restorePreview.set(undefined);
-    this.pendingRestoreContents = undefined;
+  private async chooseRestoreMode(payload: BackupPayload): Promise<void> {
+    const alert = await this.alerts.create({
+      header: 'Restore backup',
+      message: `This backup contains ${payload.people.length} people and ${payload.occasions.length} occasions.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Merge', role: 'MERGE' },
+        { text: 'Replace', role: 'REPLACE', cssClass: 'danger' },
+      ],
+    });
+    await alert.present();
+    const result = await alert.onDidDismiss();
+    if (result.role === 'MERGE' || result.role === 'REPLACE') await this.restoreFromBackup(payload, result.role);
   }
 
   private async restoreFromBackup(payload: BackupPayload, mode: 'MERGE' | 'REPLACE'): Promise<void> {
