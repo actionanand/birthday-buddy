@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import {
@@ -11,9 +12,11 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonInput,
   IonItem,
   IonLabel,
   IonList,
+  IonModal,
   IonSelect,
   IonSelectOption,
   IonTitle,
@@ -23,7 +26,7 @@ import {
   ToastController,
 } from '@ionic/angular';
 import { AppSettings, REMINDER_PRESETS, ReminderChoice } from '../../core/models/domain.models';
-import { BackupService } from '../../core/services/backup.service';
+import { BackupPayload, BackupService } from '../../core/services/backup.service';
 import { BirthdayStoreService } from '../../core/services/birthday-store.service';
 import { ContactSyncService } from '../../core/services/contact-sync.service';
 import { PinService } from '../../core/services/pin.service';
@@ -33,6 +36,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
   selector: 'app-settings',
   imports: [
     RouterLink,
+    ReactiveFormsModule,
     IonBackButton,
     IonBadge,
     IonButton,
@@ -41,9 +45,11 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
     IonContent,
     IonHeader,
     IonIcon,
+    IonInput,
     IonItem,
     IonLabel,
     IonList,
+    IonModal,
     IonSelect,
     IonSelectOption,
     IonTitle,
@@ -251,7 +257,81 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
           </p>
         </section>
       </main></ion-content
+    ><ion-modal
+      cssClass="backup-password-modal"
+      [isOpen]="passwordDialogOpen()"
+      [backdropDismiss]="!passwordDialogBusy()"
+      (didDismiss)="closePasswordDialog()"
+      ><ng-template
+        ><ion-header
+          ><ion-toolbar
+            ><ion-title>{{ passwordDialogMode() === 'EXPORT' ? 'Create encrypted backup' : 'Unlock backup' }}</ion-title
+            ><ion-buttons slot="end"
+              ><ion-button [disabled]="passwordDialogBusy()" (click)="closePasswordDialog()"
+                >Cancel</ion-button
+              ></ion-buttons
+            ></ion-toolbar
+          ></ion-header
+        ><ion-content
+          ><form class="backup-password-form" (ngSubmit)="submitPasswordDialog()" novalidate>
+            <p>
+              {{
+                passwordDialogMode() === 'EXPORT'
+                  ? 'Use at least 8 characters. Birthday Buddy cannot recover this password.'
+                  : 'Enter the password used when this backup was created.'
+              }}
+            </p>
+            <ion-input
+              label="Backup password"
+              labelPlacement="stacked"
+              fill="outline"
+              autocomplete="current-password"
+              [type]="passwordVisible() ? 'text' : 'password'"
+              [formControl]="backupPassword"
+              [disabled]="passwordDialogBusy()"
+              ><ion-button
+                class="password-visibility-button"
+                slot="end"
+                type="button"
+                fill="clear"
+                [attr.aria-label]="passwordVisible() ? 'Hide backup password' : 'Show backup password'"
+                [attr.title]="passwordVisible() ? 'Hide password' : 'Show password'"
+                (click)="passwordVisible.update(visible => !visible)"
+                ><ion-icon
+                  slot="icon-only"
+                  [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
+                  aria-hidden="true"></ion-icon></ion-button
+            ></ion-input>
+            @if (passwordDialogError()) {
+              <p class="backup-password-error" role="alert">{{ passwordDialogError() }}</p>
+            }
+            <ion-button type="submit" expand="block" [disabled]="passwordDialogBusy()">
+              {{ passwordDialogMode() === 'EXPORT' ? 'Create Backup' : 'Continue' }}
+            </ion-button>
+          </form></ion-content
+        ></ng-template
+      ></ion-modal
     >`,
+  styles: `
+    .backup-password-form {
+      display: grid;
+      gap: 1rem;
+      padding: 1.25rem;
+    }
+    .backup-password-form > p {
+      margin: 0;
+      color: var(--app-text-secondary);
+      line-height: 1.5;
+    }
+    .backup-password-error {
+      color: var(--ion-color-danger) !important;
+      font-size: 0.9rem;
+    }
+    .password-visibility-button {
+      margin-top: 1.15rem;
+      min-width: 44px;
+    }
+  `,
 })
 export class SettingsPage {
   readonly store = inject(BirthdayStoreService);
@@ -266,6 +346,13 @@ export class SettingsPage {
   readonly native = Capacitor.isNativePlatform();
   readonly settings = this.store.settings;
   readonly busy = signal(false);
+  readonly passwordDialogOpen = signal(false);
+  readonly passwordDialogBusy = signal(false);
+  readonly passwordDialogMode = signal<'EXPORT' | 'RESTORE'>('EXPORT');
+  readonly passwordVisible = signal(false);
+  readonly passwordDialogError = signal('');
+  readonly backupPassword = new FormControl('', { nonNullable: true });
+  private pendingRestoreContents?: string;
   key(choice: ReminderChoice): string {
     return `${choice.unit}:${choice.value}`;
   }
@@ -307,10 +394,14 @@ export class SettingsPage {
     await alert.present();
   }
   private async syncAndApplyContacts(): Promise<void> {
-    const candidates = await this.contacts.scanContacts();
-    const changes = candidates.length + this.contacts.availabilityChanges();
-    await this.contacts.apply(candidates);
-    await this.toast(changes ? `${changes} contact changes synced` : 'Contacts are up to date');
+    try {
+      const candidates = await this.contacts.scanContacts();
+      const changes = candidates.length + this.contacts.availabilityChanges();
+      await this.contacts.apply(candidates);
+      await this.toast(changes ? `${changes} contact changes synced` : 'Contacts are up to date');
+    } catch (error: unknown) {
+      await this.toast(error instanceof Error ? error.message : 'Contacts could not be synced');
+    }
   }
   async configurePin(changing = false): Promise<void> {
     const inputs = [
@@ -410,21 +501,7 @@ export class SettingsPage {
     await alert.present();
   }
   async createBackup(): Promise<void> {
-    const alert = await this.alerts.create({
-      header: 'Create encrypted backup',
-      message: 'Use a password with at least 8 characters. Birthday Buddy cannot recover it.',
-      inputs: [{ name: 'password', type: 'password', placeholder: 'Backup password' }],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Create',
-          handler: (values: { password?: string }) => {
-            void this.exportBackup(values.password ?? '');
-          },
-        },
-      ],
-    });
-    await alert.present();
+    this.openPasswordDialog('EXPORT');
   }
   private async exportBackup(password: string): Promise<void> {
     const loading = await this.loaders.create({ message: 'Encrypting backup…' });
@@ -459,20 +536,8 @@ export class SettingsPage {
     }
   }
   private async requestBackupPassword(contents: string): Promise<void> {
-    const passwordAlert = await this.alerts.create({
-      header: 'Unlock backup',
-      inputs: [{ name: 'password', type: 'password', placeholder: 'Backup password' }],
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Continue',
-          handler: (values: { password?: string }) => {
-            void this.previewRestore(contents, values.password ?? '');
-          },
-        },
-      ],
-    });
-    await passwordAlert.present();
+    this.pendingRestoreContents = contents;
+    this.openPasswordDialog('RESTORE');
   }
   private async previewRestore(contents: string, password: string): Promise<void> {
     try {
@@ -482,23 +547,75 @@ export class SettingsPage {
         message: `${payload.people.length} people and ${payload.occasions.length} occasions. Merge keeps existing data. Replace clears it first.`,
         buttons: [
           { text: 'Cancel', role: 'cancel' },
-          {
-            text: 'Merge',
-            handler: () => {
-              void this.backup.restore(payload, 'MERGE');
-            },
-          },
-          {
-            text: 'Replace',
-            role: 'destructive',
-            handler: () => {
-              void this.backup.restore(payload, 'REPLACE');
-            },
-          },
+          { text: 'Merge', role: 'merge' },
+          { text: 'Replace', role: 'replace', cssClass: 'alert-button-role-destructive' },
         ],
       });
       await alert.present();
+      const result = await alert.onDidDismiss();
+      if (result.role === 'merge') await this.restoreFromBackup(payload, 'MERGE');
+      if (result.role === 'replace') await this.restoreFromBackup(payload, 'REPLACE');
     } catch (error: unknown) {
+      await this.toast(error instanceof Error ? error.message : 'Restore failed');
+    }
+  }
+
+  openPasswordDialog(mode: 'EXPORT' | 'RESTORE'): void {
+    this.passwordDialogMode.set(mode);
+    this.backupPassword.setValue('');
+    this.passwordVisible.set(false);
+    this.passwordDialogError.set('');
+    this.passwordDialogOpen.set(true);
+  }
+
+  closePasswordDialog(): void {
+    if (this.passwordDialogBusy()) return;
+    this.passwordDialogOpen.set(false);
+    this.backupPassword.setValue('');
+    this.passwordVisible.set(false);
+    this.passwordDialogError.set('');
+    if (this.passwordDialogMode() === 'RESTORE') this.pendingRestoreContents = undefined;
+  }
+
+  async submitPasswordDialog(): Promise<void> {
+    const password = this.backupPassword.value;
+    if (password.length < 8) {
+      this.passwordDialogError.set('Enter a password with at least 8 characters.');
+      return;
+    }
+    this.passwordDialogBusy.set(true);
+    this.passwordDialogError.set('');
+    const mode = this.passwordDialogMode();
+    const contents = this.pendingRestoreContents;
+    this.passwordDialogOpen.set(false);
+    try {
+      if (mode === 'EXPORT') await this.exportBackup(password);
+      else if (contents) await this.previewRestore(contents, password);
+      else await this.toast('Choose a backup file again.');
+    } finally {
+      this.passwordDialogBusy.set(false);
+      this.backupPassword.setValue('');
+      this.passwordVisible.set(false);
+      this.pendingRestoreContents = undefined;
+    }
+  }
+
+  private async restoreFromBackup(payload: BackupPayload, mode: 'MERGE' | 'REPLACE'): Promise<void> {
+    const loading = await this.loaders.create({ message: mode === 'MERGE' ? 'Merging backup…' : 'Restoring backup…' });
+    await loading.present();
+    try {
+      const restored = await this.backup.restore(payload, mode);
+      await loading.dismiss();
+      const message =
+        mode === 'MERGE' && restored.people === 0 && restored.occasions === 0
+          ? 'Backup checked. All people and occasions already exist.'
+          : `Backup restored: ${restored.people} people and ${restored.occasions} occasions.`;
+      const toast = await this.toasts.create({ message, duration: 1800, position: 'bottom' });
+      await toast.present();
+      await toast.onDidDismiss();
+      window.location.reload();
+    } catch (error: unknown) {
+      await loading.dismiss();
       await this.toast(error instanceof Error ? error.message : 'Restore failed');
     }
   }

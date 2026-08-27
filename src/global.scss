@@ -77,6 +77,15 @@ ion-button {
 ion-fab-button {
   --box-shadow: 0 10px 26px rgba(var(--ion-color-primary-rgb), 0.3);
 }
+ion-modal.backup-password-modal {
+  --width: min(92vw, 440px);
+  --height: 330px;
+  --border-radius: 22px;
+  --box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+}
+ion-modal.backup-password-modal::part(content) {
+  border: 1px solid var(--app-border);
+}
 .page-shell,
 .form-shell,
 .settings-shell {

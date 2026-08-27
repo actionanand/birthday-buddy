@@ -5,7 +5,7 @@ import { AppSettings, ContactSyncIgnore, Occasion, OccasionReminder, Person } fr
 import { BirthdayStoreService } from './birthday-store.service';
 import { RepositoryProviderService } from './repository-provider.service';
 
-interface BackupPayload {
+export interface BackupPayload {
   format: 'birthday-buddy-backup';
   version: 1;
   createdAt: string;
@@ -14,6 +14,12 @@ interface BackupPayload {
   reminders: OccasionReminder[];
   ignores: ContactSyncIgnore[];
   settings: AppSettings;
+}
+
+export interface RestoreResult {
+  people: number;
+  occasions: number;
+  reminders: number;
 }
 
 interface EncryptedBackup {
@@ -132,7 +138,7 @@ export class BackupService {
     return payload;
   }
 
-  async restore(payload: BackupPayload, mode: 'MERGE' | 'REPLACE'): Promise<void> {
+  async restore(payload: BackupPayload, mode: 'MERGE' | 'REPLACE'): Promise<RestoreResult> {
     const stores = ['people', 'occasions', 'occasion_reminders', 'contact_sync_ignores'] as const;
     if (mode === 'REPLACE') {
       await this.repositories.adapter.clear([...stores]);
@@ -143,8 +149,11 @@ export class BackupService {
         ...payload.ignores.map(value => ({ store: 'contact_sync_ignores' as const, operation: 'PUT' as const, value })),
         { store: 'app_settings', operation: 'PUT', value: payload.settings },
       ]);
-      window.location.reload();
-      return;
+      return {
+        people: payload.people.length,
+        occasions: payload.occasions.length,
+        reminders: payload.reminders.length,
+      };
     }
 
     const identity = (person: Person) =>
@@ -178,7 +187,7 @@ export class BackupService {
       ...reminders.map(value => ({ store: 'occasion_reminders' as const, operation: 'PUT' as const, value })),
       ...payload.ignores.map(value => ({ store: 'contact_sync_ignores' as const, operation: 'PUT' as const, value })),
     ]);
-    window.location.reload();
+    return { people: people.length, occasions: occasions.length, reminders: reminders.length };
   }
 
   private async deriveKey(password: string, salt: Uint8Array<ArrayBuffer>, usages: KeyUsage[]): Promise<CryptoKey> {

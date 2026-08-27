@@ -227,24 +227,40 @@ import android.provider.ContactsContract;
 import android.util.Base64;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
-import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import com.getcapacitor.annotation.ActivityCallback;
 import com.getcapacitor.annotation.CapacitorPlugin;
-import com.getcapacitor.annotation.Permission;
-import com.getcapacitor.annotation.PermissionCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 
-@CapacitorPlugin(name = "BirthdayBuddyContacts", permissions = { @Permission(alias = "contacts", strings = { Manifest.permission.READ_CONTACTS }) })
+@CapacitorPlugin(name = "BirthdayBuddyContacts")
 public class BirthdayBuddyContactsPlugin extends Plugin {
+  private ActivityResultLauncher<String> contactsPermissionLauncher;
+  private PluginCall pendingContactsCall;
+
+  @Override
+  public void load() {
+    contactsPermissionLauncher = bridge.registerForActivityResult(
+      new ActivityResultContracts.RequestPermission(),
+      granted -> {
+        PluginCall call = pendingContactsCall;
+        pendingContactsCall = null;
+        if (call == null) return;
+        if (granted) readAll(call); else call.reject("Contact permission was not granted.");
+      }
+    );
+  }
+
   @PluginMethod
   public void permissionStatus(PluginCall call) {
-    JSObject result = new JSObject(); result.put("granted", getPermissionState("contacts") == PermissionState.GRANTED); call.resolve(result);
+    JSObject result = new JSObject(); result.put("granted", hasContactPermission()); call.resolve(result);
   }
 
   @PluginMethod
@@ -264,14 +280,17 @@ public class BirthdayBuddyContactsPlugin extends Plugin {
 
   @PluginMethod
   public void readContacts(PluginCall call) {
-    if (getPermissionState("contacts") != PermissionState.GRANTED) { requestPermissionForAlias("contacts", call, "contactsPermission"); return; }
+    if (!hasContactPermission()) {
+      if (pendingContactsCall != null) { call.reject("A contact permission request is already in progress."); return; }
+      pendingContactsCall = call;
+      contactsPermissionLauncher.launch(Manifest.permission.READ_CONTACTS);
+      return;
+    }
     readAll(call);
   }
 
-  @PermissionCallback
-  private void contactsPermission(PluginCall call) {
-    if (getPermissionState("contacts") != PermissionState.GRANTED) { call.reject("Contact permission was not granted."); return; }
-    readAll(call);
+  private boolean hasContactPermission() {
+    return ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_CONTACTS) == android.content.pm.PackageManager.PERMISSION_GRANTED;
   }
 
   private void readAll(PluginCall call) {

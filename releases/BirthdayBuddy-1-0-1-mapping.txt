@@ -3,8 +3,8 @@
 # min_api: 24
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: 92cfb2f23aabfecd4b3b4614006896cb8707419011de9713fcc4ee086b62980e
-# pg_map_hash: SHA-256 92cfb2f23aabfecd4b3b4614006896cb8707419011de9713fcc4ee086b62980e
+# pg_map_id: 6a12a00daaf30a7bde5961ea2c6035ab2311a785ed44056a4ac107a369865638
+# pg_map_hash: SHA-256 6a12a00daaf30a7bde5961ea2c6035ab2311a785ed44056a4ac107a369865638
 _COROUTINE.ArtificialStackFrames -> R8$$REMOVED$$CLASS$$0:
 # {"id":"sourceFile","fileName":"CoroutineDebugging.kt"}
 _COROUTINE.CoroutineDebuggingKt -> R8$$REMOVED$$CLASS$$1:
@@ -321,7 +321,7 @@ _COROUTINE._BOUNDARY -> a.a:
     5:13:android.content.pm.ResolveInfo androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.getSystemFallbackPicker$activity_release(android.content.Context):734:734 -> Q
     14:18:android.content.pm.ResolveInfo androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.getSystemFallbackPicker$activity_release(android.content.Context):733:733 -> Q
     6:12:java.lang.String androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.getVisualMimeType$activity_release(androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType):741:741 -> R
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/g;)Ljava/lang/String;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/f;)Ljava/lang/String;"}
     13:18:java.lang.String androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.getVisualMimeType$activity_release(androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType):744:744 -> R
     19:20:java.lang.String androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.getVisualMimeType$activity_release(androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType):740:740 -> R
     21:23:void kotlin.NoWhenBranchMatchedException.<init>():9:9 -> R
@@ -2553,7 +2553,7 @@ androidx.activity.ComponentActivity$activityResultRegistry$1 -> androidx.activit
     61:72:void androidx.activity.result.ActivityResultRegistry.doDispatch(java.lang.String,int,android.content.Intent,androidx.activity.result.ActivityResultRegistry$CallbackAndContract):356:356 -> a
     61:72:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,int,android.content.Intent):311 -> a
     6:13:void onLaunch(int,androidx.activity.result.contract.ActivityResultContract,java.lang.Object,androidx.core.app.ActivityOptionsCompat):167:167 -> b
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(ILe/b;Ljava/lang/Object;)V"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(ILe/a;Ljava/lang/Object;)V"}
     14:32:void onLaunch(int,androidx.activity.result.contract.ActivityResultContract,java.lang.Object,androidx.core.app.ActivityOptionsCompat):169:169 -> b
     33:36:void onLaunch(int,androidx.activity.result.contract.ActivityResultContract,java.lang.Object,androidx.core.app.ActivityOptionsCompat):176:176 -> b
     37:55:void onLaunch(int,androidx.activity.result.contract.ActivityResultContract,java.lang.Object,androidx.core.app.ActivityOptionsCompat):179:179 -> b
@@ -2586,7 +2586,7 @@ androidx.activity.ComponentActivity$activityResultRegistry$1 -> androidx.activit
     172:175:void androidx.core.app.ActivityCompat.startActivityForResult(android.app.Activity,android.content.Intent,int,android.os.Bundle):243:243 -> b
     172:175:void onLaunch(int,androidx.activity.result.contract.ActivityResultContract,java.lang.Object,androidx.core.app.ActivityOptionsCompat):223 -> b
     16:18:androidx.activity.result.ActivityResultLauncher androidx.activity.result.ActivityResultRegistry.register(java.lang.String,androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):166:166 -> c
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Le/b;Ld/b;)Ld/g;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Le/a;Ld/b;)Ld/g;"}
     19:28:androidx.activity.result.ActivityResultLauncher androidx.activity.result.ActivityResultRegistry.register(java.lang.String,androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):167:167 -> c
     29:36:androidx.activity.result.ActivityResultLauncher androidx.activity.result.ActivityResultRegistry.register(java.lang.String,androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):168:168 -> c
     37:40:androidx.activity.result.ActivityResultLauncher androidx.activity.result.ActivityResultRegistry.register(java.lang.String,androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):169:169 -> c
@@ -2697,44 +2697,44 @@ androidx.activity.ComponentActivity$activityResultRegistry$1$$ExternalSyntheticL
     131:137:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$1(androidx.activity.ComponentActivity$activityResultRegistry$1,int,android.content.IntentSender$SendIntentException):212:212 -> run
     131:137:void run():0 -> run
     138:145:void run():0:0 -> run
-    146:147:java.lang.Object androidx.activity.result.contract.ActivityResultContract$SynchronousResult.getValue():51:51 -> run
-    146:147:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    146:149:java.lang.Object androidx.activity.result.contract.ActivityResultContract$SynchronousResult.getValue():51:51 -> run
+    146:149:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    146:147:void run():0 -> run
-    148:149:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):324:324 -> run
-    148:149:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    146:149:void run():0 -> run
+    150:151:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):324:324 -> run
+    150:151:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    148:149:void run():0 -> run
-    150:164:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):324:324 -> run
-    150:164:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    150:164:void run():0 -> run
-    165:174:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):325:325 -> run
-    165:174:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    165:174:void run():0 -> run
-    175:180:androidx.activity.result.ActivityResultCallback androidx.activity.result.ActivityResultRegistry$CallbackAndContract.getCallback():389:389 -> run
-    175:180:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):326 -> run
-    175:180:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    175:180:void run():0 -> run
-    181:185:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):328:328 -> run
-    181:185:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    181:185:void run():0 -> run
-    186:191:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):330:330 -> run
-    186:191:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    186:191:void run():0 -> run
-    192:193:androidx.activity.result.ActivityResultCallback androidx.activity.result.ActivityResultRegistry$CallbackAndContract.getCallback():389:389 -> run
-    192:193:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):333 -> run
+    150:151:void run():0 -> run
+    152:166:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):324:324 -> run
+    152:166:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    152:166:void run():0 -> run
+    167:176:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):325:325 -> run
+    167:176:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    167:176:void run():0 -> run
+    177:182:androidx.activity.result.ActivityResultCallback androidx.activity.result.ActivityResultRegistry$CallbackAndContract.getCallback():389:389 -> run
+    177:182:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):326 -> run
+    177:182:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    177:182:void run():0 -> run
+    183:187:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):328:328 -> run
+    183:187:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    183:187:void run():0 -> run
+    188:193:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):330:330 -> run
+    188:193:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    188:193:void run():0 -> run
+    194:195:androidx.activity.result.ActivityResultCallback androidx.activity.result.ActivityResultRegistry$CallbackAndContract.getCallback():389:389 -> run
+    194:195:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):333 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    192:193:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    192:193:void run():0 -> run
-    194:198:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):333:333 -> run
-    194:198:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    194:198:void run():0 -> run
-    199:206:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):334:334 -> run
-    199:206:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    199:206:void run():0 -> run
-    207:210:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):335:335 -> run
-    207:210:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
-    207:210:void run():0 -> run
+    194:195:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    194:195:void run():0 -> run
+    196:200:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):333:333 -> run
+    196:200:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    196:200:void run():0 -> run
+    201:208:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):334:334 -> run
+    201:208:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    201:208:void run():0 -> run
+    209:212:boolean androidx.activity.result.ActivityResultRegistry.dispatchResult(int,java.lang.Object):335:335 -> run
+    209:212:void androidx.activity.ComponentActivity$activityResultRegistry$1.onLaunch$lambda$0(androidx.activity.ComponentActivity$activityResultRegistry$1,int,androidx.activity.result.contract.ActivityResultContract$SynchronousResult):170 -> run
+    209:212:void run():0 -> run
 androidx.activity.ComponentDialog -> androidx.activity.t:
 # {"id":"sourceFile","fileName":"ComponentDialog.kt"}
     androidx.lifecycle.LifecycleRegistry _lifecycleRegistry -> g
@@ -3352,11 +3352,11 @@ androidx.activity.result.ActivityResultRegistry$$ExternalSyntheticLambda0 -> d.d
       # {"id":"com.android.tools.r8.residualsignature","signature":"Ld/b;"}
       # {"id":"com.android.tools.r8.synthesized"}
     androidx.activity.result.contract.ActivityResultContract androidx.activity.result.ActivityResultRegistry$$InternalSyntheticLambda$2$073865f354efa79bc9ce380b350a9dd384a07a787c60f82103fd741e6d5d0501$0.f$3 -> j
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/b;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/a;"}
       # {"id":"com.android.tools.r8.synthesized"}
     1:12:void d.ActivityResultRegistry$$ExternalSyntheticLambda0.<init>(androidx.activity.ComponentActivity$activityResultRegistry$1,java.lang.String,d.ActivityResultCallback,e.ActivityResultContract):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroidx/activity/q;Ljava/lang/String;Ld/b;Le/b;)V"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroidx/activity/q;Ljava/lang/String;Ld/b;Le/a;)V"}
     5:10:void androidx.activity.result.ActivityResultRegistry.register$lambda$1(androidx.activity.result.ActivityResultRegistry,java.lang.String,androidx.activity.result.ActivityResultCallback,androidx.activity.result.contract.ActivityResultContract,androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event):96:96 -> a
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroidx/lifecycle/s;Landroidx/lifecycle/m;)V"}
     11:26:void androidx.activity.result.ActivityResultRegistry.register$lambda$1(androidx.activity.result.ActivityResultRegistry,java.lang.String,androidx.activity.result.ActivityResultCallback,androidx.activity.result.contract.ActivityResultContract,androidx.lifecycle.LifecycleOwner,androidx.lifecycle.Lifecycle$Event):97:97 -> a
@@ -3381,9 +3381,9 @@ androidx.activity.result.ActivityResultRegistry$CallbackAndContract -> d.e:
     androidx.activity.result.ActivityResultCallback callback -> a
       # {"id":"com.android.tools.r8.residualsignature","signature":"Ld/b;"}
     androidx.activity.result.contract.ActivityResultContract contract -> b
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/b;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/a;"}
     11:13:void <init>(androidx.activity.result.ActivityResultCallback,androidx.activity.result.contract.ActivityResultContract):388:388 -> <init>
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/b;Ld/b;)V"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/a;Ld/b;)V"}
     14:15:void <init>(androidx.activity.result.ActivityResultCallback,androidx.activity.result.contract.ActivityResultContract):389:389 -> <init>
     16:18:void <init>(androidx.activity.result.ActivityResultCallback,androidx.activity.result.contract.ActivityResultContract):390:390 -> <init>
 androidx.activity.result.ActivityResultRegistry$LifecycleContainer -> d.f:
@@ -3403,10 +3403,10 @@ androidx.activity.result.ActivityResultRegistry$register$2 -> d.g:
       # {"id":"com.android.tools.r8.residualsignature","signature":"Landroidx/activity/q;"}
     java.lang.String $key -> c
     androidx.activity.result.contract.ActivityResultContract $contract -> d
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/b;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/a;"}
     1:12:void d.ActivityResultRegistry$register$2.<init>(androidx.activity.ComponentActivity$activityResultRegistry$1,java.lang.String,e.ActivityResultContract,int):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroidx/activity/q;Ljava/lang/String;Le/b;I)V"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroidx/activity/q;Ljava/lang/String;Le/a;I)V"}
     6:9:void androidx.activity.result.ActivityResultRegistry$register$3.launch(java.lang.Object,androidx.core.app.ActivityOptionsCompat):184:184 -> a
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/Object;)V"}
     10:11:java.util.Map androidx.activity.result.ActivityResultRegistry.access$getKeyToRc$p(androidx.activity.result.ActivityResultRegistry):42:42 -> a
@@ -3463,31 +3463,23 @@ androidx.activity.result.IntentSenderRequest$Builder -> R8$$REMOVED$$CLASS$$6:
 androidx.activity.result.PickVisualMediaRequest -> d.i:
 # {"id":"sourceFile","fileName":"PickVisualMediaRequest.kt"}
     androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType mediaType -> a
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/g;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/f;"}
     int maxItems -> b
     androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab defaultTab -> c
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/d;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/c;"}
 androidx.activity.result.PickVisualMediaRequest$Builder -> R8$$REMOVED$$CLASS$$7:
 # {"id":"sourceFile","fileName":"PickVisualMediaRequest.kt"}
-androidx.activity.result.contract.ActivityResultContract -> e.b:
+androidx.activity.result.contract.ActivityResultContract -> e.a:
 # {"id":"sourceFile","fileName":"ActivityResultContract.kt"}
     android.content.Intent createIntent(android.content.Context,java.lang.Object) -> a
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Landroid/content/Intent;"}
     1:2:androidx.activity.result.contract.ActivityResultContract$SynchronousResult getSynchronousResult(android.content.Context,java.lang.Object):44:44 -> b
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Le/a;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Lr1/i;"}
     java.lang.Object parseResult(int,android.content.Intent) -> c
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/content/Intent;I)Ljava/lang/Object;"}
-androidx.activity.result.contract.ActivityResultContract$SynchronousResult -> e.a:
-# {"id":"sourceFile","fileName":"ActivityResultContract.kt"}
-    java.lang.Object value -> a
-    com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.snackbarManager -> b
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/a;"}
-    1:3:void com.google.android.material.snackbar.SnackbarManager.<init>():49:51 -> <init>
-    4:4:void com.google.android.material.snackbar.SnackbarManager.<init>():53:53 -> <init>
-    5:5:void <init>(java.lang.Object):51:51 -> <init>
 androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion -> R8$$REMOVED$$CLASS$$8:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
-androidx.activity.result.contract.ActivityResultContracts$PickMultipleVisualMedia -> e.c:
+androidx.activity.result.contract.ActivityResultContracts$PickMultipleVisualMedia -> e.b:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
     int maxItems -> a
     1:3:void androidx.activity.result.contract.ActivityResultContract.<init>():29:29 -> <init>
@@ -3577,7 +3569,7 @@ androidx.activity.result.contract.ActivityResultContracts$PickMultipleVisualMedi
     205:218:android.content.Intent createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):1035:1035 -> a
     205:218:android.content.Intent createIntent(android.content.Context,java.lang.Object):966 -> a
     1:2:androidx.activity.result.contract.ActivityResultContract$SynchronousResult getSynchronousResult(android.content.Context,java.lang.Object):966:966 -> b
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Le/a;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Lr1/i;"}
     3:9:androidx.activity.result.contract.ActivityResultContract$SynchronousResult getSynchronousResult(android.content.Context,androidx.activity.result.PickVisualMediaRequest):0:0 -> b
     3:9:androidx.activity.result.contract.ActivityResultContract$SynchronousResult getSynchronousResult(android.content.Context,java.lang.Object):966 -> b
     8:12:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):427:427 -> c
@@ -3608,30 +3600,30 @@ androidx.activity.result.contract.ActivityResultContracts$PickMultipleVisualMedi
     66:68:java.lang.Object parseResult(int,android.content.Intent):966:966 -> c
 androidx.activity.result.contract.ActivityResultContracts$PickMultipleVisualMedia$Companion -> R8$$REMOVED$$CLASS$$9:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
-androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab$PhotosTab -> e.d:
+androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab$PhotosTab -> e.c:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
     androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab$PhotosTab INSTANCE -> a
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/d;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/c;"}
     3:5:void androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab.<init>():851:851 -> <clinit>
     3:5:void androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab.<init>(kotlin.jvm.internal.DefaultConstructorMarker):0 -> <clinit>
     3:5:void <init>():858 -> <clinit>
     3:5:void <clinit>():0 -> <clinit>
     6:8:void <clinit>():0:0 -> <clinit>
-androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$ImageAndVideo -> e.e:
+androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$ImageAndVideo -> e.d:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
     androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$ImageAndVideo INSTANCE -> a
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/e;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/d;"}
     3:5:void <init>():759:759 -> <clinit>
     3:5:void <clinit>():0 -> <clinit>
     6:8:void <clinit>():0:0 -> <clinit>
-androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$ImageOnly -> e.f:
+androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$ImageOnly -> e.e:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
     androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$ImageOnly INSTANCE -> a
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/f;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/e;"}
     3:5:void <init>():753:753 -> <clinit>
     3:5:void <clinit>():0 -> <clinit>
     6:8:void <clinit>():0:0 -> <clinit>
-androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType -> e.g:
+androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType -> e.f:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
 androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions$Companion -> R8$$REMOVED$$CLASS$$10:
 # {"id":"sourceFile","fileName":"ActivityResultContracts.kt"}
@@ -28351,7 +28343,7 @@ androidx.biometric.BiometricManager$DefaultInjector -> androidx.biometric.u:
     14:19:java.io.InputStream com.getcapacitor.AndroidProtocolHandler.openFile(java.lang.String):69:69 -> e
 androidx.biometric.BiometricPrompt -> androidx.biometric.y:
 # {"id":"sourceFile","fileName":"BiometricPrompt.java"}
-    androidx.fragment.app.FragmentManager mClientFragmentManager -> a
+    androidx.fragment.app.FragmentManager mClientFragmentManager -> g
       # {"id":"com.android.tools.r8.residualsignature","signature":"Landroidx/fragment/app/q0;"}
     1:1:void <init>(androidx.fragment.app.FragmentActivity,java.util.concurrent.Executor,androidx.biometric.BiometricPrompt$AuthenticationCallback):831:831 -> <init>
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/util/concurrent/Executor;Lg5/b;)V"}
@@ -53225,7 +53217,7 @@ androidx.core.splashscreen.SplashScreen$Impl31$hierarchyListener$1 -> m0.e:
     1:1:void onChildViewRemoved(android.view.View,android.view.View):406:406 -> onChildViewRemoved
 androidx.core.splashscreen.SplashScreen$KeepOnScreenCondition -> m0.g:
 # {"id":"sourceFile","fileName":"SplashScreen.kt"}
-    boolean shouldKeepOnScreen() -> b
+    boolean shouldKeepOnScreen() -> c
 androidx.core.splashscreen.SplashScreenViewProvider$ViewImpl$$ExternalSyntheticLambda0 -> m0.i:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
@@ -67724,9 +67716,9 @@ androidx.fragment.app.FragmentManager$1 -> androidx.fragment.app.h0:
     43:52:void handleOnBackStarted(androidx.activity.BackEventCompat):535 -> d
 androidx.fragment.app.FragmentManager$10 -> androidx.fragment.app.g0:
 # {"id":"sourceFile","fileName":"FragmentManager.java"}
-    int $r8$classId -> a
+    int $r8$classId -> g
       # {"id":"com.android.tools.r8.synthesized"}
-    androidx.fragment.app.FragmentManager this$0 -> b
+    androidx.fragment.app.FragmentManager this$0 -> h
       # {"id":"com.android.tools.r8.residualsignature","signature":"Landroidx/fragment/app/q0;"}
     1:8:void <init>(androidx.fragment.app.FragmentManagerImpl,int):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
@@ -68051,210 +68043,233 @@ androidx.fragment.app.FragmentManager$FragmentIntentSenderContract -> androidx.f
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Landroid/content/Intent;"}
     8:13:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.createIntent(android.content.Context,android.content.Intent):0:0 -> a
     8:13:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.createIntent(android.content.Context,java.lang.Object):66 -> a
-    14:15:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.Object):136:136 -> a
-    16:20:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.String[]):0:0 -> a
-    16:20:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.Object):136 -> a
-    21:39:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions$Companion.createIntent$activity_release(java.lang.String[]):172:172 -> a
-    21:39:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.String[]):177 -> a
-    21:39:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.Object):136 -> a
-    40:41:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603:603 -> a
-    42:46:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):0:0 -> a
-    42:46:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    47:58:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemPickerAvailable$activity_release():714:714 -> a
-    47:58:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):871 -> a
-    47:58:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    59:65:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemPickerAvailable$activity_release():719:719 -> a
-    59:65:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):871 -> a
-    59:65:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    66:72:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):872:872 -> a
-    66:72:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    73:74:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType androidx.activity.result.PickVisualMediaRequest.getMediaType():195:195 -> a
-    73:74:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):873 -> a
-    73:74:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    75:81:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):873:873 -> a
-    75:81:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    82:83:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab androidx.activity.result.PickVisualMediaRequest.getDefaultTab():204:204 -> a
-    82:83:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):874 -> a
-    82:83:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    84:92:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):874:874 -> a
-    84:92:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    93:98:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemFallbackPickerAvailable$activity_release(android.content.Context):727:727 -> a
-    93:98:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):889 -> a
-    93:98:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    99:106:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):890:890 -> a
-    99:106:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    107:113:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):891:891 -> a
-    107:113:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    114:122:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):892:892 -> a
+    14:15:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.Object):210:210 -> a
+    16:20:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.String):0:0 -> a
+    16:20:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.Object):210 -> a
+    21:24:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.String):212:212 -> a
+    21:24:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.Object):210 -> a
+    25:43:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions$Companion.createIntent$activity_release(java.lang.String[]):172:172 -> a
+    25:43:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.String):212 -> a
+    25:43:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestPermission.createIntent(android.content.Context,java.lang.Object):210 -> a
+    44:45:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.Object):136:136 -> a
+    46:50:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.String[]):0:0 -> a
+    46:50:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.Object):136 -> a
+    51:69:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions$Companion.createIntent$activity_release(java.lang.String[]):172:172 -> a
+    51:69:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.String[]):177 -> a
+    51:69:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.createIntent(android.content.Context,java.lang.Object):136 -> a
+    70:71:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603:603 -> a
+    72:76:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):0:0 -> a
+    72:76:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    77:88:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemPickerAvailable$activity_release():714:714 -> a
+    77:88:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):871 -> a
+    77:88:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    89:95:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemPickerAvailable$activity_release():719:719 -> a
+    89:95:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):871 -> a
+    89:95:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    96:102:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):872:872 -> a
+    96:102:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    103:104:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType androidx.activity.result.PickVisualMediaRequest.getMediaType():195:195 -> a
+    103:104:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):873 -> a
+    103:104:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    105:111:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):873:873 -> a
+    105:111:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    112:113:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab androidx.activity.result.PickVisualMediaRequest.getDefaultTab():204:204 -> a
+    112:113:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):874 -> a
+    112:113:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    114:122:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):874:874 -> a
     114:122:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    123:124:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType androidx.activity.result.PickVisualMediaRequest.getMediaType():195:195 -> a
-    123:124:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):893 -> a
-    123:124:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    125:131:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):893:893 -> a
-    125:131:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    132:133:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab androidx.activity.result.PickVisualMediaRequest.getDefaultTab():204:204 -> a
-    132:133:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):894 -> a
-    132:133:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    134:143:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):894:894 -> a
-    134:143:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    144:151:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):890:890 -> a
-    144:151:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    152:158:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):904:904 -> a
-    152:158:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    159:160:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType androidx.activity.result.PickVisualMediaRequest.getMediaType():195:195 -> a
-    159:160:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):905 -> a
-    159:160:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    161:167:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):905:905 -> a
-    161:167:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    168:173:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):907:907 -> a
-    168:173:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    174:178:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):910:910 -> a
-    174:178:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    179:192:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):911:911 -> a
-    179:192:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
-    193:194:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923:3923 -> a
-    195:201:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3929:3929 -> a
-    195:201:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    202:205:android.content.Intent androidx.activity.result.IntentSenderRequest.getFillInIntent():40:40 -> a
-    202:205:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3930 -> a
+    123:128:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemFallbackPickerAvailable$activity_release(android.content.Context):727:727 -> a
+    123:128:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):889 -> a
+    123:128:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    129:136:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):890:890 -> a
+    129:136:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    137:143:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):891:891 -> a
+    137:143:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    144:152:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):892:892 -> a
+    144:152:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    153:154:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType androidx.activity.result.PickVisualMediaRequest.getMediaType():195:195 -> a
+    153:154:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):893 -> a
+    153:154:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    155:161:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):893:893 -> a
+    155:161:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    162:163:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$DefaultTab androidx.activity.result.PickVisualMediaRequest.getDefaultTab():204:204 -> a
+    162:163:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):894 -> a
+    162:163:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    164:173:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):894:894 -> a
+    164:173:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    174:181:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):890:890 -> a
+    174:181:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    182:188:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):904:904 -> a
+    182:188:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    189:190:androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$VisualMediaType androidx.activity.result.PickVisualMediaRequest.getMediaType():195:195 -> a
+    189:190:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):905 -> a
+    189:190:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    191:197:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):905:905 -> a
+    191:197:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    198:203:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):907:907 -> a
+    198:203:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    204:208:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):910:910 -> a
+    204:208:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    209:222:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,androidx.activity.result.PickVisualMediaRequest):911:911 -> a
+    209:222:android.content.Intent androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.createIntent(android.content.Context,java.lang.Object):603 -> a
+    223:224:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923:3923 -> a
+    225:231:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3929:3929 -> a
+    225:231:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    232:235:android.content.Intent androidx.activity.result.IntentSenderRequest.getFillInIntent():40:40 -> a
+    232:235:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3930 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    202:205:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    206:213:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3932:3932 -> a
-    206:213:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    214:216:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3934:3934 -> a
-    214:216:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    217:219:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3935:3935 -> a
-    217:219:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    220:228:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3936:3936 -> a
-    220:228:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    229:230:android.content.IntentSender androidx.activity.result.IntentSenderRequest.getIntentSender():35:35 -> a
-    229:230:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3937 -> a
-    229:230:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    231:232:int androidx.activity.result.IntentSenderRequest.getFlagsValues():44:44 -> a
-    231:232:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3939 -> a
-    231:232:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    233:234:int androidx.activity.result.IntentSenderRequest.getFlagsMask():42:42 -> a
-    233:234:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3939 -> a
-    233:234:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    235:241:androidx.activity.result.IntentSenderRequest androidx.activity.result.IntentSenderRequest$Builder.build():152:152 -> a
-    235:241:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3940 -> a
-    235:241:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    242:247:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3944:3944 -> a
-    242:247:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    248:253:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3945:3945 -> a
-    248:253:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    254:274:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3946:3946 -> a
-    254:274:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
-    11:12:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136:136 -> b
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Le/a;"}
-    13:17:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):0:0 -> b
-    13:17:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    18:20:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):184:184 -> b
-    18:20:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    21:28:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):185:185 -> b
-    21:28:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    29:35:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1072:1072 -> b
-    29:35:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    36:46:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):189:189 -> b
-    36:46:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    47:56:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1074:1074 -> b
-    47:56:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    57:61:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1075:1075 -> b
-    57:61:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    62:66:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1076:1076 -> b
-    62:66:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    67:68:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):193:193 -> b
-    67:68:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    69:74:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1077:1077 -> b
-    69:74:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    75:80:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):193:193 -> b
-    75:80:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
-    81:82:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.getSynchronousResult(android.content.Context,java.lang.Object):603:603 -> b
-    83:90:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.getSynchronousResult(android.content.Context,androidx.activity.result.PickVisualMediaRequest):0:0 -> b
-    83:90:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.getSynchronousResult(android.content.Context,java.lang.Object):603 -> b
-    6:20:androidx.activity.result.ActivityResult androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.parseResult(int,android.content.Intent):84:84 -> c
-    6:20:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.parseResult(int,android.content.Intent):66 -> c
+    232:235:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    236:243:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3932:3932 -> a
+    236:243:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    244:246:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3934:3934 -> a
+    244:246:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    247:249:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3935:3935 -> a
+    247:249:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    250:258:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3936:3936 -> a
+    250:258:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    259:260:android.content.IntentSender androidx.activity.result.IntentSenderRequest.getIntentSender():35:35 -> a
+    259:260:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3937 -> a
+    259:260:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    261:262:int androidx.activity.result.IntentSenderRequest.getFlagsValues():44:44 -> a
+    261:262:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3939 -> a
+    261:262:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    263:264:int androidx.activity.result.IntentSenderRequest.getFlagsMask():42:42 -> a
+    263:264:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3939 -> a
+    263:264:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    265:271:androidx.activity.result.IntentSenderRequest androidx.activity.result.IntentSenderRequest$Builder.build():152:152 -> a
+    265:271:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3940 -> a
+    265:271:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    272:277:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3944:3944 -> a
+    272:277:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    278:283:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3945:3945 -> a
+    278:283:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    284:304:android.content.Intent createIntent(android.content.Context,androidx.activity.result.IntentSenderRequest):3946:3946 -> a
+    284:304:android.content.Intent createIntent(android.content.Context,java.lang.Object):3923 -> a
+    11:12:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.Object):210:210 -> b
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lh/i;Ljava/lang/Object;)Lr1/i;"}
+    13:17:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.String):0:0 -> b
+    13:17:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.Object):210 -> b
+    18:23:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.String):229:229 -> b
+    18:23:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.Object):210 -> b
+    24:34:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.String):232:232 -> b
+    24:34:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestPermission.getSynchronousResult(android.content.Context,java.lang.Object):210 -> b
+    35:36:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136:136 -> b
+    37:41:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):0:0 -> b
+    37:41:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    42:44:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):184:184 -> b
+    42:44:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    45:53:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):185:185 -> b
+    45:53:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    54:60:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1072:1072 -> b
+    54:60:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    61:71:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):189:189 -> b
+    61:71:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    72:81:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1074:1074 -> b
+    72:81:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    82:86:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1075:1075 -> b
+    82:86:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    87:91:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1076:1076 -> b
+    87:91:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    92:93:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):193:193 -> b
+    92:93:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    94:99:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):1077:1077 -> b
+    94:99:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    100:106:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.String[]):193:193 -> b
+    100:106:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.getSynchronousResult(android.content.Context,java.lang.Object):136 -> b
+    107:108:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.getSynchronousResult(android.content.Context,java.lang.Object):603:603 -> b
+    109:116:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.getSynchronousResult(android.content.Context,androidx.activity.result.PickVisualMediaRequest):0:0 -> b
+    109:116:androidx.activity.result.contract.ActivityResultContract$SynchronousResult androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.getSynchronousResult(android.content.Context,java.lang.Object):603 -> b
+    6:17:androidx.activity.result.ActivityResult androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.parseResult(int,android.content.Intent):84:84 -> c
+    6:17:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.parseResult(int,android.content.Intent):66 -> c
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/content/Intent;I)Ljava/lang/Object;"}
-    21:26:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):200:200 -> c
-    21:26:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    27:38:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):201:201 -> c
-    27:38:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    39:44:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):1080:1080 -> c
-    39:44:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    45:56:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):1081:1081 -> c
-    45:56:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    57:60:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):204:204 -> c
-    57:60:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    61:66:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):1082:1082 -> c
-    61:66:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    67:71:java.util.List kotlin.collections.ArraysKt___ArraysKt.filterNotNull(java.lang.Object[]):4325:4325 -> c
-    67:71:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    67:71:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    72:84:java.util.Collection kotlin.collections.ArraysKt___ArraysKt.filterNotNullTo(java.lang.Object[],java.util.Collection):4334:4334 -> c
-    72:84:java.util.List kotlin.collections.ArraysKt___ArraysKt.filterNotNull(java.lang.Object[]):4325 -> c
-    72:84:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    72:84:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    85:88:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3967:3967 -> c
-    85:88:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    85:88:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    89:92:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3968:3968 -> c
-    89:92:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    89:92:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    93:109:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3969:3969 -> c
-    93:109:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    93:109:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    110:121:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3970:3970 -> c
-    110:121:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    110:121:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    122:129:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3971:3971 -> c
-    122:129:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    122:129:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    130:134:kotlin.Pair kotlin.TuplesKt.to(java.lang.Object,java.lang.Object):43:43 -> c
-    130:134:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3533 -> c
-    130:134:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    130:134:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    135:138:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3971:3971 -> c
-    135:138:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
-    135:138:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    139:143:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205:205 -> c
-    139:143:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
-    144:154:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136:136 -> c
-    155:160:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929:929 -> c
-    155:160:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    161:165:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):427:427 -> c
-    161:165:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    161:165:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    166:174:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):428:428 -> c
-    166:174:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    166:174:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    175:181:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):429:429 -> c
-    175:181:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    175:181:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    182:187:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):430:430 -> c
-    182:187:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    182:187:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    188:192:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):431:431 -> c
-    188:192:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    188:192:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    193:199:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):433:433 -> c
-    193:199:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    193:199:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    200:209:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):434:434 -> c
-    200:209:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    200:209:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    210:215:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):436:436 -> c
-    210:215:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    210:215:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    216:220:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):440:440 -> c
-    216:220:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    216:220:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    221:231:java.lang.Object kotlin.collections.CollectionsKt___CollectionsKt.firstOrNull(java.util.List):288:288 -> c
-    221:231:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
-    221:231:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    232:236:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929:929 -> c
-    232:236:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
-    237:242:androidx.activity.result.ActivityResult parseResult(int,android.content.Intent):3954:3954 -> c
-    237:242:java.lang.Object parseResult(int,android.content.Intent):3923 -> c
+    18:26:java.lang.Boolean androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):219:219 -> c
+    18:26:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):210 -> c
+    27:39:java.lang.Boolean androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):1072:1072 -> c
+    27:39:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):210 -> c
+    40:44:java.lang.Boolean androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):220:220 -> c
+    40:44:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):210 -> c
+    45:56:java.lang.Boolean androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):217:217 -> c
+    45:56:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestPermission.parseResult(int,android.content.Intent):210 -> c
+    57:62:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):200:200 -> c
+    57:62:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    63:74:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):201:201 -> c
+    63:74:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    75:80:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):1080:1080 -> c
+    75:80:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    81:92:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):1081:1081 -> c
+    81:92:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    93:96:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):204:204 -> c
+    93:96:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    97:102:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):1082:1082 -> c
+    97:102:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    103:107:java.util.List kotlin.collections.ArraysKt___ArraysKt.filterNotNull(java.lang.Object[]):4325:4325 -> c
+    103:107:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    103:107:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    108:120:java.util.Collection kotlin.collections.ArraysKt___ArraysKt.filterNotNullTo(java.lang.Object[],java.util.Collection):4334:4334 -> c
+    108:120:java.util.List kotlin.collections.ArraysKt___ArraysKt.filterNotNull(java.lang.Object[]):4325 -> c
+    108:120:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    108:120:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    121:124:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3967:3967 -> c
+    121:124:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    121:124:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    125:128:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3968:3968 -> c
+    125:128:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    125:128:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    129:145:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3969:3969 -> c
+    129:145:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    129:145:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    146:157:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3970:3970 -> c
+    146:157:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    146:157:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    158:165:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3971:3971 -> c
+    158:165:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    158:165:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    166:170:kotlin.Pair kotlin.TuplesKt.to(java.lang.Object,java.lang.Object):43:43 -> c
+    166:170:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3533 -> c
+    166:170:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    166:170:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    171:174:java.util.List kotlin.collections.CollectionsKt___CollectionsKt.zip(java.lang.Iterable,java.lang.Iterable):3971:3971 -> c
+    171:174:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205 -> c
+    171:174:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    175:179:java.util.Map androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):205:205 -> c
+    175:179:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136 -> c
+    180:190:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$RequestMultiplePermissions.parseResult(int,android.content.Intent):136:136 -> c
+    191:196:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929:929 -> c
+    191:196:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    197:201:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):427:427 -> c
+    197:201:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    197:201:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    202:210:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):428:428 -> c
+    202:210:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    202:210:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    211:217:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):429:429 -> c
+    211:217:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    211:217:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    218:223:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):430:430 -> c
+    218:223:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    218:223:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    224:228:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):431:431 -> c
+    224:228:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    224:228:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    229:235:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):433:433 -> c
+    229:235:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    229:235:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    236:245:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):434:434 -> c
+    236:245:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    236:245:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    246:251:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):436:436 -> c
+    246:251:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    246:251:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    252:256:java.util.List androidx.activity.result.contract.ActivityResultContracts$GetMultipleContents$Companion.getClipDataUris$activity_release(android.content.Intent):440:440 -> c
+    252:256:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    252:256:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    257:267:java.lang.Object kotlin.collections.CollectionsKt___CollectionsKt.firstOrNull(java.util.List):288:288 -> c
+    257:267:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929 -> c
+    257:267:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    268:272:android.net.Uri androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):929:929 -> c
+    268:272:java.lang.Object androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia.parseResult(int,android.content.Intent):603 -> c
+    273:278:androidx.activity.result.ActivityResult parseResult(int,android.content.Intent):3954:3954 -> c
+    273:278:java.lang.Object parseResult(int,android.content.Intent):3923 -> c
 androidx.fragment.app.FragmentManager$LaunchedFragmentInfo -> androidx.fragment.app.m0:
 # {"id":"sourceFile","fileName":"FragmentManager.java"}
     java.lang.String mWho -> g
@@ -93134,6 +93149,8 @@ androidx.webkit.internal.WebMessageListenerAdapter -> r1.i:
       # {"id":"com.android.tools.r8.synthesized"}
     androidx.webkit.WebViewCompat$WebMessageListener mWebMessageListener -> h
       # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/lang/Object;"}
+    com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.snackbarManager -> i
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Lr1/i;"}
     1:1:void r1.WebMessageListenerAdapter.<init>(int,java.lang.Object):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
     2:2:void com.getcapacitor.community.database.sqlite.SQLite.UtilsMigrate.<init>():7:7 -> <init>
@@ -93151,27 +93168,31 @@ androidx.webkit.internal.WebMessageListenerAdapter -> r1.i:
     7:7:void r1.WebMessageListenerAdapter.<init>(int):0 -> <init>
     8:8:void androidx.collection.internal.LruHashMap.<init>(int,float):35:35 -> <init>
     8:8:void r1.WebMessageListenerAdapter.<init>(int):0 -> <init>
-    9:9:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):40:40 -> <init>
-    10:10:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):49:49 -> <init>
-    11:11:void androidx.core.splashscreen.SplashScreenViewProvider$ViewImpl31.<init>(android.app.Activity):119:119 -> <init>
-    11:11:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):49 -> <init>
-    12:13:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):50:51 -> <init>
-    14:16:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):47:49 -> <init>
-    17:18:void androidx.core.view.SoftwareKeyboardControllerCompat$Impl30.<init>(android.view.View):160:161 -> <init>
-    17:18:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):49 -> <init>
-    19:19:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):49:49 -> <init>
-    20:20:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):51:51 -> <init>
-    21:21:void androidx.emoji2.viewsintegration.EmojiTextViewHelper.<init>(android.widget.TextView,boolean):96:96 -> <init>
+    9:11:void com.google.android.material.snackbar.SnackbarManager.<init>():49:51 -> <init>
+    9:11:void r1.WebMessageListenerAdapter.<init>(int):0 -> <init>
+    12:12:void com.google.android.material.snackbar.SnackbarManager.<init>():53:53 -> <init>
+    12:12:void r1.WebMessageListenerAdapter.<init>(int):0 -> <init>
+    13:13:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):40:40 -> <init>
+    14:14:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):49:49 -> <init>
+    15:15:void androidx.core.splashscreen.SplashScreenViewProvider$ViewImpl31.<init>(android.app.Activity):119:119 -> <init>
+    15:15:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):49 -> <init>
+    16:17:void androidx.core.splashscreen.SplashScreenViewProvider.<init>(android.app.Activity):50:51 -> <init>
+    18:20:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):47:49 -> <init>
+    21:22:void androidx.core.view.SoftwareKeyboardControllerCompat$Impl30.<init>(android.view.View):160:161 -> <init>
+    21:22:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):49 -> <init>
+    23:23:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):49:49 -> <init>
+    24:24:void androidx.core.view.SoftwareKeyboardControllerCompat.<init>(android.view.View):51:51 -> <init>
+    25:25:void androidx.emoji2.viewsintegration.EmojiTextViewHelper.<init>(android.widget.TextView,boolean):96:96 -> <init>
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/widget/TextView;)V"}
-    22:22:void androidx.emoji2.viewsintegration.EmojiTextViewHelper.<init>(android.widget.TextView,boolean):101:101 -> <init>
-    23:23:void kotlinx.coroutines.flow.AbstractFlow.<init>():220:220 -> <init>
-    23:23:void kotlinx.coroutines.flow.SafeFlow.<init>(kotlin.jvm.functions.Function2):55 -> <init>
+    26:26:void androidx.emoji2.viewsintegration.EmojiTextViewHelper.<init>(android.widget.TextView,boolean):101:101 -> <init>
+    27:27:void kotlinx.coroutines.flow.AbstractFlow.<init>():220:220 -> <init>
+    27:27:void kotlinx.coroutines.flow.SafeFlow.<init>(kotlin.jvm.functions.Function2):55 -> <init>
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ln4/p;)V"}
-    24:24:void kotlinx.coroutines.flow.SafeFlow.<init>(kotlin.jvm.functions.Function2):55:55 -> <init>
-    25:25:void androidx.core.view.ContentInfoCompat$Compat31Impl.<init>(android.view.ContentInfo):416:416 -> <init>
-    26:26:java.lang.Object androidx.core.util.Preconditions.checkNotNull(java.lang.Object):137:137 -> <init>
-    26:26:void androidx.core.view.ContentInfoCompat$Compat31Impl.<init>(android.view.ContentInfo):417 -> <init>
-    27:27:void androidx.core.view.ContentInfoCompat$Compat31Impl.<init>(android.view.ContentInfo):417:417 -> <init>
+    28:28:void kotlinx.coroutines.flow.SafeFlow.<init>(kotlin.jvm.functions.Function2):55:55 -> <init>
+    29:29:void androidx.core.view.ContentInfoCompat$Compat31Impl.<init>(android.view.ContentInfo):416:416 -> <init>
+    30:30:java.lang.Object androidx.core.util.Preconditions.checkNotNull(java.lang.Object):137:137 -> <init>
+    30:30:void androidx.core.view.ContentInfoCompat$Compat31Impl.<init>(android.view.ContentInfo):417 -> <init>
+    31:31:void androidx.core.view.ContentInfoCompat$Compat31Impl.<init>(android.view.ContentInfo):417:417 -> <init>
     1:6:androidx.core.view.WindowInsetsCompat androidx.coordinatorlayout.widget.CoordinatorLayout$1.onApplyWindowInsets(android.view.View,androidx.core.view.WindowInsetsCompat):3526:3526 -> a
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/view/View;Lp0/q1;)Lp0/q1;"}
     7:8:androidx.core.view.WindowInsetsCompat androidx.coordinatorlayout.widget.CoordinatorLayout.setWindowInsets(androidx.core.view.WindowInsetsCompat):389:389 -> a
@@ -94062,83 +94083,103 @@ androidx.webkit.internal.WebViewProviderFactory -> r1.o:
     org.chromium.support_lib_boundary.StaticsBoundaryInterface getStatics() -> getStatics
 com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin -> com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin:
 # {"id":"sourceFile","fileName":"BirthdayBuddyContactsPlugin.java"}
+    androidx.activity.result.ActivityResultLauncher contactsPermissionLauncher -> contactsPermissionLauncher
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Ld/c;"}
+    com.getcapacitor.PluginCall pendingContactsCall -> pendingContactsCall
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Lcom/getcapacitor/f0;"}
     1:4:void <init>():26:26 -> <init>
-    1:2:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):79:79 -> contact
+    1:4:void $r8$lambda$-fRfqqj3DIrFmWyPd_pO2frAVNc(com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin,java.lang.Boolean):0:0 -> c
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:2:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):98:98 -> contact
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/getcapacitor/x;"}
     3:5:void com.getcapacitor.JSObject.<init>():18:18 -> contact
-    3:5:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):79 -> contact
-    6:28:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):79:79 -> contact
-    29:40:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):80:80 -> contact
+    3:5:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):98 -> contact
+    6:28:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):98:98 -> contact
+    29:40:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):99:99 -> contact
     4:12:int androidx.activity.result.ActivityResult.getResultCode():32:32 -> contactPicked
-    4:12:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):41 -> contactPicked
+    4:12:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):57 -> contactPicked
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;Ld/a;)V"}
-    13:19:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):41:41 -> contactPicked
-    20:21:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):43:43 -> contactPicked
+    13:19:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):57:57 -> contactPicked
+    20:21:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):59:59 -> contactPicked
     22:24:void com.getcapacitor.JSObject.<init>():18:18 -> contactPicked
-    22:24:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):43 -> contactPicked
-    25:42:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):43:43 -> contactPicked
-    43:45:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):44:44 -> contactPicked
+    22:24:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):59 -> contactPicked
+    25:42:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):59:59 -> contactPicked
+    43:45:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):60:60 -> contactPicked
     46:49:void com.getcapacitor.PluginCall.reject(java.lang.String,java.lang.Exception):111:111 -> contactPicked
-    46:49:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):44 -> contactPicked
-    50:53:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):41:41 -> contactPicked
-    1:13:void contactsPermission(com.getcapacitor.PluginCall):55:55 -> contactsPermission
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
-    14:17:void com.getcapacitor.PluginCall.reject(java.lang.String):119:119 -> contactsPermission
-    14:17:void contactsPermission(com.getcapacitor.PluginCall):55 -> contactsPermission
-      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    18:21:void contactsPermission(com.getcapacitor.PluginCall):56:56 -> contactsPermission
-    5:73:int[] parseDate(java.lang.String):93:93 -> parseDate
-    1:2:void permissionStatus(com.getcapacitor.PluginCall):29:29 -> permissionStatus
+    46:49:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):60 -> contactPicked
+    50:53:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):57:57 -> contactPicked
+    1:16:boolean hasContactPermission():75:75 -> hasContactPermission
+    1:3:void lambda$load$0(java.lang.Boolean):35:35 -> lambda$load$0
+    4:8:void lambda$load$0(java.lang.Boolean):36:36 -> lambda$load$0
+    9:20:void lambda$load$0(java.lang.Boolean):38:38 -> lambda$load$0
+    21:24:void com.getcapacitor.PluginCall.reject(java.lang.String):119:119 -> lambda$load$0
+    21:24:void lambda$load$0(java.lang.Boolean):38 -> lambda$load$0
+    1:5:void load():32:32 -> load
+    6:8:void androidx.activity.result.contract.ActivityResultContract.<init>():29:29 -> load
+    6:8:void androidx.activity.result.contract.ActivityResultContracts$RequestPermission.<init>():210 -> load
+    6:8:void load():32 -> load
+    9:22:void load():32:32 -> load
+    5:73:int[] parseDate(java.lang.String):112:112 -> parseDate
+    1:2:void permissionStatus(com.getcapacitor.PluginCall):45:45 -> permissionStatus
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
     3:5:void com.getcapacitor.JSObject.<init>():18:18 -> permissionStatus
-    3:5:void permissionStatus(com.getcapacitor.PluginCall):29 -> permissionStatus
-    6:27:void permissionStatus(com.getcapacitor.PluginCall):29:29 -> permissionStatus
-    1:9:void pickContact(com.getcapacitor.PluginCall):34:34 -> pickContact
+    3:5:void permissionStatus(com.getcapacitor.PluginCall):45 -> permissionStatus
+    6:18:void permissionStatus(com.getcapacitor.PluginCall):45:45 -> permissionStatus
+    1:9:void pickContact(com.getcapacitor.PluginCall):50:50 -> pickContact
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
-    10:15:void pickContact(com.getcapacitor.PluginCall):35:35 -> pickContact
-    1:2:void readAll(com.getcapacitor.PluginCall):61:61 -> readAll
+    10:15:void pickContact(com.getcapacitor.PluginCall):51:51 -> pickContact
+    1:2:void readAll(com.getcapacitor.PluginCall):80:80 -> readAll
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
     3:5:void com.getcapacitor.JSArray.<init>():12:12 -> readAll
-    3:5:void readAll(com.getcapacitor.PluginCall):61 -> readAll
-    6:7:void readAll(com.getcapacitor.PluginCall):62:62 -> readAll
+    3:5:void readAll(com.getcapacitor.PluginCall):80 -> readAll
+    6:7:void readAll(com.getcapacitor.PluginCall):81:81 -> readAll
     8:10:void com.getcapacitor.JSArray.<init>():12:12 -> readAll
-    8:10:void readAll(com.getcapacitor.PluginCall):62 -> readAll
-    11:15:void readAll(com.getcapacitor.PluginCall):63:63 -> readAll
-    16:17:void readAll(com.getcapacitor.PluginCall):64:64 -> readAll
+    8:10:void readAll(com.getcapacitor.PluginCall):81 -> readAll
+    11:15:void readAll(com.getcapacitor.PluginCall):82:82 -> readAll
+    16:17:void readAll(com.getcapacitor.PluginCall):83:83 -> readAll
     18:25:com.getcapacitor.JSArray com.getcapacitor.PluginCall.getArray(java.lang.String):296:296 -> readAll
-    18:25:void readAll(com.getcapacitor.PluginCall):64 -> readAll
+    18:25:void readAll(com.getcapacitor.PluginCall):83 -> readAll
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    26:43:void readAll(com.getcapacitor.PluginCall):65:65 -> readAll
-    44:75:void readAll(com.getcapacitor.PluginCall):66:66 -> readAll
-    76:134:void readAll(com.getcapacitor.PluginCall):67:67 -> readAll
-    135:136:void readAll(com.getcapacitor.PluginCall):68:68 -> readAll
+    26:43:void readAll(com.getcapacitor.PluginCall):84:84 -> readAll
+    44:75:void readAll(com.getcapacitor.PluginCall):85:85 -> readAll
+    76:134:void readAll(com.getcapacitor.PluginCall):86:86 -> readAll
+    135:136:void readAll(com.getcapacitor.PluginCall):87:87 -> readAll
     137:139:void com.getcapacitor.JSObject.<init>():18:18 -> readAll
-    137:139:void readAll(com.getcapacitor.PluginCall):68 -> readAll
-    140:153:void readAll(com.getcapacitor.PluginCall):68:68 -> readAll
-    154:156:void readAll(com.getcapacitor.PluginCall):69:69 -> readAll
+    137:139:void readAll(com.getcapacitor.PluginCall):87 -> readAll
+    140:153:void readAll(com.getcapacitor.PluginCall):87:87 -> readAll
+    154:156:void readAll(com.getcapacitor.PluginCall):88:88 -> readAll
     157:160:void com.getcapacitor.PluginCall.reject(java.lang.String,java.lang.Exception):111:111 -> readAll
-    157:160:void readAll(com.getcapacitor.PluginCall):69 -> readAll
+    157:160:void readAll(com.getcapacitor.PluginCall):88 -> readAll
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    1:16:void readContacts(com.getcapacitor.PluginCall):49:49 -> readContacts
+    1:6:void readContacts(com.getcapacitor.PluginCall):65:65 -> readContacts
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
-    17:20:void readContacts(com.getcapacitor.PluginCall):50:50 -> readContacts
-    1:2:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):84:84 -> readEvents
+    7:13:void readContacts(com.getcapacitor.PluginCall):66:66 -> readContacts
+    14:17:void com.getcapacitor.PluginCall.reject(java.lang.String):119:119 -> readContacts
+    14:17:void readContacts(com.getcapacitor.PluginCall):66 -> readContacts
+      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
+    18:19:void readContacts(com.getcapacitor.PluginCall):67:67 -> readContacts
+    20:23:void readContacts(com.getcapacitor.PluginCall):68:68 -> readContacts
+    24:27:void androidx.activity.result.ActivityResultLauncher.launch(java.lang.Object):37:37 -> readContacts
+    24:27:void readContacts(com.getcapacitor.PluginCall):68 -> readContacts
+      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
+    28:31:void readContacts(com.getcapacitor.PluginCall):71:71 -> readContacts
+    1:2:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):103:103 -> readEvents
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Ljava/lang/String;)Lcom/getcapacitor/v;"}
     3:5:void com.getcapacitor.JSArray.<init>():12:12 -> readEvents
-    3:5:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):84 -> readEvents
-    6:40:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):86:86 -> readEvents
-    41:83:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):87:87 -> readEvents
+    3:5:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):103 -> readEvents
+    6:40:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):105:105 -> readEvents
+    41:83:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106:106 -> readEvents
     84:86:void com.getcapacitor.JSObject.<init>():18:18 -> readEvents
-    84:86:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):87 -> readEvents
-    87:147:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):87:87 -> readEvents
-    4:10:java.lang.String readPhoto(java.lang.String):98:98 -> readPhoto
-    11:115:java.lang.String readPhoto(java.lang.String):99:99 -> readPhoto
-    1:30:com.getcapacitor.JSObject readSingle(android.net.Uri):73:73 -> readSingle
+    84:86:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106 -> readEvents
+    87:147:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106:106 -> readEvents
+    4:10:java.lang.String readPhoto(java.lang.String):117:117 -> readPhoto
+    11:115:java.lang.String readPhoto(java.lang.String):118:118 -> readPhoto
+    1:30:com.getcapacitor.JSObject readSingle(android.net.Uri):92:92 -> readSingle
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/net/Uri;)Lcom/getcapacitor/x;"}
-    31:37:com.getcapacitor.JSObject readSingle(android.net.Uri):74:74 -> readSingle
-    38:64:com.getcapacitor.JSObject readSingle(android.net.Uri):75:75 -> readSingle
-    65:72:com.getcapacitor.JSObject readSingle(android.net.Uri):74:74 -> readSingle
+    31:37:com.getcapacitor.JSObject readSingle(android.net.Uri):93:93 -> readSingle
+    38:64:com.getcapacitor.JSObject readSingle(android.net.Uri):94:94 -> readSingle
+    65:72:com.getcapacitor.JSObject readSingle(android.net.Uri):93:93 -> readSingle
 com.actionanand.birthdaybuddy.app.BirthdayBuddyFilesPlugin -> com.actionanand.birthdaybuddy.app.BirthdayBuddyFilesPlugin:
 # {"id":"sourceFile","fileName":"BirthdayBuddyFilesPlugin.java"}
     1:4:void <init>():18:18 -> <init>
@@ -95254,7 +95295,7 @@ com.capacitorjs.plugins.camera.CameraPlugin -> com.capacitorjs.plugins.camera.Ca
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/capacitorjs/plugins/camera/CameraPlugin;Lcom/getcapacitor/f0;Landroid/net/Uri;)V"}
     2:18:androidx.activity.result.contract.ActivityResultContract getContractForCall(com.getcapacitor.PluginCall):343:343 -> getContractForCall
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)Le/b;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)Le/a;"}
     19:24:androidx.activity.result.contract.ActivityResultContract getContractForCall(com.getcapacitor.PluginCall):345:345 -> getContractForCall
     25:26:androidx.activity.result.contract.ActivityResultContract getContractForCall(com.getcapacitor.PluginCall):347:347 -> getContractForCall
     27:37:boolean androidx.activity.result.contract.ActivityResultContracts$PickVisualMedia$Companion.isSystemPickerAvailable$activity_release():714:714 -> getContractForCall
@@ -95719,7 +95760,7 @@ com.capacitorjs.plugins.camera.CameraPlugin -> com.capacitorjs.plugins.camera.Ca
     185:191:com.getcapacitor.JSObject processPickedImages(android.net.Uri):516:516 -> processPickedImages
     192:192:com.getcapacitor.JSObject processPickedImages(android.net.Uri):519:519 -> processPickedImages
     1:20:androidx.activity.result.ActivityResultLauncher registerActivityResultLauncher(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):331:331 -> registerActivityResultLauncher
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/b;Ld/b;)Ld/c;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/a;Ld/b;)Ld/c;"}
     21:22:androidx.activity.result.ActivityResultLauncher registerActivityResultLauncher(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):332:332 -> registerActivityResultLauncher
     23:25:androidx.fragment.app.Fragment com.getcapacitor.Bridge.getFragment():504:504 -> registerActivityResultLauncher
     23:25:androidx.activity.result.ActivityResultLauncher registerActivityResultLauncher(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):332 -> registerActivityResultLauncher
@@ -95930,11 +95971,11 @@ com.capacitorjs.plugins.camera.CameraPlugin -> com.capacitorjs.plugins.camera.Ca
 com.capacitorjs.plugins.camera.CameraPlugin$$ExternalSyntheticLambda3 -> com.capacitorjs.plugins.camera.d:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    int $r8$classId -> a
+    int $r8$classId -> g
       # {"id":"com.android.tools.r8.synthesized"}
-    com.capacitorjs.plugins.camera.CameraPlugin com.capacitorjs.plugins.camera.CameraPlugin$$InternalSyntheticLambda$1$3afb3d6918af3dc6610e14d428b7ccef4a6e6f790a66231192b22314515c76c5$0.f$0 -> b
+    com.capacitorjs.plugins.camera.CameraPlugin com.capacitorjs.plugins.camera.CameraPlugin$$InternalSyntheticLambda$1$3afb3d6918af3dc6610e14d428b7ccef4a6e6f790a66231192b22314515c76c5$0.f$0 -> h
       # {"id":"com.android.tools.r8.synthesized"}
-    com.getcapacitor.PluginCall com.capacitorjs.plugins.camera.CameraPlugin$$InternalSyntheticLambda$1$3afb3d6918af3dc6610e14d428b7ccef4a6e6f790a66231192b22314515c76c5$0.f$1 -> c
+    com.getcapacitor.PluginCall com.capacitorjs.plugins.camera.CameraPlugin$$InternalSyntheticLambda$1$3afb3d6918af3dc6610e14d428b7ccef4a6e6f790a66231192b22314515c76c5$0.f$1 -> i
       # {"id":"com.android.tools.r8.residualsignature","signature":"Lcom/getcapacitor/f0;"}
       # {"id":"com.android.tools.r8.synthesized"}
     1:10:void <init>(com.capacitorjs.plugins.camera.CameraPlugin,com.getcapacitor.PluginCall,int):0:0 -> <init>
@@ -103139,56 +103180,58 @@ com.capacitorjs.plugins.statusbar.StatusBarPlugin$$ExternalSyntheticLambda5 -> a
     28:35:androidx.core.view.WindowInsetsCompat com.capacitorjs.plugins.keyboard.Keyboard.lambda$new$0(boolean,android.view.View,androidx.core.view.WindowInsetsCompat):71:71 -> a
     28:35:p0.WindowInsetsCompat a2.StatusBarPlugin$$ExternalSyntheticLambda5.onApplyWindowInsets(android.view.View,p0.WindowInsetsCompat):0 -> a
     36:42:p0.WindowInsetsCompat a2.StatusBarPlugin$$ExternalSyntheticLambda5.onApplyWindowInsets(android.view.View,p0.WindowInsetsCompat):0:0 -> a
-    5:17:boolean com.capacitorjs.plugins.splashscreen.SplashScreen.lambda$showWithAndroid12API$0():102:102 -> b
-    5:10:void com.getcapacitor.BridgeWebChromeClient.lambda$onPermissionRequest$2(android.webkit.PermissionRequest,java.lang.Boolean):114:114 -> c
+    1:10:void a2.StatusBarPlugin$$ExternalSyntheticLambda5.onActivityResult(java.lang.Object):0:0 -> b
+      # {"id":"com.android.tools.r8.synthesized"}
+    5:17:boolean com.capacitorjs.plugins.splashscreen.SplashScreen.lambda$showWithAndroid12API$0():102:102 -> c
+    5:10:void com.getcapacitor.BridgeWebChromeClient.lambda$onPermissionRequest$2(android.webkit.PermissionRequest,java.lang.Boolean):114:114 -> d
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/Boolean;)V"}
-    11:18:void com.getcapacitor.BridgeWebChromeClient.lambda$onPermissionRequest$2(android.webkit.PermissionRequest,java.lang.Boolean):115:115 -> c
-    19:22:void com.getcapacitor.BridgeWebChromeClient.lambda$onPermissionRequest$2(android.webkit.PermissionRequest,java.lang.Boolean):117:117 -> c
-    5:15:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):362:362 -> d
+    11:18:void com.getcapacitor.BridgeWebChromeClient.lambda$onPermissionRequest$2(android.webkit.PermissionRequest,java.lang.Boolean):115:115 -> d
+    19:22:void com.getcapacitor.BridgeWebChromeClient.lambda$onPermissionRequest$2(android.webkit.PermissionRequest,java.lang.Boolean):117:117 -> d
+    5:15:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):362:362 -> e
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lc2/e;ILandroid/os/Bundle;)Z"}
-    16:19:void androidx.core.view.inputmethod.InputContentInfoCompat.requestPermission():229:229 -> d
-    16:19:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):365 -> d
+    16:19:void androidx.core.view.inputmethod.InputContentInfoCompat.requestPermission():229:229 -> e
+    16:19:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):365 -> e
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    20:22:void androidx.core.view.inputmethod.InputContentInfoCompat.requestPermission():229:229 -> d
-    20:22:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):365 -> d
-    23:30:java.lang.Object androidx.core.view.inputmethod.InputContentInfoCompat.unwrap():216:216 -> d
-    23:30:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):377 -> d
-    31:34:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):377:377 -> d
-    35:46:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):378:378 -> d
-    47:53:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):379:379 -> d
-    54:61:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):367:367 -> d
-    62:63:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381:381 -> d
-    64:67:android.content.ClipDescription androidx.core.view.inputmethod.InputContentInfoCompat.getDescription():177:177 -> d
-    64:67:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381 -> d
+    20:22:void androidx.core.view.inputmethod.InputContentInfoCompat.requestPermission():229:229 -> e
+    20:22:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):365 -> e
+    23:30:java.lang.Object androidx.core.view.inputmethod.InputContentInfoCompat.unwrap():216:216 -> e
+    23:30:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):377 -> e
+    31:34:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):377:377 -> e
+    35:46:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):378:378 -> e
+    47:53:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):379:379 -> e
+    54:61:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):367:367 -> e
+    62:63:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381:381 -> e
+    64:67:android.content.ClipDescription androidx.core.view.inputmethod.InputContentInfoCompat.getDescription():177:177 -> e
+    64:67:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381 -> e
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    68:71:android.content.ClipDescription androidx.core.view.inputmethod.InputContentInfoCompat.getDescription():177:177 -> d
-    68:71:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381 -> d
-    72:73:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381:381 -> d
-    74:77:android.net.Uri androidx.core.view.inputmethod.InputContentInfoCompat.getContentUri():168:168 -> d
-    74:77:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):382 -> d
-    78:88:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):382:382 -> d
-    89:94:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):483:483 -> d
-    89:94:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> d
-    95:96:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485:485 -> d
-    95:96:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> d
-    97:99:void androidx.core.view.ContentInfoCompat$BuilderCompatImpl.<init>(android.content.ClipData,int):572:572 -> d
-    97:99:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485 -> d
-    97:99:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> d
-    100:101:void androidx.core.view.ContentInfoCompat$BuilderCompatImpl.<init>(android.content.ClipData,int):573:573 -> d
-    100:101:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485 -> d
-    100:101:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> d
-    102:103:void androidx.core.view.ContentInfoCompat$BuilderCompatImpl.<init>(android.content.ClipData,int):574:574 -> d
-    102:103:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485 -> d
-    102:103:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> d
-    104:107:android.net.Uri androidx.core.view.inputmethod.InputContentInfoCompat.getLinkUri():184:184 -> d
-    104:107:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):384 -> d
-    108:110:androidx.core.view.ContentInfoCompat$Builder androidx.core.view.ContentInfoCompat$Builder.setLinkUri(android.net.Uri):531:531 -> d
-    108:110:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):384 -> d
-    111:113:androidx.core.view.ContentInfoCompat$Builder androidx.core.view.ContentInfoCompat$Builder.setExtras(android.os.Bundle):542:542 -> d
-    111:113:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):385 -> d
-    114:117:androidx.core.view.ContentInfoCompat androidx.core.view.ContentInfoCompat$Builder.build():550:550 -> d
-    114:117:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):386 -> d
-    118:125:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):387:387 -> d
+    68:71:android.content.ClipDescription androidx.core.view.inputmethod.InputContentInfoCompat.getDescription():177:177 -> e
+    68:71:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381 -> e
+    72:73:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):381:381 -> e
+    74:77:android.net.Uri androidx.core.view.inputmethod.InputContentInfoCompat.getContentUri():168:168 -> e
+    74:77:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):382 -> e
+    78:88:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):382:382 -> e
+    89:94:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):483:483 -> e
+    89:94:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> e
+    95:96:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485:485 -> e
+    95:96:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> e
+    97:99:void androidx.core.view.ContentInfoCompat$BuilderCompatImpl.<init>(android.content.ClipData,int):572:572 -> e
+    97:99:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485 -> e
+    97:99:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> e
+    100:101:void androidx.core.view.ContentInfoCompat$BuilderCompatImpl.<init>(android.content.ClipData,int):573:573 -> e
+    100:101:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485 -> e
+    100:101:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> e
+    102:103:void androidx.core.view.ContentInfoCompat$BuilderCompatImpl.<init>(android.content.ClipData,int):574:574 -> e
+    102:103:void androidx.core.view.ContentInfoCompat$Builder.<init>(android.content.ClipData,int):485 -> e
+    102:103:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):383 -> e
+    104:107:android.net.Uri androidx.core.view.inputmethod.InputContentInfoCompat.getLinkUri():184:184 -> e
+    104:107:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):384 -> e
+    108:110:androidx.core.view.ContentInfoCompat$Builder androidx.core.view.ContentInfoCompat$Builder.setLinkUri(android.net.Uri):531:531 -> e
+    108:110:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):384 -> e
+    111:113:androidx.core.view.ContentInfoCompat$Builder androidx.core.view.ContentInfoCompat$Builder.setExtras(android.os.Bundle):542:542 -> e
+    111:113:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):385 -> e
+    114:117:androidx.core.view.ContentInfoCompat androidx.core.view.ContentInfoCompat$Builder.build():550:550 -> e
+    114:117:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):386 -> e
+    118:125:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):387:387 -> e
 com.getcapacitor.App -> com.getcapacitor.a:
 # {"id":"sourceFile","fileName":"App.java"}
     boolean isActive -> a
@@ -104015,7 +104058,7 @@ com.getcapacitor.Bridge -> com.getcapacitor.g:
     45:54:java.lang.String pluginId(java.lang.Class):730:730 -> f
     55:64:java.lang.String pluginId(java.lang.Class):733:733 -> f
     1:5:androidx.activity.result.ActivityResultLauncher registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):1009:1009 -> g
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/b;Ld/b;)Ld/c;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/a;Ld/b;)Ld/c;"}
     6:7:androidx.activity.result.ActivityResultLauncher androidx.activity.ComponentActivity.registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):811:811 -> g
     6:7:androidx.activity.result.ActivityResultLauncher registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):1009 -> g
     8:12:androidx.activity.result.ActivityResultLauncher androidx.activity.ComponentActivity.registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultRegistry,androidx.activity.result.ActivityResultCallback):0:0 -> g
@@ -104739,23 +104782,23 @@ com.getcapacitor.BridgeWebChromeClient$$ExternalSyntheticLambda10 -> com.getcapa
     1:10:void <init>(com.getcapacitor.BridgeWebChromeClient,android.webkit.GeolocationPermissions$Callback,java.lang.String):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/q;Landroid/webkit/GeolocationPermissions$Callback;Ljava/lang/String;)V"}
-    1:12:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):253:253 -> c
+    1:12:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):253:253 -> d
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/Boolean;)V"}
-    13:16:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):254:254 -> c
-    17:22:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):256:256 -> c
-    23:32:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):257:257 -> c
-    33:34:android.content.Context com.getcapacitor.Bridge.getContext():486:486 -> c
-    33:34:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):259 -> c
+    13:16:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):254:254 -> d
+    17:22:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):256:256 -> d
+    23:32:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):257:257 -> d
+    33:34:android.content.Context com.getcapacitor.Bridge.getContext():486:486 -> d
+    33:34:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):259 -> d
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    35:40:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):259:259 -> c
-    41:44:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):261:261 -> c
-    45:48:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):263:263 -> c
+    35:40:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):259:259 -> d
+    41:44:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):261:261 -> d
+    45:48:void com.getcapacitor.BridgeWebChromeClient.lambda$onGeolocationPermissionsShowPrompt$11(android.webkit.GeolocationPermissions$Callback,java.lang.String,java.lang.Boolean):263:263 -> d
 com.getcapacitor.BridgeWebChromeClient$$ExternalSyntheticLambda11 -> com.getcapacitor.j:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    int $r8$classId -> a
+    int $r8$classId -> g
       # {"id":"com.android.tools.r8.synthesized"}
-    com.getcapacitor.BridgeWebChromeClient com.getcapacitor.BridgeWebChromeClient$$InternalSyntheticLambda$2$ffba60f8fca3019f127542f39c4c550d73bb9f5da2f69798f926a46e34c0e28f$0.f$0 -> b
+    com.getcapacitor.BridgeWebChromeClient com.getcapacitor.BridgeWebChromeClient$$InternalSyntheticLambda$2$ffba60f8fca3019f127542f39c4c550d73bb9f5da2f69798f926a46e34c0e28f$0.f$0 -> h
       # {"id":"com.android.tools.r8.residualsignature","signature":"Lcom/getcapacitor/q;"}
       # {"id":"com.android.tools.r8.synthesized"}
     1:8:void <init>(com.getcapacitor.BridgeWebChromeClient,int):0:0 -> <init>
@@ -104778,9 +104821,9 @@ com.getcapacitor.BridgeWebChromeClient$$ExternalSyntheticLambda11 -> com.getcapa
 com.getcapacitor.BridgeWebChromeClient$$ExternalSyntheticLambda13 -> com.getcapacitor.k:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    int $r8$classId -> a
+    int $r8$classId -> g
       # {"id":"com.android.tools.r8.synthesized"}
-    android.webkit.ValueCallback com.getcapacitor.BridgeWebChromeClient$$InternalSyntheticLambda$3$0b2cc5dbde9cf4434fbe59531531d100eff308567660eb4c486760b70fb54435$0.f$0 -> b
+    android.webkit.ValueCallback com.getcapacitor.BridgeWebChromeClient$$InternalSyntheticLambda$3$0b2cc5dbde9cf4434fbe59531531d100eff308567660eb4c486760b70fb54435$0.f$0 -> h
       # {"id":"com.android.tools.r8.synthesized"}
     1:8:void <init>(android.webkit.ValueCallback,int):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
@@ -104853,18 +104896,18 @@ com.getcapacitor.BridgeWebChromeClient$$ExternalSyntheticLambda9 -> com.getcapac
     1:12:void <init>(com.getcapacitor.BridgeWebChromeClient,android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/q;Landroid/webkit/ValueCallback;Landroid/webkit/WebChromeClient$FileChooserParams;Z)V"}
-    1:8:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):290:290 -> c
+    1:8:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):290:290 -> d
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/Boolean;)V"}
-    9:18:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):291:291 -> c
-    19:34:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):293:293 -> c
-    35:38:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):294:294 -> c
+    9:18:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):291:291 -> d
+    19:34:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):293:293 -> d
+    35:38:void com.getcapacitor.BridgeWebChromeClient.lambda$onShowFileChooser$12(android.webkit.ValueCallback,android.webkit.WebChromeClient$FileChooserParams,boolean,java.lang.Boolean):294:294 -> d
 com.getcapacitor.BridgeWebChromeClient$ActivityResultListener -> com.getcapacitor.o:
 # {"id":"sourceFile","fileName":"BridgeWebChromeClient.java"}
     void onActivityResult(androidx.activity.result.ActivityResult) -> a
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ld/a;)V"}
 com.getcapacitor.BridgeWebChromeClient$PermissionListener -> com.getcapacitor.p:
 # {"id":"sourceFile","fileName":"BridgeWebChromeClient.java"}
-    void onPermissionSelect(java.lang.Boolean) -> c
+    void onPermissionSelect(java.lang.Boolean) -> d
 com.getcapacitor.BridgeWebViewClient -> com.getcapacitor.r:
 # {"id":"sourceFile","fileName":"BridgeWebViewClient.java"}
     com.getcapacitor.Bridge bridge -> a
@@ -105963,12 +106006,12 @@ com.getcapacitor.Plugin -> com.getcapacitor.e0:
 com.getcapacitor.Plugin$$ExternalSyntheticLambda1 -> com.getcapacitor.d0:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    int $r8$classId -> a
+    int $r8$classId -> g
       # {"id":"com.android.tools.r8.synthesized"}
-    com.getcapacitor.Plugin com.getcapacitor.Plugin$$InternalSyntheticLambda$1$02e352ec66b95ae0ecc7672b8f67d90bf50aeb3ab6347b1c21b6480360826c1d$1.f$0 -> b
+    com.getcapacitor.Plugin com.getcapacitor.Plugin$$InternalSyntheticLambda$1$02e352ec66b95ae0ecc7672b8f67d90bf50aeb3ab6347b1c21b6480360826c1d$1.f$0 -> h
       # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/lang/Object;"}
       # {"id":"com.android.tools.r8.synthesized"}
-    java.lang.reflect.Method com.getcapacitor.Plugin$$InternalSyntheticLambda$1$02e352ec66b95ae0ecc7672b8f67d90bf50aeb3ab6347b1c21b6480360826c1d$1.f$1 -> c
+    java.lang.reflect.Method com.getcapacitor.Plugin$$InternalSyntheticLambda$1$02e352ec66b95ae0ecc7672b8f67d90bf50aeb3ab6347b1c21b6480360826c1d$1.f$1 -> i
       # {"id":"com.android.tools.r8.residualsignature","signature":"Ljava/lang/Object;"}
       # {"id":"com.android.tools.r8.synthesized"}
     1:10:void <init>(int,java.lang.Object,java.lang.Object):0:0 -> <init>
@@ -130110,44 +130153,44 @@ com.google.android.material.snackbar.BaseTransientBottomBar$Behavior -> com.goog
     19:22:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():37:37 -> j
     19:22:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
     19:22:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    23:29:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():38:38 -> j
-    23:29:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
-    23:29:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    30:31:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():40:40 -> j
-    30:31:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
-    30:31:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    32:33:void com.google.android.material.snackbar.SnackbarManager.restoreTimeoutIfPaused(com.google.android.material.snackbar.SnackbarManager$Callback):154:154 -> j
+    23:31:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():38:38 -> j
+    23:31:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
+    23:31:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    32:33:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():40:40 -> j
     32:33:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
-      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     32:33:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    34:34:void com.google.android.material.snackbar.SnackbarManager.restoreTimeoutIfPaused(com.google.android.material.snackbar.SnackbarManager$Callback):154:154 -> j
-    34:34:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
-    34:34:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    35:39:void com.google.android.material.snackbar.SnackbarManager.restoreTimeoutIfPaused(com.google.android.material.snackbar.SnackbarManager$Callback):159:159 -> j
-    35:39:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
-    35:39:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    40:55:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1425:1425 -> j
-    40:55:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    56:59:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():37:37 -> j
-    56:59:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
-    56:59:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    60:66:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():38:38 -> j
-    60:66:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
-    60:66:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    67:68:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():40:40 -> j
-    67:68:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
-    67:68:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    69:70:void com.google.android.material.snackbar.SnackbarManager.pauseTimeout(com.google.android.material.snackbar.SnackbarManager$Callback):145:145 -> j
-    69:70:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+    34:35:void com.google.android.material.snackbar.SnackbarManager.restoreTimeoutIfPaused(com.google.android.material.snackbar.SnackbarManager$Callback):154:154 -> j
+    34:35:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    69:70:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    71:71:void com.google.android.material.snackbar.SnackbarManager.pauseTimeout(com.google.android.material.snackbar.SnackbarManager$Callback):145:145 -> j
-    71:71:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
-    71:71:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    72:76:void com.google.android.material.snackbar.SnackbarManager.pauseTimeout(com.google.android.material.snackbar.SnackbarManager$Callback):150:150 -> j
-    72:76:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
-    72:76:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
-    77:81:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1394:1394 -> j
+    34:35:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    36:36:void com.google.android.material.snackbar.SnackbarManager.restoreTimeoutIfPaused(com.google.android.material.snackbar.SnackbarManager$Callback):154:154 -> j
+    36:36:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
+    36:36:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    37:41:void com.google.android.material.snackbar.SnackbarManager.restoreTimeoutIfPaused(com.google.android.material.snackbar.SnackbarManager$Callback):159:159 -> j
+    37:41:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1431 -> j
+    37:41:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    42:57:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1425:1425 -> j
+    42:57:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    58:61:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():37:37 -> j
+    58:61:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+    58:61:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    62:70:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():38:38 -> j
+    62:70:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+    62:70:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    71:72:com.google.android.material.snackbar.SnackbarManager com.google.android.material.snackbar.SnackbarManager.getInstance():40:40 -> j
+    71:72:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+    71:72:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    73:74:void com.google.android.material.snackbar.SnackbarManager.pauseTimeout(com.google.android.material.snackbar.SnackbarManager$Callback):145:145 -> j
+    73:74:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
+    73:74:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    75:75:void com.google.android.material.snackbar.SnackbarManager.pauseTimeout(com.google.android.material.snackbar.SnackbarManager$Callback):145:145 -> j
+    75:75:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+    75:75:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    76:80:void com.google.android.material.snackbar.SnackbarManager.pauseTimeout(com.google.android.material.snackbar.SnackbarManager$Callback):150:150 -> j
+    76:80:void com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1426 -> j
+    76:80:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1393 -> j
+    81:85:boolean onInterceptTouchEvent(androidx.coordinatorlayout.widget.CoordinatorLayout,android.view.View,android.view.MotionEvent):1394:1394 -> j
     1:5:boolean canSwipeDismissView(android.view.View):1387:1387 -> v
     6:8:boolean com.google.android.material.snackbar.BaseTransientBottomBar$BehaviorDelegate.canSwipeDismissView(android.view.View):1416:1416 -> v
     6:8:boolean canSwipeDismissView(android.view.View):1387 -> v
@@ -130351,9 +130394,9 @@ com.google.android.material.snackbar.SnackbarContentLayout -> com.google.android
 com.google.android.material.snackbar.SnackbarManager$1 -> e3.e:
 # {"id":"sourceFile","fileName":"SnackbarManager.java"}
     com.google.android.material.snackbar.SnackbarManager this$0 -> a
-      # {"id":"com.android.tools.r8.residualsignature","signature":"Le/a;"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"Lr1/i;"}
     1:6:void <init>(com.google.android.material.snackbar.SnackbarManager):54:54 -> <init>
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Le/a;)V"}
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Lr1/i;)V"}
     1:6:boolean handleMessage(android.os.Message):57:57 -> handleMessage
     7:12:boolean handleMessage(android.os.Message):59:59 -> handleMessage
     13:14:void com.google.android.material.snackbar.SnackbarManager.handleTimeout(com.google.android.material.snackbar.SnackbarManager$SnackbarRecord):240:240 -> handleMessage
@@ -136120,7 +136163,7 @@ com.google.android.material.textfield.TextInputLayout$$ExternalSyntheticLambda3 
     18:21:void androidx.transition.Transition$TransitionListener.onTransitionEnd(androidx.transition.Transition,boolean):2525:2525 -> a
     18:21:void f3.TextInputLayout$$ExternalSyntheticLambda3.notifyListener(n1.Transition$TransitionListener,n1.Transition,boolean):0 -> a
     22:26:void f3.TextInputLayout$$ExternalSyntheticLambda3.notifyListener(n1.Transition$TransitionListener,n1.Transition,boolean):0:0 -> a
-    1:2:boolean f3.TextInputLayout$$ExternalSyntheticLambda3.shouldKeepOnScreen():0:0 -> b
+    1:2:boolean f3.TextInputLayout$$ExternalSyntheticLambda3.shouldKeepOnScreen():0:0 -> c
       # {"id":"com.android.tools.r8.synthesized"}
 com.google.android.material.textfield.TextInputLayout$1 -> f3.b0:
 # {"id":"sourceFile","fileName":"TextInputLayout.java"}
@@ -174901,23 +174944,23 @@ org.apache.cordova.engine.SystemWebChromeClient -> f5.c:
     21:26:void onGeolocationPermissionsShowPrompt(java.lang.String,android.webkit.GeolocationPermissions$Callback):172:172 -> onGeolocationPermissionsShowPrompt
     27:30:void onGeolocationPermissionsShowPrompt(java.lang.String,android.webkit.GeolocationPermissions$Callback):174:174 -> onGeolocationPermissionsShowPrompt
     1:10:void onHideCustomView():188:188 -> onHideCustomView
-    1:11:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87:87 -> onJsAlert
-    12:20:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):39:39 -> onJsAlert
-    12:20:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    21:23:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):40:40 -> onJsAlert
-    21:23:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    24:29:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):41:41 -> onJsAlert
-    24:29:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    30:32:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):43:43 -> onJsAlert
-    30:32:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    33:44:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):44:44 -> onJsAlert
-    33:44:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    45:53:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):51:51 -> onJsAlert
-    45:53:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    54:62:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):58:58 -> onJsAlert
-    54:62:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
-    63:69:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):71:71 -> onJsAlert
-    63:69:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    1:12:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87:87 -> onJsAlert
+    13:21:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):39:39 -> onJsAlert
+    13:21:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    22:24:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):40:40 -> onJsAlert
+    22:24:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    25:30:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):41:41 -> onJsAlert
+    25:30:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    31:33:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):43:43 -> onJsAlert
+    31:33:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    34:45:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):44:44 -> onJsAlert
+    34:45:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    46:54:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):51:51 -> onJsAlert
+    46:54:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    55:63:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):58:58 -> onJsAlert
+    55:63:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
+    64:70:void org.apache.cordova.CordovaDialogsHelper.showAlert(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):71:71 -> onJsAlert
+    64:70:boolean onJsAlert(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):87 -> onJsAlert
     1:10:boolean onJsConfirm(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):104:104 -> onJsConfirm
     11:19:void org.apache.cordova.CordovaDialogsHelper.showConfirm(java.lang.String,org.apache.cordova.CordovaDialogsHelper$Result):75:75 -> onJsConfirm
     11:19:boolean onJsConfirm(android.webkit.WebView,java.lang.String,java.lang.String,android.webkit.JsResult):104 -> onJsConfirm
