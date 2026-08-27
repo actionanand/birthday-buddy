@@ -92,14 +92,32 @@ const tinkAnnotationRules = [
   '-dontwarn com.google.errorprone.annotations.Immutable',
   '-dontwarn com.google.errorprone.annotations.RestrictedApi',
 ];
+const capacitorAnnotationComment = `
+
+# Capacitor discovers plugin permissions and callback methods through runtime annotations. Preserve
+# both the annotation metadata and annotation interfaces when R8 optimization is enabled.
+`;
+const capacitorAnnotationRules = [
+  '-keepattributes RuntimeVisibleAnnotations,RuntimeInvisibleAnnotations,AnnotationDefault',
+  '-keep @interface com.getcapacitor.annotation.CapacitorPlugin',
+  '-keep @interface com.getcapacitor.annotation.Permission',
+  '-keep @interface com.getcapacitor.annotation.PermissionCallback',
+  '-keep @interface com.getcapacitor.annotation.ActivityCallback',
+  '-keep @interface com.getcapacitor.PluginMethod',
+];
 let proguardRules = existsSync(proguardPath) ? await readFile(proguardPath, 'utf8') : '';
 if (!proguardRules.includes('# Google Tink references these JSR-305 and Error Prone annotations'))
   proguardRules = `${proguardRules.trimEnd()}${tinkAnnotationComment}`;
 for (const annotationRule of tinkAnnotationRules) {
   if (!proguardRules.includes(annotationRule)) proguardRules = `${proguardRules.trimEnd()}\n${annotationRule}\n`;
 }
+if (!proguardRules.includes('# Capacitor discovers plugin permissions and callback methods'))
+  proguardRules = `${proguardRules.trimEnd()}${capacitorAnnotationComment}`;
+for (const annotationRule of capacitorAnnotationRules) {
+  if (!proguardRules.includes(annotationRule)) proguardRules = `${proguardRules.trimEnd()}\n${annotationRule}\n`;
+}
 await writeFile(proguardPath, `${proguardRules.trimEnd()}\n`, 'utf8');
-for (const annotationRule of tinkAnnotationRules) {
+for (const annotationRule of [...tinkAnnotationRules, ...capacitorAnnotationRules]) {
   if (!proguardRules.includes(annotationRule))
     throw new Error(`Required R8 rule was not written to ${proguardPath}: ${annotationRule}`);
 }
@@ -115,9 +133,78 @@ public class MainActivity extends BridgeActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(BirthdayBuddyContactsPlugin.class);
+    registerPlugin(BirthdayBuddyNotificationPermissionPlugin.class);
     registerPlugin(BirthdayBuddyFilesPlugin.class);
     registerPlugin(BirthdayBuddySecurityPlugin.class);
     super.onCreate(savedInstanceState);
+  }
+}
+`,
+  'utf8',
+);
+
+await writeFile(
+  path.join(packagePath, 'BirthdayBuddyNotificationPermissionPlugin.java'),
+  `package com.actionanand.birthdaybuddy.app;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
+import com.getcapacitor.JSObject;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+
+@CapacitorPlugin(name = "BirthdayBuddyNotificationPermission")
+public class BirthdayBuddyNotificationPermissionPlugin extends Plugin {
+  private ActivityResultLauncher<String> notificationPermissionLauncher;
+  private PluginCall pendingPermissionCall;
+
+  @Override
+  public void load() {
+    notificationPermissionLauncher = bridge.registerForActivityResult(
+      new ActivityResultContracts.RequestPermission(),
+      granted -> {
+        PluginCall call = pendingPermissionCall;
+        pendingPermissionCall = null;
+        if (call != null) resolvePermission(call, granted || hasNotificationPermission());
+      }
+    );
+  }
+
+  @PluginMethod
+  public void permissionStatus(PluginCall call) {
+    resolvePermission(call, hasNotificationPermission());
+  }
+
+  @PluginMethod
+  public void requestPermission(PluginCall call) {
+    if (hasNotificationPermission()) {
+      resolvePermission(call, true);
+      return;
+    }
+    if (pendingPermissionCall != null) {
+      call.reject("A notification permission request is already in progress.");
+      return;
+    }
+    pendingPermissionCall = call;
+    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+  }
+
+  private boolean hasNotificationPermission() {
+    return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+      ContextCompat.checkSelfPermission(getContext(), Manifest.permission.POST_NOTIFICATIONS) ==
+        PackageManager.PERMISSION_GRANTED;
+  }
+
+  private void resolvePermission(PluginCall call, boolean granted) {
+    JSObject result = new JSObject();
+    result.put("granted", granted);
+    call.resolve(result);
   }
 }
 `,

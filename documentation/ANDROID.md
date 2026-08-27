@@ -150,5 +150,6 @@ Each enabled reminder is registered as an annual calendar schedule on the privat
 - **Contacts scan is denied:** Android Settings → Apps → Birthday Buddy → Permissions → Contacts.
 - **Notifications are absent:** save an occasion with at least one enabled reminder and grant notification permission when asked.
 - **R8 reports missing Tink annotation classes:** rerun `npm run android:patch`. The native patch adds the required narrow `-dontwarn` rules for Tink's compile-time JSR-305 and Error Prone annotations.
+- **Release app crashes in Capacitor `getPermissionStates`:** rerun `npm run android:patch` before rebuilding. The patch preserves Capacitor's runtime permission annotations through R8 and installs the direct Android contacts and notification permission bridges.
 - **Unsigned release:** verify all signing secrets and ensure the Base64 keystore text is complete.
 - **AAB rejected for version code:** run `npm run android:version` before a local rebuild or let the `main-android` workflow bump it.
