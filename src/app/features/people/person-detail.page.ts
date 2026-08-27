@@ -116,7 +116,11 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
                     ><ion-label
                       ><h2>{{ occasion.customTypeName || labels[occasion.type] }}</h2>
                       <p>{{ dates.formatDate(occasion) }}</p></ion-label
-                    ><ion-note slot="end">{{ store.remindersFor(occasion.id).length }} reminders</ion-note></ion-item
+                    ><ion-note slot="end">{{
+                      occasion.reminderMode === 'DEFAULT'
+                        ? 'Default reminders'
+                        : store.remindersFor(occasion.id).length + ' custom reminders'
+                    }}</ion-note></ion-item
                   ><ion-item-options side="end"
                     ><ion-item-option
                       color="danger"

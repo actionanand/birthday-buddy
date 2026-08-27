@@ -39,6 +39,7 @@ export class ContactSyncService {
 
   async scanContacts(): Promise<ContactSyncCandidate[]> {
     if (!this.available) return [];
+    if (this.syncing()) return this.candidates();
     this.syncing.set(true);
     try {
       const linkedLookupKeys = this.store

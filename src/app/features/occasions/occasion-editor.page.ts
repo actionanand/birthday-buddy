@@ -140,77 +140,97 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
           <section class="form-section">
             <div class="section-heading">
               <div>
-                <span class="eyebrow">Multiple alerts supported</span>
+                <span class="eyebrow">Universal or contact-specific</span>
                 <h2>Remind me</h2>
               </div>
             </div>
             <ion-list class="form-card">
-              @for (preset of presets; track key(preset.choice)) {
+              <ion-item
+                ><ion-toggle
+                  justify="space-between"
+                  [checked]="useDefaultReminders()"
+                  (ionChange)="useDefaultReminders.set($any($event.detail.checked))"
+                  >Use universal default reminders</ion-toggle
+                ></ion-item
+              >
+              @if (useDefaultReminders()) {
+                <ion-item
+                  ><ion-label
+                    ><h2>Using Settings defaults</h2>
+                    <p>{{ defaultReminderSummary() }}</p>
+                    <p>{{ defaultTimeLabel() }}</p></ion-label
+                  ></ion-item
+                >
+              } @else {
+                @for (preset of presets; track key(preset.choice)) {
+                  <ion-item
+                    ><ion-checkbox
+                      justify="space-between"
+                      [checked]="selected(key(preset.choice))"
+                      (ionChange)="toggleReminder(preset.choice, $any($event.detail.checked))"
+                      >{{ preset.label }}</ion-checkbox
+                    ></ion-item
+                  >
+                }
                 <ion-item
                   ><ion-checkbox
                     justify="space-between"
-                    [checked]="selected(key(preset.choice))"
-                    (ionChange)="toggleReminder(preset.choice, $any($event.detail.checked))"
-                    >{{ preset.label }}</ion-checkbox
+                    [checked]="customEnabled()"
+                    (ionChange)="customEnabled.set($any($event.detail.checked))"
+                    >Custom days before</ion-checkbox
                   ></ion-item
                 >
-              }
-              <ion-item
-                ><ion-checkbox
-                  justify="space-between"
-                  [checked]="customEnabled()"
-                  (ionChange)="customEnabled.set($any($event.detail.checked))"
-                  >Custom</ion-checkbox
-                ></ion-item
-              >
-              @if (customEnabled()) {
-                <ion-item
-                  ><ion-input
-                    label="Days before"
-                    labelPlacement="stacked"
-                    inputmode="numeric"
-                    type="number"
-                    min="1"
-                    max="365"
-                    [formControl]="form.controls.customDays"></ion-input
-                ></ion-item>
+                @if (customEnabled()) {
+                  <ion-item
+                    ><ion-input
+                      label="Days before"
+                      labelPlacement="stacked"
+                      inputmode="numeric"
+                      type="number"
+                      min="1"
+                      max="365"
+                      [formControl]="form.controls.customDays"></ion-input
+                  ></ion-item>
+                }
               }
             </ion-list>
           </section>
-          <section class="form-section">
-            <div class="section-heading">
-              <div>
-                <span class="eyebrow">Notification time</span>
-                <h2>Reminder time</h2>
+          @if (!useDefaultReminders()) {
+            <section class="form-section">
+              <div class="section-heading">
+                <div>
+                  <span class="eyebrow">Notification time</span>
+                  <h2>Reminder time</h2>
+                </div>
               </div>
-            </div>
-            <ion-list class="form-card"
-              ><ion-item
-                ><ion-toggle
-                  justify="space-between"
-                  [checked]="useDefaultTime()"
-                  (ionChange)="useDefaultTime.set($any($event.detail.checked))"
-                  >Use default time</ion-toggle
-                ></ion-item
-              >
-              @if (!useDefaultTime()) {
-                <ion-item
-                  ><ion-input
-                    label="Time"
-                    labelPlacement="stacked"
-                    type="time"
-                    [formControl]="form.controls.time"></ion-input
-                ></ion-item>
-              } @else {
-                <ion-item
-                  ><ion-label
-                    ><p>Default</p>
-                    <h2>{{ defaultTimeLabel() }}</h2></ion-label
+              <ion-list class="form-card"
+                ><ion-item
+                  ><ion-toggle
+                    justify="space-between"
+                    [checked]="useDefaultTime()"
+                    (ionChange)="useDefaultTime.set($any($event.detail.checked))"
+                    >Use default time</ion-toggle
                   ></ion-item
                 >
-              }
-            </ion-list>
-          </section>
+                @if (!useDefaultTime()) {
+                  <ion-item
+                    ><ion-input
+                      label="Time"
+                      labelPlacement="stacked"
+                      type="time"
+                      [formControl]="form.controls.time"></ion-input
+                  ></ion-item>
+                } @else {
+                  <ion-item
+                    ><ion-label
+                      ><p>Default</p>
+                      <h2>{{ defaultTimeLabel() }}</h2></ion-label
+                    ></ion-item
+                  >
+                }
+              </ion-list>
+            </section>
+          }
           @if (error()) {
             <ion-note class="form-error" color="danger" role="alert">{{ error() }}</ion-note>
           }
@@ -240,6 +260,7 @@ export class OccasionEditorPage {
   readonly saving = signal(false);
   readonly error = signal('');
   readonly customEnabled = signal(false);
+  readonly useDefaultReminders = signal(true);
   readonly useDefaultTime = signal(true);
   readonly selectedChoices = signal<ReminderChoice[]>([]);
   readonly maxDate = `${new Date().getFullYear() + 1}-12-31`;
@@ -271,6 +292,11 @@ export class OccasionEditorPage {
   defaultTimeLabel(): string {
     return this.formatTime(this.store.settings().defaultReminderHour, this.store.settings().defaultReminderMinute);
   }
+  defaultReminderSummary(): string {
+    const selected = new Set(this.store.settings().defaultReminderOffsets.map(choice => this.key(choice)));
+    const labels = this.presets.filter(preset => selected.has(this.key(preset.choice))).map(preset => preset.label);
+    return labels.length ? labels.join(', ') : 'No notifications';
+  }
   constructor() {
     void this.populate();
   }
@@ -289,7 +315,20 @@ export class OccasionEditorPage {
         enabled: occasion.enabled,
       });
       const reminders = this.store.remindersFor(occasion.id);
-      this.selectedChoices.set(reminders.map(item => ({ unit: item.offsetUnit, value: item.offsetValue })));
+      this.useDefaultReminders.set(occasion.reminderMode === 'DEFAULT');
+      const presetKeys = new Set(this.presets.map(preset => this.key(preset.choice)));
+      this.selectedChoices.set(
+        reminders
+          .map(item => ({ unit: item.offsetUnit, value: item.offsetValue }))
+          .filter(choice => presetKeys.has(this.key(choice))),
+      );
+      const custom = reminders.find(
+        reminder => !presetKeys.has(this.key({ unit: reminder.offsetUnit, value: reminder.offsetValue })),
+      );
+      if (custom?.offsetUnit === 'DAY') {
+        this.customEnabled.set(true);
+        this.form.controls.customDays.setValue(custom.offsetValue);
+      }
       const first = reminders[0];
       if (first) {
         this.form.controls.time.setValue(
@@ -300,7 +339,10 @@ export class OccasionEditorPage {
             first.minute === this.store.settings().defaultReminderMinute,
         );
       }
-    } else this.selectedChoices.set([...this.store.settings().defaultReminderOffsets]);
+    } else {
+      this.useDefaultReminders.set(true);
+      this.selectedChoices.set([...this.store.settings().defaultReminderOffsets]);
+    }
   }
   key(choice: ReminderChoice): string {
     return `${choice.unit}:${choice.value}`;
@@ -343,8 +385,10 @@ export class OccasionEditorPage {
       this.error.set('Choose a valid calendar date.');
       return;
     }
-    let choices = [...this.selectedChoices()];
-    if (this.customEnabled()) choices.push({ unit: 'DAY', value: raw.customDays });
+    let choices = this.useDefaultReminders()
+      ? [...this.store.settings().defaultReminderOffsets]
+      : [...this.selectedChoices()];
+    if (!this.useDefaultReminders() && this.customEnabled()) choices.push({ unit: 'DAY', value: raw.customDays });
     choices = [...new Map(choices.map(choice => [this.key(choice), choice])).values()];
     const [hour, minute] = this.useDefaultTime()
       ? [this.store.settings().defaultReminderHour, this.store.settings().defaultReminderMinute]
@@ -364,6 +408,7 @@ export class OccasionEditorPage {
         source: existing?.source ?? 'MANUAL',
         androidEventReference: existing?.androidEventReference,
         userModified: existing?.source === 'ANDROID_CONTACT' ? true : false,
+        reminderMode: this.useDefaultReminders() ? 'DEFAULT' : 'CUSTOM',
         enabled: raw.enabled,
       },
       choices,

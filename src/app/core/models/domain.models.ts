@@ -1,6 +1,7 @@
 export type PersonSource = 'MANUAL' | 'ANDROID_CONTACT' | 'ANDROID_CONTACT_DELETED';
 export type PhotoSource = 'ANDROID_CONTACT' | 'MANUAL' | 'INITIALS';
 export type OccasionSource = 'MANUAL' | 'ANDROID_CONTACT';
+export type ReminderMode = 'DEFAULT' | 'CUSTOM';
 export type OccasionType =
   | 'BIRTHDAY'
   | 'WEDDING_ANNIVERSARY'
@@ -39,6 +40,7 @@ export interface Occasion {
   source: OccasionSource;
   androidEventReference?: string;
   userModified: boolean;
+  reminderMode?: ReminderMode;
   enabled: boolean;
   trashedAt?: string;
   deleteAfter?: string;

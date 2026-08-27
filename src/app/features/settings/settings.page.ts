@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
@@ -149,7 +149,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                   ><ion-select-option value="APP_OPEN">Check When App Opens</ion-select-option
                   ><ion-select-option value="DAILY">Once Per Day</ion-select-option></ion-select
                 ></ion-item
-              ><ion-item button="true" detail="true" (click)="syncNow()"
+              ><ion-item button="true" detail="true" [disabled]="contacts.syncing()" (click)="syncNow()"
                 ><ion-icon slot="start" name="sync-outline"></ion-icon
                 ><ion-label
                   ><h2>Sync Contacts Now</h2>
@@ -265,51 +265,81 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
       ><ng-template
         ><ion-header
           ><ion-toolbar
-            ><ion-title>{{ passwordDialogMode() === 'EXPORT' ? 'Create encrypted backup' : 'Unlock backup' }}</ion-title
+            ><ion-title>{{
+              restorePreview()
+                ? 'Restore backup'
+                : passwordDialogMode() === 'EXPORT'
+                  ? 'Create encrypted backup'
+                  : 'Unlock backup'
+            }}</ion-title
             ><ion-buttons slot="end"
               ><ion-button [disabled]="passwordDialogBusy()" (click)="closePasswordDialog()"
                 >Cancel</ion-button
               ></ion-buttons
             ></ion-toolbar
           ></ion-header
-        ><ion-content
-          ><form class="backup-password-form" (ngSubmit)="submitPasswordDialog()" novalidate>
-            <p>
-              {{
-                passwordDialogMode() === 'EXPORT'
-                  ? 'Use at least 8 characters. Birthday Buddy cannot recover this password.'
-                  : 'Enter the password used when this backup was created.'
-              }}
-            </p>
-            <ion-input
-              label="Backup password"
-              labelPlacement="stacked"
-              fill="outline"
-              autocomplete="current-password"
-              [type]="passwordVisible() ? 'text' : 'password'"
-              [formControl]="backupPassword"
-              [disabled]="passwordDialogBusy()"
-              ><ion-button
-                class="password-visibility-button"
-                slot="end"
-                type="button"
-                fill="clear"
-                [attr.aria-label]="passwordVisible() ? 'Hide backup password' : 'Show backup password'"
-                [attr.title]="passwordVisible() ? 'Hide password' : 'Show password'"
-                (click)="passwordVisible.update(visible => !visible)"
-                ><ion-icon
-                  slot="icon-only"
-                  [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
-                  aria-hidden="true"></ion-icon></ion-button
-            ></ion-input>
-            @if (passwordDialogError()) {
-              <p class="backup-password-error" role="alert">{{ passwordDialogError() }}</p>
-            }
-            <ion-button type="submit" expand="block" [disabled]="passwordDialogBusy()">
-              {{ passwordDialogMode() === 'EXPORT' ? 'Create Backup' : 'Continue' }}
-            </ion-button>
-          </form></ion-content
-        ></ng-template
+        ><ion-content>
+          @if (restorePreview(); as preview) {
+            <section class="restore-choice" aria-labelledby="restore-choice-title">
+              <h2 id="restore-choice-title">Choose how to restore</h2>
+              <p>
+                This backup contains {{ preview.people.length }} people and {{ preview.occasions.length }} occasions.
+              </p>
+              <ion-button expand="block" (click)="confirmRestore('MERGE')" [disabled]="passwordDialogBusy()">
+                Merge with existing data
+              </ion-button>
+              <p>Merge keeps existing people and adds anything that is missing.</p>
+              <ion-button
+                expand="block"
+                color="danger"
+                (click)="confirmRestore('REPLACE')"
+                [disabled]="passwordDialogBusy()">
+                Replace all local data
+              </ion-button>
+              <p>Replace permanently clears current people and occasions before restoring this backup.</p>
+              <ion-button expand="block" fill="clear" (click)="closePasswordDialog()" [disabled]="passwordDialogBusy()">
+                Cancel
+              </ion-button>
+            </section>
+          } @else {
+            <form class="backup-password-form" (ngSubmit)="submitPasswordDialog()" novalidate>
+              <p>
+                {{
+                  passwordDialogMode() === 'EXPORT'
+                    ? 'Use at least 8 characters. Birthday Buddy cannot recover this password.'
+                    : 'Enter the password used when this backup was created.'
+                }}
+              </p>
+              <ion-input
+                label="Backup password"
+                labelPlacement="stacked"
+                fill="outline"
+                autocomplete="current-password"
+                [type]="passwordVisible() ? 'text' : 'password'"
+                [formControl]="backupPassword"
+                [disabled]="passwordDialogBusy()"
+                ><ion-button
+                  class="password-visibility-button"
+                  slot="end"
+                  type="button"
+                  fill="clear"
+                  [attr.aria-label]="passwordVisible() ? 'Hide backup password' : 'Show backup password'"
+                  [attr.title]="passwordVisible() ? 'Hide password' : 'Show password'"
+                  (click)="passwordVisible.update(visible => !visible)"
+                  ><ion-icon
+                    slot="icon-only"
+                    [name]="passwordVisible() ? 'eye-off-outline' : 'eye-outline'"
+                    aria-hidden="true"></ion-icon></ion-button
+              ></ion-input>
+              @if (passwordDialogError()) {
+                <p class="backup-password-error" role="alert">{{ passwordDialogError() }}</p>
+              }
+              <ion-button type="submit" expand="block" [disabled]="passwordDialogBusy()">
+                {{ passwordDialogMode() === 'EXPORT' ? 'Create Backup' : 'Continue' }}
+              </ion-button>
+            </form>
+          }
+        </ion-content></ng-template
       ></ion-modal
     >`,
   styles: `
@@ -331,6 +361,19 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
       margin-top: 1.15rem;
       min-width: 44px;
     }
+    .restore-choice {
+      display: grid;
+      gap: 0.75rem;
+      padding: 1.25rem;
+    }
+    .restore-choice h2,
+    .restore-choice p {
+      margin: 0;
+    }
+    .restore-choice p {
+      color: var(--app-text-secondary);
+      line-height: 1.5;
+    }
   `,
 })
 export class SettingsPage {
@@ -351,7 +394,9 @@ export class SettingsPage {
   readonly passwordDialogMode = signal<'EXPORT' | 'RESTORE'>('EXPORT');
   readonly passwordVisible = signal(false);
   readonly passwordDialogError = signal('');
+  readonly restorePreview = signal<BackupPayload | undefined>(undefined);
   readonly backupPassword = new FormControl('', { nonNullable: true });
+  private readonly passwordModal = viewChild(IonModal);
   private pendingRestoreContents?: string;
   key(choice: ReminderChoice): string {
     return `${choice.unit}:${choice.value}`;
@@ -361,7 +406,14 @@ export class SettingsPage {
   }
   async patch(patch: Partial<AppSettings>): Promise<void> {
     await this.store.updateSettings({ ...this.settings(), ...patch });
-    if (patch.notificationPrivacy || patch.feb29Policy) await this.scheduler.reconcileAll(false);
+    if (
+      patch.notificationPrivacy ||
+      patch.feb29Policy ||
+      patch.defaultReminderOffsets ||
+      patch.defaultReminderHour !== undefined ||
+      patch.defaultReminderMinute !== undefined
+    )
+      await this.scheduler.reconcileAll(false);
   }
   async toggleDefault(choice: ReminderChoice, checked: boolean): Promise<void> {
     const values = checked
@@ -539,32 +591,12 @@ export class SettingsPage {
     this.pendingRestoreContents = contents;
     this.openPasswordDialog('RESTORE');
   }
-  private async previewRestore(contents: string, password: string): Promise<void> {
-    try {
-      const payload = await this.backup.preview(contents, password);
-      const alert = await this.alerts.create({
-        header: 'Restore backup',
-        message: `${payload.people.length} people and ${payload.occasions.length} occasions. Merge keeps existing data. Replace clears it first.`,
-        buttons: [
-          { text: 'Cancel', role: 'cancel' },
-          { text: 'Merge', role: 'merge' },
-          { text: 'Replace', role: 'replace', cssClass: 'alert-button-role-destructive' },
-        ],
-      });
-      await alert.present();
-      const result = await alert.onDidDismiss();
-      if (result.role === 'merge') await this.restoreFromBackup(payload, 'MERGE');
-      if (result.role === 'replace') await this.restoreFromBackup(payload, 'REPLACE');
-    } catch (error: unknown) {
-      await this.toast(error instanceof Error ? error.message : 'Restore failed');
-    }
-  }
-
   openPasswordDialog(mode: 'EXPORT' | 'RESTORE'): void {
     this.passwordDialogMode.set(mode);
     this.backupPassword.setValue('');
     this.passwordVisible.set(false);
     this.passwordDialogError.set('');
+    this.restorePreview.set(undefined);
     this.passwordDialogOpen.set(true);
   }
 
@@ -574,6 +606,7 @@ export class SettingsPage {
     this.backupPassword.setValue('');
     this.passwordVisible.set(false);
     this.passwordDialogError.set('');
+    this.restorePreview.set(undefined);
     if (this.passwordDialogMode() === 'RESTORE') this.pendingRestoreContents = undefined;
   }
 
@@ -587,17 +620,51 @@ export class SettingsPage {
     this.passwordDialogError.set('');
     const mode = this.passwordDialogMode();
     const contents = this.pendingRestoreContents;
-    this.passwordDialogOpen.set(false);
     try {
-      if (mode === 'EXPORT') await this.exportBackup(password);
-      else if (contents) await this.previewRestore(contents, password);
-      else await this.toast('Choose a backup file again.');
+      if (mode === 'RESTORE') {
+        if (!contents) {
+          this.passwordDialogError.set('Choose a backup file again.');
+          return;
+        }
+        this.restorePreview.set(await this.backup.preview(contents, password));
+        this.pendingRestoreContents = undefined;
+        this.backupPassword.setValue('');
+        this.passwordVisible.set(false);
+        return;
+      }
+      await this.dismissPasswordModal();
+      await this.exportBackup(password);
+    } catch (error: unknown) {
+      this.passwordDialogError.set(error instanceof Error ? error.message : 'The backup could not be opened.');
     } finally {
       this.passwordDialogBusy.set(false);
-      this.backupPassword.setValue('');
-      this.passwordVisible.set(false);
-      this.pendingRestoreContents = undefined;
+      if (mode === 'EXPORT') this.resetPasswordDialog();
     }
+  }
+
+  async confirmRestore(mode: 'MERGE' | 'REPLACE'): Promise<void> {
+    const payload = this.restorePreview();
+    if (!payload || this.passwordDialogBusy()) return;
+    this.passwordDialogBusy.set(true);
+    await this.dismissPasswordModal();
+    this.passwordDialogBusy.set(false);
+    this.resetPasswordDialog();
+    await this.restoreFromBackup(payload, mode);
+  }
+
+  private async dismissPasswordModal(): Promise<void> {
+    const modal = this.passwordModal();
+    const dismissed = modal?.onDidDismiss();
+    this.passwordDialogOpen.set(false);
+    if (dismissed) await dismissed;
+  }
+
+  private resetPasswordDialog(): void {
+    this.backupPassword.setValue('');
+    this.passwordVisible.set(false);
+    this.passwordDialogError.set('');
+    this.restorePreview.set(undefined);
+    this.pendingRestoreContents = undefined;
   }
 
   private async restoreFromBackup(payload: BackupPayload, mode: 'MERGE' | 'REPLACE'): Promise<void> {

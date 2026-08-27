@@ -67,7 +67,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
         ><ion-title>People</ion-title
         ><ion-buttons slot="end">
           @if (sync.available) {
-            <ion-button (click)="syncContacts()" aria-label="Sync contacts"
+            <ion-button (click)="syncContacts()" aria-label="Sync contacts" [disabled]="sync.syncing()"
               ><ion-icon name="sync-outline"></ion-icon
             ></ion-button>
           }</ion-buttons></ion-toolbar
