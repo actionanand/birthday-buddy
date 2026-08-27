@@ -1,11 +1,20 @@
 import { Service, inject } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 import { LocalNotifications, LocalNotificationSchema } from '@capacitor/local-notifications';
 import { NotificationPrivacy, OCCASION_LABELS, Occasion, OccasionReminder, Person } from '../models/domain.models';
 import { createId, stableNotificationId } from '../utils/id';
 import { BirthdayStoreService } from './birthday-store.service';
 import { OccasionDateService } from './occasion-date.service';
 import { RepositoryProviderService } from './repository-provider.service';
+
+interface NativeNotificationPermissionPlugin {
+  permissionStatus(): Promise<{ granted: boolean }>;
+  requestPermission(): Promise<{ granted: boolean }>;
+}
+
+const NativeNotificationPermission = registerPlugin<NativeNotificationPermissionPlugin>(
+  'BirthdayBuddyNotificationPermission',
+);
 
 @Service()
 export class ReminderSchedulerService {
@@ -16,13 +25,13 @@ export class ReminderSchedulerService {
 
   async notificationPermissionGranted(): Promise<boolean> {
     if (!Capacitor.isNativePlatform()) return true;
-    return (await LocalNotifications.checkPermissions()).display === 'granted';
+    return this.notificationPermission(false);
   }
 
   async requestNotificationPermission(): Promise<boolean> {
     if (!Capacitor.isNativePlatform()) return true;
     await this.ensureAndroidChannel();
-    const granted = (await LocalNotifications.requestPermissions()).display === 'granted';
+    const granted = await this.notificationPermission(true);
     if (granted) await this.reconcileAll(false);
     return granted;
   }
@@ -45,10 +54,7 @@ export class ReminderSchedulerService {
         await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
     }
     if (active.length === 0) return 'scheduled';
-    const permission = requestPermission
-      ? await LocalNotifications.requestPermissions()
-      : await LocalNotifications.checkPermissions();
-    if (permission.display !== 'granted') return 'denied';
+    if (!(await this.notificationPermission(requestPermission))) return 'denied';
     for (const occasion of active) await this.rescheduleOccasion(occasion.id, false);
     return 'scheduled';
   }
@@ -67,10 +73,7 @@ export class ReminderSchedulerService {
       await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
       return 'scheduled';
     }
-    const permission = requestPermission
-      ? await LocalNotifications.requestPermissions()
-      : await LocalNotifications.checkPermissions();
-    if (permission.display !== 'granted') return 'denied';
+    if (!(await this.notificationPermission(requestPermission))) return 'denied';
     const occurrence = this.dates.nextOccurrence(occasion, this.store.settings().feb29Policy);
     if (!occurrence) return 'scheduled';
     const notifications: LocalNotificationSchema[] = [];
@@ -150,6 +153,19 @@ export class ReminderSchedulerService {
       lightColor: '#397153',
       vibration: true,
     });
+  }
+
+  private async notificationPermission(request: boolean): Promise<boolean> {
+    if (Capacitor.getPlatform() === 'android') {
+      const result = request
+        ? await NativeNotificationPermission.requestPermission()
+        : await NativeNotificationPermission.permissionStatus();
+      return result.granted;
+    }
+    const result = request
+      ? await LocalNotifications.requestPermissions()
+      : await LocalNotifications.checkPermissions();
+    return result.display === 'granted';
   }
 
   private nextAnnualFire(scheduledAt: Date): Date {
