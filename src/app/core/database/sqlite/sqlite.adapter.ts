@@ -13,6 +13,7 @@ const TABLES: StoreName[] = [
 export class SQLiteAdapter implements DatabaseAdapter {
   private readonly connection = new SQLiteConnection(CapacitorSQLite);
   private database?: SQLiteDBConnection;
+  private writeQueue: Promise<void> = Promise.resolve();
 
   async initialize(): Promise<void> {
     if (this.database) return;
@@ -39,12 +40,14 @@ export class SQLiteAdapter implements DatabaseAdapter {
   }
 
   async getAll<T extends EntityWithId>(store: StoreName): Promise<T[]> {
+    await this.writeQueue;
     const database = await this.requireDatabase();
     const result = await database.query(`SELECT data FROM ${store}`);
     return ((result.values ?? []) as Array<{ data?: unknown }>).map(row => this.deserialize<T>(row.data));
   }
 
   async get<T extends EntityWithId>(store: StoreName, id: string): Promise<T | undefined> {
+    await this.writeQueue;
     const database = await this.requireDatabase();
     const result = await database.query(`SELECT data FROM ${store} WHERE id = ? LIMIT 1`, [id]);
     const row = result.values?.[0] as { data?: unknown } | undefined;
@@ -52,47 +55,71 @@ export class SQLiteAdapter implements DatabaseAdapter {
   }
 
   async put<T extends EntityWithId>(store: StoreName, value: T): Promise<void> {
-    const database = await this.requireDatabase();
-    await database.run(`INSERT OR REPLACE INTO ${store}(id, data) VALUES (?, ?)`, [value.id, JSON.stringify(value)]);
+    await this.enqueueWrite(async database => {
+      await database.run(`INSERT OR REPLACE INTO ${store}(id, data) VALUES (?, ?)`, [value.id, JSON.stringify(value)]);
+    });
   }
 
   async delete(store: StoreName, id: string): Promise<void> {
-    const database = await this.requireDatabase();
-    await database.run(`DELETE FROM ${store} WHERE id = ?`, [id]);
+    await this.enqueueWrite(async database => {
+      await database.run(`DELETE FROM ${store} WHERE id = ?`, [id]);
+    });
   }
 
   async batch(mutations: StorageMutation[]): Promise<void> {
-    const database = await this.requireDatabase();
-    await database.beginTransaction();
-    try {
-      for (const mutation of mutations) {
-        if (mutation.operation === 'PUT' && mutation.value) {
-          await database.run(`INSERT OR REPLACE INTO ${mutation.store}(id, data) VALUES (?, ?)`, [
-            mutation.value.id,
-            JSON.stringify(mutation.value),
-          ]);
+    if (mutations.length === 0) return;
+    await this.enqueueWrite(async database => {
+      await database.beginTransaction();
+      try {
+        for (const mutation of mutations) {
+          if (mutation.operation === 'PUT' && mutation.value) {
+            await database.run(
+              `INSERT OR REPLACE INTO ${mutation.store}(id, data) VALUES (?, ?)`,
+              [mutation.value.id, JSON.stringify(mutation.value)],
+              false,
+            );
+          }
+          if (mutation.operation === 'DELETE' && mutation.id) {
+            await database.run(`DELETE FROM ${mutation.store} WHERE id = ?`, [mutation.id], false);
+          }
         }
-        if (mutation.operation === 'DELETE' && mutation.id) {
-          await database.run(`DELETE FROM ${mutation.store} WHERE id = ?`, [mutation.id]);
+        await database.commitTransaction();
+      } catch (error: unknown) {
+        try {
+          await database.rollbackTransaction();
+        } catch {
+          // Preserve the original write error if the native transaction already closed.
         }
+        throw error;
       }
-      await database.commitTransaction();
-    } catch (error: unknown) {
-      await database.rollbackTransaction();
-      throw error;
-    }
+    });
   }
 
   async clear(stores: StoreName[]): Promise<void> {
-    await this.batch(
-      (
-        await Promise.all(
-          stores.map(async store =>
-            (await this.getAll(store)).map(entity => ({ store, operation: 'DELETE' as const, id: entity.id })),
-          ),
-        )
-      ).flat(),
+    if (stores.length === 0) return;
+    await this.enqueueWrite(async database => {
+      await database.beginTransaction();
+      try {
+        for (const store of stores) await database.run(`DELETE FROM ${store}`, [], false);
+        await database.commitTransaction();
+      } catch (error: unknown) {
+        try {
+          await database.rollbackTransaction();
+        } catch {
+          // Preserve the original write error if the native transaction already closed.
+        }
+        throw error;
+      }
+    });
+  }
+
+  private async enqueueWrite(operation: (database: SQLiteDBConnection) => Promise<void>): Promise<void> {
+    const queued = this.writeQueue.then(
+      async () => operation(await this.requireDatabase()),
+      async () => operation(await this.requireDatabase()),
     );
+    this.writeQueue = queued.catch(() => undefined);
+    return queued;
   }
 
   private async requireDatabase(): Promise<SQLiteDBConnection> {

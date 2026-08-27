@@ -69,6 +69,7 @@ export class BirthdayStoreService {
     if (settings) this.settings.set(settings);
     else await this.updateSettings({ ...DEFAULT_SETTINGS, updatedAt: new Date().toISOString() });
     this.ignores.set(ignores);
+    await this.migrateLegacyReminderModes();
     await this.purgeExpiredTrash();
     this.loading.set(false);
     this.ready.set(true);
@@ -130,27 +131,23 @@ export class BirthdayStoreService {
   ): Promise<Occasion> {
     const now = new Date().toISOString();
     const existing = input.id ? this.occasion(input.id) : undefined;
+    const reminderMode = input.reminderMode ?? existing?.reminderMode ?? 'DEFAULT';
     const occasion: Occasion = {
       ...input,
       id: existing?.id ?? createId(),
+      reminderMode,
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
     };
     const oldReminders = existing ? this.remindersFor(existing.id) : [];
-    const unique = [...new Map(choices.map(choice => [`${choice.unit}:${choice.value}`, choice])).values()];
-    const reminders: OccasionReminder[] = unique.map(choice => ({
-      id:
-        oldReminders.find(item => item.offsetUnit === choice.unit && item.offsetValue === choice.value)?.id ??
-        createId(),
-      occasionId: occasion.id,
-      offsetUnit: choice.unit,
-      offsetValue: choice.value,
-      hour,
-      minute,
-      enabled: true,
-      createdAt: now,
-      updatedAt: now,
-    }));
+    const reminders = this.buildReminders(
+      occasion.id,
+      reminderMode === 'DEFAULT' ? this.settings().defaultReminderOffsets : choices,
+      reminderMode === 'DEFAULT' ? this.settings().defaultReminderHour : hour,
+      reminderMode === 'DEFAULT' ? this.settings().defaultReminderMinute : minute,
+      oldReminders,
+      now,
+    );
     await this.repositories.adapter.batch([
       { store: 'occasions', operation: 'PUT', value: occasion },
       ...oldReminders
@@ -341,8 +338,40 @@ export class BirthdayStoreService {
 
   async updateSettings(settings: AppSettings): Promise<void> {
     const updated = { ...settings, id: 'settings' as const, updatedAt: new Date().toISOString() };
-    await this.repositories.settings.save(updated);
+    const previous = this.settings();
+    const defaultsChanged =
+      previous.defaultReminderHour !== updated.defaultReminderHour ||
+      previous.defaultReminderMinute !== updated.defaultReminderMinute ||
+      this.reminderChoiceSignature(previous.defaultReminderOffsets) !==
+        this.reminderChoiceSignature(updated.defaultReminderOffsets);
+    if (!defaultsChanged) {
+      await this.repositories.settings.save(updated);
+      this.settings.set(updated);
+      return;
+    }
+    const inheritedOccasions = this.occasions().filter(occasion => occasion.reminderMode === 'DEFAULT');
+    const inheritedIds = new Set(inheritedOccasions.map(occasion => occasion.id));
+    const now = new Date().toISOString();
+    const reminders = inheritedOccasions.flatMap(occasion =>
+      this.buildReminders(
+        occasion.id,
+        updated.defaultReminderOffsets,
+        updated.defaultReminderHour,
+        updated.defaultReminderMinute,
+        this.remindersFor(occasion.id),
+        now,
+      ),
+    );
+    await this.repositories.adapter.batch([
+      { store: 'app_settings', operation: 'PUT', value: updated },
+      ...this.reminders()
+        .filter(reminder => inheritedIds.has(reminder.occasionId))
+        .filter(old => !reminders.some(reminder => reminder.id === old.id))
+        .map(old => ({ store: 'occasion_reminders' as const, operation: 'DELETE' as const, id: old.id })),
+      ...reminders.map(value => ({ store: 'occasion_reminders' as const, operation: 'PUT' as const, value })),
+    ]);
     this.settings.set(updated);
+    this.reminders.update(items => [...items.filter(reminder => !inheritedIds.has(reminder.occasionId)), ...reminders]);
   }
 
   async unlinkPerson(id: string): Promise<void> {
@@ -409,6 +438,70 @@ export class BirthdayStoreService {
   private removeIgnores(ids: string[]): void {
     const idSet = new Set(ids);
     this.ignores.update(items => items.filter(item => !idSet.has(item.id)));
+  }
+
+  private async migrateLegacyReminderModes(): Promise<void> {
+    const legacy = this.occasions().filter(occasion => occasion.reminderMode === undefined);
+    if (legacy.length === 0) return;
+    const normalized = legacy.map<Occasion>(occasion => ({
+      ...occasion,
+      reminderMode: this.remindersMatchDefaults(occasion.id) ? 'DEFAULT' : 'CUSTOM',
+    }));
+    await this.repositories.adapter.batch(
+      normalized.map(value => ({ store: 'occasions' as const, operation: 'PUT' as const, value })),
+    );
+    const normalizedById = new Map(normalized.map(occasion => [occasion.id, occasion]));
+    this.occasions.update(items => items.map(occasion => normalizedById.get(occasion.id) ?? occasion));
+  }
+
+  private remindersMatchDefaults(occasionId: string): boolean {
+    const reminders = this.remindersFor(occasionId);
+    const settings = this.settings();
+    if (reminders.length !== new Set(settings.defaultReminderOffsets.map(choice => this.reminderKey(choice))).size)
+      return false;
+    const defaults = new Set(settings.defaultReminderOffsets.map(choice => this.reminderKey(choice)));
+    return reminders.every(
+      reminder =>
+        reminder.enabled &&
+        reminder.hour === settings.defaultReminderHour &&
+        reminder.minute === settings.defaultReminderMinute &&
+        defaults.has(this.reminderKey(reminder)),
+    );
+  }
+
+  private buildReminders(
+    occasionId: string,
+    choices: ReminderChoice[],
+    hour: number,
+    minute: number,
+    existing: OccasionReminder[],
+    now: string,
+  ): OccasionReminder[] {
+    const unique = [...new Map(choices.map(choice => [this.reminderKey(choice), choice])).values()];
+    return unique.map(choice => {
+      const old = existing.find(
+        reminder => reminder.offsetUnit === choice.unit && reminder.offsetValue === choice.value,
+      );
+      return {
+        id: old?.id ?? createId(),
+        occasionId,
+        offsetUnit: choice.unit,
+        offsetValue: choice.value,
+        hour,
+        minute,
+        enabled: true,
+        createdAt: old?.createdAt ?? now,
+        updatedAt: now,
+      };
+    });
+  }
+
+  private reminderChoiceSignature(choices: ReminderChoice[]): string {
+    return [...new Set(choices.map(choice => this.reminderKey(choice)))].sort().join('|');
+  }
+
+  private reminderKey(choice: ReminderChoice | OccasionReminder): string {
+    return 'unit' in choice ? `${choice.unit}:${choice.value}` : `${choice.offsetUnit}:${choice.offsetValue}`;
   }
 
   private deleteAfter(trashedAt: string): string {
