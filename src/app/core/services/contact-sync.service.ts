@@ -44,7 +44,8 @@ export class ContactSyncService {
     try {
       const linkedLookupKeys = this.store
         .activePeople()
-        .flatMap(person => (person.androidContactLookupKey ? [person.androidContactLookupKey] : []));
+        .flatMap(person => [person.androidContactLookupKey, ...(person.androidContactLookupKeys ?? [])])
+        .filter((value): value is string => Boolean(value));
       const result = await NativeContacts.readContacts({ linkedLookupKeys });
       this.availabilityChanges.set(
         await this.syncAvailability(result.lookupKeys ?? result.contacts.map(contact => contact.lookupKey)),
@@ -78,12 +79,13 @@ export class ContactSyncService {
       const contact = candidate.contact;
       let person = candidate.personId ? this.store.person(candidate.personId) : undefined;
       if (candidate.kind === 'NEW_PERSON') {
-        person = this.store.activePeople().find(item => item.androidContactLookupKey === contact.lookupKey);
+        person = this.findPerson(contact.lookupKey);
         person ??= await this.store.savePerson({
           name: contact.displayName,
-          favorite: false,
+          favorite: contact.favorite,
           source: 'ANDROID_CONTACT',
           androidContactLookupKey: contact.lookupKey,
+          androidContactLookupKeys: [contact.lookupKey],
           photoPath: contact.photoData,
           photoSource: contact.photoData ? 'ANDROID_CONTACT' : 'INITIALS',
           contactAvailable: true,
@@ -103,6 +105,7 @@ export class ContactSyncService {
           photoUserModified: false,
         });
       }
+      if (candidate.kind === 'FAVORITE_CHANGE' && person) await this.store.savePerson({ ...person, favorite: true });
       if (
         candidate.kind === 'DATE_CONFLICT' &&
         candidate.occasionId &&
@@ -138,7 +141,12 @@ export class ContactSyncService {
             .map(reminder => ({ unit: reminder.offsetUnit, value: reminder.offsetValue }));
           const first = this.store.remindersFor(occasion.id)[0];
           await this.store.saveOccasion(
-            { ...occasion, androidEventReference: candidate.event.reference },
+            {
+              ...occasion,
+              source: 'ANDROID_CONTACT',
+              androidEventReference: candidate.event.reference,
+              userModified: occasion.source === 'MANUAL' || occasion.userModified,
+            },
             reminders,
             first?.hour ?? 8,
             first?.minute ?? 0,
@@ -158,20 +166,23 @@ export class ContactSyncService {
         ignores.some(ignore => ignore.ignoreType === 'CONTACT' && ignore.androidContactLookupKey === contact.lookupKey)
       )
         continue;
-      const person = this.store.activePeople().find(item => item.androidContactLookupKey === contact.lookupKey);
+      const contactEvents = this.uniqueEvents(contact.events);
+      const person = this.findPerson(contact.lookupKey);
       if (!person) {
-        for (const event of contact.events)
+        for (const event of contactEvents)
           result.push(this.candidate('NEW_PERSON', contact, undefined, undefined, event));
         continue;
       }
-      if (person.name !== contact.displayName) result.push(this.candidate('NAME_CHANGE', contact, person.id));
+      if (!person.nameUserModified && person.name !== contact.displayName)
+        result.push(this.candidate('NAME_CHANGE', contact, person.id));
       if (
         !person.photoUserModified &&
         person.photoPath !== contact.photoData &&
         (person.photoSource === 'ANDROID_CONTACT' || Boolean(contact.photoData))
       )
         result.push(this.candidate('PHOTO_CHANGE', contact, person.id));
-      for (const event of contact.events) {
+      if (contact.favorite && !person.favorite) result.push(this.candidate('FAVORITE_CHANGE', contact, person.id));
+      for (const event of contactEvents) {
         if (
           ignores.some(
             ignore =>
@@ -181,16 +192,23 @@ export class ContactSyncService {
           )
         )
           continue;
-        const importedOfType = this.store
+        const occasionsOfType = this.store
           .occasionsFor(person.id)
-          .filter(item => item.source === 'ANDROID_CONTACT' && item.type === event.type);
+          .filter(
+            item =>
+              item.type === event.type &&
+              (event.type !== 'CUSTOM' ||
+                (item.customTypeName?.trim().toLocaleLowerCase() ?? '') ===
+                  (event.customTypeName?.trim().toLocaleLowerCase() ?? '')),
+          );
         const occasion =
-          importedOfType.find(item => item.androidEventReference === event.reference) ??
-          importedOfType.find(
+          occasionsOfType.find(item => item.androidEventReference === event.reference) ??
+          occasionsOfType.find(
             item => item.day === event.day && item.month === event.month && item.year === event.year,
           ) ??
-          (importedOfType.length === 1 && contact.events.filter(item => item.type === event.type).length === 1
-            ? importedOfType[0]
+          (occasionsOfType.filter(item => item.source === 'ANDROID_CONTACT').length === 1 &&
+          contactEvents.filter(item => item.type === event.type).length === 1
+            ? occasionsOfType.find(item => item.source === 'ANDROID_CONTACT')
             : undefined);
         if (!occasion) result.push(this.candidate('NEW_OCCASION', contact, person.id, undefined, event));
         else if (occasion.day !== event.day || occasion.month !== event.month || occasion.year !== event.year) {
@@ -224,10 +242,13 @@ export class ContactSyncService {
 
   private async importEvent(personId: string, event: AndroidContactSummary['events'][number]): Promise<Occasion> {
     const settings = this.store.settings();
+    const duplicate = this.store.findDuplicateOccasion({ personId, ...event });
+    if (duplicate) return duplicate;
     return this.store.saveOccasion(
       {
         personId,
         type: event.type,
+        customTypeName: event.customTypeName,
         day: event.day,
         month: event.month,
         year: event.year,
@@ -246,13 +267,34 @@ export class ContactSyncService {
     const availableLookupKeys = new Set(lookupKeys);
     let changes = 0;
     for (const person of this.store.activePeople()) {
-      if (!person.androidContactLookupKey || person.source === 'MANUAL') continue;
-      const available = availableLookupKeys.has(person.androidContactLookupKey);
+      const personLookupKeys = [person.androidContactLookupKey, ...(person.androidContactLookupKeys ?? [])].filter(
+        (value): value is string => Boolean(value),
+      );
+      if (!personLookupKeys.length || person.source === 'MANUAL') continue;
+      const available = personLookupKeys.some(key => availableLookupKeys.has(key));
       const source = available ? 'ANDROID_CONTACT' : 'ANDROID_CONTACT_DELETED';
       if (person.contactAvailable === available && person.source === source) continue;
       await this.store.savePerson({ ...person, source, contactAvailable: available });
       changes += 1;
     }
     return changes;
+  }
+
+  private findPerson(lookupKey: string) {
+    return this.store
+      .activePeople()
+      .find(
+        person => person.androidContactLookupKey === lookupKey || person.androidContactLookupKeys?.includes(lookupKey),
+      );
+  }
+
+  private uniqueEvents(events: AndroidContactSummary['events']): AndroidContactSummary['events'] {
+    const identities = new Set<string>();
+    return events.filter(event => {
+      const identity = `${event.type}:${event.customTypeName?.trim().toLocaleLowerCase() ?? ''}:${event.year ?? ''}-${event.month}-${event.day}`;
+      if (identities.has(identity)) return false;
+      identities.add(identity);
+      return true;
+    });
   }
 }

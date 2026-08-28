@@ -28,7 +28,7 @@ import { OccasionCardComponent } from '../../shared/components/occasion-card/occ
   template: `<ion-header translucent="true"
       ><ion-toolbar><ion-title>Upcoming</ion-title></ion-toolbar
       ><ion-toolbar
-        ><ion-segment [value]="range()" (ionChange)="setRange($event.detail.value)"
+        ><ion-segment [value]="range()" (ionChange)="setRange($any($event).detail.value)"
           ><ion-segment-button value="30">30 days</ion-segment-button
           ><ion-segment-button value="90">3 months</ion-segment-button
           ><ion-segment-button value="365">Year</ion-segment-button></ion-segment
@@ -37,7 +37,7 @@ import { OccasionCardComponent } from '../../shared/components/occasion-card/occ
         ><ion-searchbar
           placeholder="Search people or occasions"
           [debounce]="250"
-          (ionInput)="query.set($any($event.detail.value || ''))"></ion-searchbar></ion-toolbar
+          (ionInput)="query.set($any($event).detail.value || '')"></ion-searchbar></ion-toolbar
     ></ion-header>
     <ion-content fullscreen="true"
       ><main class="page-shell">

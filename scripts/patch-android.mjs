@@ -387,29 +387,44 @@ public class BirthdayBuddyContactsPlugin extends Plugin {
       Set<String> linkedLookupKeys = new HashSet<>();
       JSArray linkedValues = call.getArray("linkedLookupKeys");
       if (linkedValues != null) for (int index = 0; index < linkedValues.length(); index++) linkedLookupKeys.add(linkedValues.optString(index));
-      Cursor cursor = getContext().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.LOOKUP_KEY, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.PHOTO_THUMBNAIL_URI }, null, null, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " COLLATE NOCASE");
-      if (cursor != null) { while (cursor.moveToNext()) { String lookupKey = cursor.getString(1); lookupKeys.put(lookupKey); JSObject contact = contact(cursor.getString(0), lookupKey, cursor.getString(2), cursor.getString(3)); if (((JSArray) contact.get("events")).length() > 0 || linkedLookupKeys.contains(lookupKey)) contacts.put(contact); } cursor.close(); }
+      Cursor cursor = getContext().getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.LOOKUP_KEY, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.PHOTO_THUMBNAIL_URI, ContactsContract.Contacts.STARRED }, null, null, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY + " COLLATE NOCASE");
+      if (cursor != null) { while (cursor.moveToNext()) { String lookupKey = cursor.getString(1); lookupKeys.put(lookupKey); JSObject contact = contact(cursor.getString(0), lookupKey, cursor.getString(2), cursor.getString(3), cursor.getInt(4) == 1); if (((JSArray) contact.get("events")).length() > 0 || linkedLookupKeys.contains(lookupKey)) contacts.put(contact); } cursor.close(); }
       JSObject response = new JSObject(); response.put("contacts", contacts); response.put("lookupKeys", lookupKeys); call.resolve(response);
     } catch (Exception error) { call.reject("Contacts could not be scanned.", error); }
   }
 
   private JSObject readSingle(Uri uri) throws Exception {
-    Cursor cursor = getContext().getContentResolver().query(uri, new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.LOOKUP_KEY, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.PHOTO_THUMBNAIL_URI }, null, null, null);
+    Cursor cursor = getContext().getContentResolver().query(uri, new String[] { ContactsContract.Contacts._ID, ContactsContract.Contacts.LOOKUP_KEY, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY, ContactsContract.Contacts.PHOTO_THUMBNAIL_URI, ContactsContract.Contacts.STARRED }, null, null, null);
     if (cursor == null || !cursor.moveToFirst()) throw new IllegalStateException("Contact was not found.");
-    JSObject result = contact(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3)); cursor.close(); return result;
+    JSObject result = contact(cursor.getString(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4) == 1); cursor.close(); return result;
   }
 
-  private JSObject contact(String id, String lookupKey, String name, String photoUri) {
-    JSObject result = new JSObject(); result.put("lookupKey", lookupKey); result.put("displayName", name == null ? "Unnamed contact" : name); result.put("events", readEvents(id, lookupKey));
+  private JSObject contact(String id, String lookupKey, String name, String photoUri, boolean favorite) {
+    JSObject result = new JSObject(); result.put("lookupKey", lookupKey); result.put("displayName", name == null ? "Unnamed contact" : name); result.put("favorite", favorite); result.put("events", readEvents(id, lookupKey));
     String photo = readPhoto(photoUri); if (photo != null) result.put("photoData", photo); return result;
   }
 
   private JSArray readEvents(String contactId, String lookupKey) {
     JSArray events = new JSArray();
+    Set<String> eventKeys = new HashSet<>();
     String selection = ContactsContract.Data.CONTACT_ID + "=? AND " + ContactsContract.Data.MIMETYPE + "=?";
-    Cursor cursor = getContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.Data._ID, ContactsContract.CommonDataKinds.Event.START_DATE, ContactsContract.CommonDataKinds.Event.TYPE }, selection, new String[] { contactId, ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE }, null);
-    if (cursor != null) { while (cursor.moveToNext()) { String dataId = cursor.getString(0); String raw = cursor.getString(1); int type = cursor.getInt(2); String label = type == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY ? "BIRTHDAY" : type == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY ? "WEDDING_ANNIVERSARY" : null; int[] date = parseDate(raw); if (label != null && date != null) { JSObject event = new JSObject(); event.put("reference", lookupKey + ":event:" + dataId); event.put("type", label); event.put("month", date[1]); event.put("day", date[2]); if (date[0] > 0) event.put("year", date[0]); events.put(event); } } cursor.close(); }
+    Cursor cursor = getContext().getContentResolver().query(ContactsContract.Data.CONTENT_URI, new String[] { ContactsContract.Data._ID, ContactsContract.CommonDataKinds.Event.START_DATE, ContactsContract.CommonDataKinds.Event.TYPE, ContactsContract.CommonDataKinds.Event.LABEL }, selection, new String[] { contactId, ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE }, null);
+    if (cursor != null) { while (cursor.moveToNext()) { String dataId = cursor.getString(0); String raw = cursor.getString(1); int type = cursor.getInt(2); String customLabel = cursor.getString(3); String occasionType = contactEventType(type, customLabel); int[] date = parseDate(raw); String normalizedLabel = "CUSTOM".equals(occasionType) && customLabel != null ? customLabel.trim().toLowerCase(java.util.Locale.ROOT) : ""; String eventKey = occasionType + ":" + normalizedLabel + ":" + (date == null ? "" : date[0] + "-" + date[1] + "-" + date[2]); if (occasionType != null && date != null && eventKeys.add(eventKey)) { JSObject event = new JSObject(); event.put("reference", lookupKey + ":event:" + dataId); event.put("type", occasionType); if ("CUSTOM".equals(occasionType)) event.put("customTypeName", customLabel == null || customLabel.trim().isEmpty() ? "Special Day" : customLabel.trim()); event.put("month", date[1]); event.put("day", date[2]); if (date[0] > 0) event.put("year", date[0]); events.put(event); } } cursor.close(); }
     return events;
+  }
+
+  private String contactEventType(int type, String label) {
+    if (type == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY) return "BIRTHDAY";
+    String normalized = label == null ? "" : label.trim().toLowerCase(java.util.Locale.ROOT);
+    if (normalized.contains("birthday") || normalized.contains("b'day") || normalized.equals("bday")) return "BIRTHDAY";
+    if (normalized.contains("betrothal") || normalized.contains("engagement")) return "ENGAGEMENT_ANNIVERSARY";
+    if (normalized.contains("work") || normalized.contains("joining") || normalized.contains("job")) return "WORK_ANNIVERSARY";
+    if (normalized.contains("friend")) return "FRIENDSHIP_ANNIVERSARY";
+    if (normalized.contains("first meet") || normalized.contains("met day") || normalized.contains("relationship")) return "RELATIONSHIP_ANNIVERSARY";
+    if (normalized.contains("memorial") || normalized.contains("remembrance")) return "REMEMBRANCE";
+    if (normalized.contains("anniversary") || normalized.contains("wedding") || normalized.contains("marriage")) return "WEDDING_ANNIVERSARY";
+    if (type == ContactsContract.CommonDataKinds.Event.TYPE_ANNIVERSARY) return "WEDDING_ANNIVERSARY";
+    return type == ContactsContract.CommonDataKinds.Event.TYPE_CUSTOM || type == ContactsContract.CommonDataKinds.Event.TYPE_OTHER ? "CUSTOM" : null;
   }
 
   private int[] parseDate(String value) {

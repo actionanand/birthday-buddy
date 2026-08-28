@@ -71,6 +71,9 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
             <app-person-avatar [name]="person.name" [photoPath]="person.photoPath" size="large" />
             <div>
               <h1>{{ person.name }}</h1>
+              @if (person.favorite) {
+                <ion-icon name="heart" color="primary" aria-label="Favorite"></ion-icon>
+              }
               @if (person.source === 'ANDROID_CONTACT') {
                 <ion-badge color="primary"><ion-icon name="sync-outline"></ion-icon>Contact synced</ion-badge>
               } @else if (person.source === 'ANDROID_CONTACT_DELETED') {
@@ -108,7 +111,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
             <ion-list inset="true">
               @for (occasion of occasions(); track occasion.id) {
                 <ion-item-sliding
-                  ><ion-item [routerLink]="['/occasion', occasion.id, 'edit']" detail="true"
+                  ><ion-item [routerLink]="['/occasion', occasion.id]" detail="true"
                     ><ion-icon
                       slot="start"
                       [name]="occasion.type === 'BIRTHDAY' ? 'gift-outline' : 'heart-outline'"

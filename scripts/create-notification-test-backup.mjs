@@ -37,6 +37,7 @@ const occasions = people.map((person, index) => ({
   source: 'MANUAL',
   userModified: false,
   reminderMode: 'CUSTOM',
+  birthdayEveReminderTime: ['23:50', '21:00', '23:00'][index],
   enabled: true,
   createdAt,
   updatedAt: createdAt,
@@ -46,7 +47,7 @@ const reminders = occasions.map((occasion, index) => ({
   occasionId: occasion.id,
   offsetUnit: 'ON_DAY',
   offsetValue: 0,
-  hour: 8,
+  hour: 6,
   minute: 0,
   enabled: true,
   createdAt,
@@ -68,8 +69,9 @@ const payload = {
       { unit: 'DAY', value: 1 },
       { unit: 'ON_DAY', value: 0 },
     ],
-    defaultReminderHour: 8,
+    defaultReminderHour: 6,
     defaultReminderMinute: 0,
+    defaultReminderTimeVersion: 1,
     notificationPrivacy: 'FULL',
     feb29Policy: 'FEB_28',
     showAge: true,
@@ -112,7 +114,7 @@ const backup = {
 const range = dates.map(
   date => `${date.year}-${String(date.month).padStart(2, '0')}-${String(date.day).padStart(2, '0')}`,
 );
-const filename = `BirthdayBuddy-notification-test-${range[0]}-to-${range[2]}.ocbackup`;
+const filename = `BirthdayBuddy-special-notification-test-${range[0]}-to-${range[2]}.ocbackup`;
 const outputDirectory = path.join(process.cwd(), 'releases');
 await mkdir(outputDirectory, { recursive: true });
 await writeFile(path.join(outputDirectory, filename), JSON.stringify(backup), 'utf8');
@@ -123,7 +125,13 @@ if (
   verifiedPayload.format !== 'birthday-buddy-backup' ||
   verifiedPayload.people.length !== 3 ||
   verifiedPayload.occasions.length !== 3 ||
-  verifiedPayload.reminders.some(reminder => reminder.offsetUnit !== 'ON_DAY')
+  verifiedPayload.occasions.some(
+    (occasion, index) => occasion.birthdayEveReminderTime !== ['23:50', '21:00', '23:00'][index],
+  ) ||
+  verifiedPayload.reminders.some(reminder => reminder.offsetUnit !== 'ON_DAY' || reminder.hour !== 6) ||
+  verifiedPayload.settings.defaultReminderHour !== 6
 )
   throw new Error('Generated backup verification failed.');
-console.log(`Created ${filename} with on-day reminders at 08:00 for ${range.join(', ')}.`);
+console.log(
+  `Created ${filename} with on-day reminders at 06:00 and birthday-eve reminders at 23:50, 21:00, and 23:00 for ${range.join(', ')}.`,
+);

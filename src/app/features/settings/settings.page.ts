@@ -32,6 +32,14 @@ import { ContactSyncService } from '../../core/services/contact-sync.service';
 import { PinService } from '../../core/services/pin.service';
 import { ReminderSchedulerService } from '../../core/services/reminder-scheduler.service';
 
+interface ToggleElement {
+  checked: boolean;
+}
+
+interface ModalElement extends HTMLElement {
+  dismiss(data?: unknown, role?: string): Promise<boolean>;
+}
+
 @Component({
   selector: 'app-settings',
   imports: [
@@ -71,7 +79,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 label="Theme"
                 interface="action-sheet"
                 [value]="settings().theme"
-                (ionChange)="patch({ theme: $any($event.detail.value) })"
+                (ionChange)="patch({ theme: $any($event).detail.value })"
                 ><ion-select-option value="SYSTEM">Automatic</ion-select-option
                 ><ion-select-option value="LIGHT">Light</ion-select-option
                 ><ion-select-option value="DARK">Dark</ion-select-option></ion-select
@@ -80,7 +88,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
               ><ion-toggle
                 justify="space-between"
                 [checked]="settings().showAge"
-                (ionChange)="patch({ showAge: $any($event.detail.checked) })"
+                (ionChange)="patch({ showAge: $any($event).detail.checked })"
                 >Show age and anniversary number</ion-toggle
               ></ion-item
             ></ion-list
@@ -94,7 +102,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 ><ion-checkbox
                   justify="space-between"
                   [checked]="defaultSelected(preset.choice)"
-                  (ionChange)="toggleDefault(preset.choice, $any($event.detail.checked))"
+                  (ionChange)="toggleDefault(preset.choice, $any($event).detail.checked)"
                   >{{ preset.label }}</ion-checkbox
                 ></ion-item
               >
@@ -117,7 +125,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 label="Notification content"
                 interface="action-sheet"
                 [value]="settings().notificationPrivacy"
-                (ionChange)="patch({ notificationPrivacy: $any($event.detail.value) })"
+                (ionChange)="patch({ notificationPrivacy: $any($event).detail.value })"
                 ><ion-select-option value="FULL">Person + Occasion</ion-select-option
                 ><ion-select-option value="PERSON_ONLY">Person Only</ion-select-option
                 ><ion-select-option value="PRIVATE">Private</ion-select-option></ion-select
@@ -127,7 +135,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 label="Feb 29 in non-leap years"
                 interface="action-sheet"
                 [value]="settings().feb29Policy"
-                (ionChange)="patch({ feb29Policy: $any($event.detail.value) })"
+                (ionChange)="patch({ feb29Policy: $any($event).detail.value })"
                 ><ion-select-option value="FEB_28">February 28</ion-select-option
                 ><ion-select-option value="MAR_1">March 1</ion-select-option
                 ><ion-select-option value="LEAP_ONLY">Only in leap years</ion-select-option></ion-select
@@ -144,7 +152,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                   label="Contacts sync"
                   interface="action-sheet"
                   [value]="settings().contactSyncMode"
-                  (ionChange)="patch({ contactSyncMode: $any($event.detail.value) })"
+                  (ionChange)="patch({ contactSyncMode: $any($event).detail.value })"
                   ><ion-select-option value="MANUAL">Manual Only</ion-select-option
                   ><ion-select-option value="APP_OPEN">Check When App Opens</ion-select-option
                   ><ion-select-option value="DAILY">Once Per Day</ion-select-option></ion-select
@@ -190,7 +198,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                     justify="space-between"
                     [checked]="security.biometricEnabled()"
                     [disabled]="biometricBusy()"
-                    (ionChange)="biometricChanged($any($event.detail.checked), $any($event.target))"
+                    (ionChange)="biometricChanged($any($event).detail.checked, $any($event).target)"
                     ><ion-icon slot="start" name="finger-print-outline"></ion-icon>Biometric unlock</ion-toggle
                   ></ion-item
                 >
@@ -200,7 +208,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                   label="Auto lock"
                   interface="action-sheet"
                   [value]="settings().autoLockMinutes"
-                  (ionChange)="patch({ autoLockMinutes: $any($event.detail.value) })"
+                  (ionChange)="patch({ autoLockMinutes: $any($event).detail.value })"
                   ><ion-select-option [value]="0">Immediately</ion-select-option
                   ><ion-select-option [value]="1">1 minute</ion-select-option
                   ><ion-select-option [value]="5">5 minutes</ion-select-option
@@ -212,7 +220,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
                 ><ion-toggle
                   justify="space-between"
                   [checked]="settings().lockOnBackground"
-                  (ionChange)="patch({ lockOnBackground: $any($event.detail.checked) })"
+                  (ionChange)="patch({ lockOnBackground: $any($event).detail.checked })"
                   >Lock in background</ion-toggle
                 ></ion-item
               ><ion-item button="true" (click)="security.lock()"
@@ -259,10 +267,11 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
         </section>
       </main></ion-content
     ><ion-modal
+      #passwordModal
       cssClass="backup-password-modal"
       [isOpen]="passwordDialogOpen()"
       [backdropDismiss]="true"
-      (didDismiss)="passwordDialogDidDismiss($any($event.detail))"
+      (didDismiss)="passwordDialogDidDismiss($any($event).detail)"
       ><ng-template
         ><ion-header
           ><ion-toolbar
@@ -481,7 +490,7 @@ export class SettingsPage {
     });
     await alert.present();
   }
-  async biometricChanged(enabled: boolean, toggle: IonToggle): Promise<void> {
+  async biometricChanged(enabled: boolean, toggle: ToggleElement): Promise<void> {
     // IonToggle changes its own visual state before an asynchronous native prompt succeeds.
     // Keep it aligned with the persisted state until the whole operation has completed.
     toggle.checked = this.security.biometricEnabled();
@@ -611,7 +620,7 @@ export class SettingsPage {
 
   private async dismissPasswordDialog(data: string | undefined, role: 'confirm' | 'cancel'): Promise<void> {
     const modal = this.passwordModal();
-    if (modal) await modal.dismiss(data, role);
+    if (modal) await (modal as unknown as { el: ModalElement }).el.dismiss(data, role);
     // Resolve explicitly as well as from didDismiss. The handler is idempotent and
     // this prevents a platform event-forwarding failure from stalling the workflow.
     this.passwordDialogDidDismiss({ data, role });

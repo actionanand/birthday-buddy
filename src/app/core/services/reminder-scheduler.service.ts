@@ -41,7 +41,11 @@ export class ReminderSchedulerService {
     await this.ensureAndroidChannel();
     const active = this.store
       .enabledOccasions()
-      .filter(occasion => this.store.remindersFor(occasion.id).some(reminder => reminder.enabled));
+      .filter(
+        occasion =>
+          this.store.remindersFor(occasion.id).some(reminder => reminder.enabled) ||
+          (occasion.type === 'BIRTHDAY' && Boolean(occasion.birthdayEveReminderTime)),
+      );
     const activeIds = new Set(active.map(occasion => occasion.id));
     const staleSchedules = (await this.repositories.notificationSchedules.list()).filter(
       schedule => !activeIds.has(schedule.occasionId),
@@ -66,10 +70,11 @@ export class ReminderSchedulerService {
     const person = occasion ? this.store.person(occasion.personId) : undefined;
     if (!occasion || !person) return 'scheduled';
     const reminders = this.store.remindersFor(occasionId).filter(reminder => reminder.enabled);
+    const birthdayEveTime = occasion.type === 'BIRTHDAY' ? occasion.birthdayEveReminderTime : undefined;
     const existing = await this.repositories.notificationSchedules.forOccasion(occasionId);
     if (existing.length)
       await LocalNotifications.cancel({ notifications: existing.map(item => ({ id: item.notificationId })) });
-    if (!occasion.enabled || reminders.length === 0) {
+    if (!occasion.enabled || (reminders.length === 0 && !birthdayEveTime)) {
       await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
       return 'scheduled';
     }
@@ -110,6 +115,50 @@ export class ReminderSchedulerService {
         id: createId(),
         occasionId,
         reminderId: reminder.id,
+        notificationId,
+        scheduledAt: nextFire.toISOString(),
+        createdAt: new Date().toISOString(),
+      });
+    }
+    if (birthdayEveTime) {
+      const [hour, minute] = birthdayEveTime.split(':').map(Number);
+      const scheduledAt = new Date(occurrence);
+      scheduledAt.setDate(scheduledAt.getDate() - 1);
+      scheduledAt.setHours(hour, minute, 0, 0);
+      const reminderId = `birthday-eve:${occasion.id}`;
+      const notificationId = stableNotificationId(reminderId);
+      const nextFire = this.nextAnnualFire(scheduledAt);
+      const message = this.birthdayEveNotificationText(
+        person,
+        birthdayEveTime,
+        this.store.settings().notificationPrivacy,
+      );
+      notifications.push({
+        id: notificationId,
+        title: message.title,
+        body: message.body,
+        smallIcon: 'ic_stat_birthday_buddy',
+        iconColor: '#397153',
+        channelId: Capacitor.getPlatform() === 'android' ? this.channelId : undefined,
+        autoCancel: true,
+        foreground: true,
+        isExactNotification: false,
+        schedule: {
+          on: {
+            month: scheduledAt.getMonth() + 1,
+            day: scheduledAt.getDate(),
+            hour,
+            minute,
+            second: 0,
+          },
+          allowWhileIdle: true,
+        },
+        extra: { occasionId, personId: person.id, birthdayEve: true },
+      });
+      schedules.push({
+        id: createId(),
+        occasionId,
+        reminderId,
         notificationId,
         scheduledAt: nextFire.toISOString(),
         createdAt: new Date().toISOString(),
@@ -222,6 +271,28 @@ export class ReminderSchedulerService {
           ? 'Tomorrow'
           : `Upcoming ${OCCASION_LABELS[occasion.type]}`,
       body: `It's ${person.name}'s ${label} ${relation}.`,
+    };
+  }
+
+  private birthdayEveNotificationText(
+    person: Person,
+    time: NonNullable<Occasion['birthdayEveReminderTime']>,
+    privacy: NotificationPrivacy,
+  ): { title: string; body: string } {
+    const timing = time === '23:50' ? 'in 10 minutes' : 'at midnight';
+    if (privacy === 'PRIVATE')
+      return {
+        title: 'Birthday reminder',
+        body: `An important birthday begins ${timing}.`,
+      };
+    if (privacy === 'PERSON_ONLY')
+      return {
+        title: 'Birthday reminder',
+        body: `${person.name}'s birthday begins ${timing}.`,
+      };
+    return {
+      title: time === '23:50' ? 'Birthday in 10 minutes' : 'Birthday at midnight',
+      body: `${person.name}'s birthday begins ${timing}.`,
     };
   }
 }
