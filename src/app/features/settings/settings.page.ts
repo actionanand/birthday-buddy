@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, viewChild } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
@@ -262,7 +262,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
       cssClass="backup-password-modal"
       [isOpen]="passwordDialogOpen()"
       [backdropDismiss]="true"
-      (didDismiss)="passwordDialogDidDismiss()"
+      (didDismiss)="passwordDialogDidDismiss($any($event.detail))"
       ><ng-template
         ><ion-header
           ><ion-toolbar
@@ -272,7 +272,7 @@ import { ReminderSchedulerService } from '../../core/services/reminder-scheduler
             ></ion-toolbar
           ></ion-header
         ><ion-content>
-          <form class="backup-password-form" (ngSubmit)="submitPasswordDialog()" novalidate>
+          <form class="backup-password-form" (submit)="submitPasswordDialog($event)" novalidate>
             <p>
               {{
                 passwordDialogMode() === 'EXPORT'
@@ -350,8 +350,8 @@ export class SettingsPage {
   readonly passwordVisible = signal(false);
   readonly passwordDialogError = signal('');
   readonly backupPassword = new FormControl('', { nonNullable: true });
+  private readonly passwordModal = viewChild(IonModal);
   private passwordResolver?: (password: string | undefined) => void;
-  private passwordResult?: string;
   key(choice: ReminderChoice): string {
     return `${choice.unit}:${choice.value}`;
   }
@@ -560,19 +560,24 @@ export class SettingsPage {
   private async requestBackupPassword(contents: string): Promise<void> {
     const password = await this.askForBackupPassword('RESTORE');
     if (!password) return;
+    const loading = await this.loaders.create({ message: 'Opening backup…' });
+    await loading.present();
+    let payload: BackupPayload;
     try {
-      const payload = await this.backup.preview(contents, password);
-      await this.chooseRestoreMode(payload);
+      payload = await this.backup.preview(contents, password);
     } catch (error: unknown) {
+      await loading.dismiss();
       await this.toast(error instanceof Error ? error.message : 'The backup could not be opened.');
+      return;
     }
+    await loading.dismiss();
+    await this.chooseRestoreMode(payload);
   }
   private askForBackupPassword(mode: 'EXPORT' | 'RESTORE'): Promise<string | undefined> {
     this.passwordDialogMode.set(mode);
     this.backupPassword.setValue('');
     this.passwordVisible.set(false);
     this.passwordDialogError.set('');
-    this.passwordResult = undefined;
     this.passwordDialogOpen.set(true);
     return new Promise(resolve => {
       this.passwordResolver = resolve;
@@ -580,29 +585,36 @@ export class SettingsPage {
   }
 
   cancelPasswordDialog(): void {
-    this.passwordResult = undefined;
-    this.passwordDialogOpen.set(false);
+    void this.dismissPasswordDialog(undefined, 'cancel');
   }
 
-  passwordDialogDidDismiss(): void {
+  passwordDialogDidDismiss(detail: { data?: unknown; role?: string }): void {
     const resolver = this.passwordResolver;
-    const result = this.passwordResult;
     this.passwordResolver = undefined;
-    this.passwordResult = undefined;
+    this.passwordDialogOpen.set(false);
     this.backupPassword.setValue('');
     this.passwordVisible.set(false);
     this.passwordDialogError.set('');
-    resolver?.(result);
+    resolver?.(detail.role === 'confirm' && typeof detail.data === 'string' ? detail.data : undefined);
   }
 
-  submitPasswordDialog(): void {
+  async submitPasswordDialog(event: Event): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
     const password = this.backupPassword.value;
     if (password.length < 8) {
       this.passwordDialogError.set('Enter a password with at least 8 characters.');
       return;
     }
-    this.passwordResult = password;
-    this.passwordDialogOpen.set(false);
+    await this.dismissPasswordDialog(password, 'confirm');
+  }
+
+  private async dismissPasswordDialog(data: string | undefined, role: 'confirm' | 'cancel'): Promise<void> {
+    const modal = this.passwordModal();
+    if (modal) await modal.dismiss(data, role);
+    // Resolve explicitly as well as from didDismiss. The handler is idempotent and
+    // this prevents a platform event-forwarding failure from stalling the workflow.
+    this.passwordDialogDidDismiss({ data, role });
   }
 
   private async chooseRestoreMode(payload: BackupPayload): Promise<void> {
