@@ -456,6 +456,7 @@ export class OccasionEditorPage {
     const occasion = this.occasionId ? this.store.occasion(this.occasionId) : undefined;
     if (!occasion && this.targetPersonId() && !this.targetPerson()) {
       this.targetPersonId.set(undefined);
+      this.form.controls.personName.enable({ emitEvent: false });
       this.error.set('That person is no longer available. Create a new person instead.');
     }
     if (occasion) {
@@ -520,6 +521,8 @@ export class OccasionEditorPage {
       customDays: 10,
       time: '06:00',
     });
+    if (personId || this.occasionId) this.form.controls.personName.disable({ emitEvent: false });
+    else this.form.controls.personName.enable({ emitEvent: false });
     this.photo.set(undefined);
     this.photoBusy.set(false);
     this.error.set('');
@@ -740,6 +743,7 @@ export class OccasionEditorPage {
   }
   private resetForAnotherOccasion(): void {
     const today = new Date();
+    this.form.controls.personName.disable({ emitEvent: false });
     this.form.patchValue({
       type: 'BIRTHDAY',
       customTypeName: '',
