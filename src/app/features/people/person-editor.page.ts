@@ -6,7 +6,6 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
-  IonCheckbox,
   IonContent,
   IonHeader,
   IonIcon,
@@ -23,12 +22,14 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
 
 @Component({
   selector: 'app-person-editor',
+  host: {
+    '(window:beforeunload)': 'beforeUnload($event)',
+  },
   imports: [
     ReactiveFormsModule,
     IonBackButton,
     IonButton,
     IonButtons,
-    IonCheckbox,
     IonContent,
     IonHeader,
     IonIcon,
@@ -52,11 +53,11 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
         <section class="photo-editor">
           <app-person-avatar [name]="form.controls.name.value || 'New person'" [photoPath]="photo()" size="large" />
           <div>
-            <ion-button size="small" fill="outline" (click)="choosePhoto()"
+            <ion-button size="small" fill="outline" [disabled]="photoBusy()" (click)="choosePhoto(fileInput)"
               ><ion-icon slot="start" name="image-outline"></ion-icon>Choose photo</ion-button
             >
             @if (native) {
-              <ion-button size="small" fill="outline" (click)="takePhoto()"
+              <ion-button size="small" fill="outline" [disabled]="photoBusy()" (click)="takePhoto()"
                 ><ion-icon slot="start" name="camera-outline"></ion-icon>Take photo</ion-button
               >
             }
@@ -74,13 +75,19 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
               autocomplete="name"
               [formControl]="form.controls.name"
               required
-              errorText="Enter a name"></ion-input></ion-item
-          ><ion-item
-            ><ion-checkbox justify="space-between" [formControl]="form.controls.favorite"
-              >Favorite</ion-checkbox
-            ></ion-item
-          ></ion-list
-        >
+              errorText="Enter a name"></ion-input>
+            <ion-button
+              slot="end"
+              fill="clear"
+              class="favorite-toggle"
+              [attr.aria-pressed]="form.controls.favorite.value"
+              [attr.aria-label]="form.controls.favorite.value ? 'Remove from favorites' : 'Add to favorites'"
+              (click)="toggleFavorite()">
+              <ion-icon
+                slot="icon-only"
+                [name]="form.controls.favorite.value ? 'heart' : 'heart-outline'"
+                [color]="form.controls.favorite.value ? 'primary' : 'medium'"></ion-icon> </ion-button></ion-item
+        ></ion-list>
         <p class="form-help">
           Birthday Buddy stores only the details needed for occasions. Phone numbers, email, and address are never
           requested.
@@ -99,8 +106,11 @@ export class PersonEditorPage {
   private readonly toasts = inject(ToastController);
   readonly native = Capacitor.isNativePlatform();
   readonly photo = signal<string | undefined>(undefined);
+  readonly photoBusy = signal(false);
   readonly saving = signal(false);
   readonly personId = this.route.snapshot.paramMap.get('id');
+  private baselineDraft = '';
+  private navigationCommitted = false;
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(100)] }),
     favorite: new FormControl(false, { nonNullable: true }),
@@ -115,20 +125,55 @@ export class PersonEditorPage {
       this.form.setValue({ name: person.name, favorite: person.favorite });
       this.photo.set(person.photoPath);
     }
+    this.baselineDraft = this.draftSnapshot();
   }
-  async choosePhoto(): Promise<void> {
-    if (this.native) this.photo.set(await this.photos.choose());
-    else document.querySelector<HTMLInputElement>('input[type=file]')?.click();
+  hasUnsavedChanges(): boolean {
+    return !this.navigationCommitted && Boolean(this.baselineDraft) && this.draftSnapshot() !== this.baselineDraft;
+  }
+  beforeUnload(event: BeforeUnloadEvent): void {
+    if (!this.hasUnsavedChanges()) return;
+    event.preventDefault();
+    event.returnValue = '';
+  }
+  toggleFavorite(): void {
+    const control = this.form.controls.favorite;
+    control.setValue(!control.value);
+    control.markAsDirty();
+  }
+  async choosePhoto(fileInput: HTMLInputElement): Promise<void> {
+    if (this.native) await this.updatePhoto(() => this.photos.choose());
+    else {
+      fileInput.value = '';
+      fileInput.click();
+    }
   }
   async takePhoto(): Promise<void> {
-    this.photo.set(await this.photos.take());
+    await this.updatePhoto(() => this.photos.take());
   }
   removePhoto(): void {
     this.photo.set(undefined);
   }
   async browserPhoto(event: Event): Promise<void> {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) this.photo.set(await this.photos.readBrowserFile(file));
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) await this.updatePhoto(() => this.photos.readBrowserFile(file));
+    input.value = '';
+  }
+  private async updatePhoto(load: () => Promise<string | undefined>): Promise<void> {
+    if (this.photoBusy()) return;
+    this.photoBusy.set(true);
+    try {
+      const photo = await load();
+      if (photo) this.photo.set(photo);
+    } catch (error: unknown) {
+      const toast = await this.toasts.create({
+        message: error instanceof Error ? error.message : 'The photo could not be processed.',
+        duration: 2300,
+      });
+      await toast.present();
+    } finally {
+      this.photoBusy.set(false);
+    }
   }
   async save(): Promise<void> {
     if (this.form.invalid) {
@@ -136,24 +181,37 @@ export class PersonEditorPage {
       return;
     }
     this.saving.set(true);
-    const existing = this.personId ? this.store.person(this.personId) : undefined;
-    const photoChanged = Boolean(existing && this.photo() !== existing.photoPath);
-    const person = await this.store.savePerson({
-      ...existing,
-      id: this.personId ?? undefined,
-      name: this.form.controls.name.value,
-      favorite: this.form.controls.favorite.value,
-      photoPath: this.photo(),
-      photoSource: photoChanged
-        ? this.photo()
-          ? 'MANUAL'
-          : 'INITIALS'
-        : (existing?.photoSource ?? (this.photo() ? 'MANUAL' : 'INITIALS')),
-      photoUserModified: photoChanged ? true : (existing?.photoUserModified ?? false),
-    });
-    this.saving.set(false);
-    const toast = await this.toasts.create({ message: existing ? 'Person updated' : 'Person added', duration: 1600 });
-    await toast.present();
-    await this.router.navigate(['/person', person.id]);
+    try {
+      const existing = this.personId ? this.store.person(this.personId) : undefined;
+      const photoChanged = Boolean(existing && this.photo() !== existing.photoPath);
+      const person = await this.store.savePerson({
+        ...existing,
+        id: this.personId ?? undefined,
+        name: this.form.controls.name.value,
+        favorite: this.form.controls.favorite.value,
+        photoPath: this.photo(),
+        photoSource: photoChanged
+          ? this.photo()
+            ? 'MANUAL'
+            : 'INITIALS'
+          : (existing?.photoSource ?? (this.photo() ? 'MANUAL' : 'INITIALS')),
+        photoUserModified: photoChanged ? true : (existing?.photoUserModified ?? false),
+      });
+      this.navigationCommitted = true;
+      const toast = await this.toasts.create({ message: existing ? 'Person updated' : 'Person added', duration: 1600 });
+      await toast.present();
+      await this.router.navigate(['/person', person.id]);
+    } catch (error: unknown) {
+      const toast = await this.toasts.create({
+        message: error instanceof Error ? error.message : 'The person could not be saved.',
+        duration: 2200,
+      });
+      await toast.present();
+    } finally {
+      this.saving.set(false);
+    }
+  }
+  private draftSnapshot(): string {
+    return JSON.stringify({ ...this.form.getRawValue(), photo: this.photo() ?? null });
   }
 }

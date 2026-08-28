@@ -10,17 +10,21 @@ import { PersonAvatarComponent } from '../person-avatar/person-avatar.component'
   selector: 'app-occasion-card',
   imports: [RouterLink, IonBadge, IonCard, IonCardContent, IonIcon, IonItem, IonLabel, IonNote, PersonAvatarComponent],
   template: `
-    <ion-card class="occasion-card" [routerLink]="['/occasion', occasion().id, 'edit']" button="true">
+    <ion-card class="occasion-card">
       <ion-card-content
         ><ion-item lines="none">
           <app-person-avatar slot="start" [name]="person().name" [photoPath]="person().photoPath" />
           <ion-label
-            ><h2>{{ person().name }}</h2>
+            ><h2>
+              <a [routerLink]="['/person', person().id]">{{ person().name }}</a>
+            </h2>
             <p>
-              <ion-icon
-                [name]="occasion().type === 'BIRTHDAY' ? 'gift-outline' : 'heart-outline'"
-                aria-hidden="true"></ion-icon>
-              {{ label() }} · {{ dates.formatDate(occasion()) }}
+              <a class="occasion-link" [routerLink]="['/occasion', occasion().id]">
+                <ion-icon
+                  [name]="occasion().type === 'BIRTHDAY' ? 'gift-outline' : 'heart-outline'"
+                  aria-hidden="true"></ion-icon>
+                {{ label() }} · {{ dates.formatDate(occasion()) }}
+              </a>
             </p>
             @if (milestone()) {
               <ion-note>{{ milestone() }}</ion-note>

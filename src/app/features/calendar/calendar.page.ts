@@ -20,7 +20,7 @@ import { OccasionCardComponent } from '../../shared/components/occasion-card/occ
   template: `<ion-header translucent="true"
       ><ion-toolbar><ion-title>Calendar</ion-title></ion-toolbar
       ><ion-toolbar
-        ><ion-segment [value]="view()" (ionChange)="setView($event.detail.value)"
+        ><ion-segment [value]="view()" (ionChange)="setView($any($event).detail.value)"
           ><ion-segment-button value="DAY">Month</ion-segment-button
           ><ion-segment-button value="YEAR">Year</ion-segment-button></ion-segment
         ></ion-toolbar
@@ -33,7 +33,7 @@ import { OccasionCardComponent } from '../../shared/components/occasion-card/occ
               presentation="date"
               [value]="selected()"
               [highlightedDates]="highlightedDates"
-              (ionChange)="select($any($event.detail.value))"
+              (ionChange)="select($any($event).detail.value)"
               aria-label="Occasion calendar"></ion-datetime>
           </section>
           <div class="section-heading">

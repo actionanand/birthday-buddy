@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { unsavedChangesGuard } from './core/guards/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
@@ -23,11 +24,13 @@ export const routes: Routes = [
   },
   {
     path: 'person/new',
-    loadComponent: () => import('./features/people/person-editor.page').then(module => module.PersonEditorPage),
+    pathMatch: 'full',
+    redirectTo: 'occasion/new',
   },
   {
     path: 'person/:id/edit',
     loadComponent: () => import('./features/people/person-editor.page').then(module => module.PersonEditorPage),
+    canDeactivate: [unsavedChangesGuard],
   },
   {
     path: 'person/:id',
@@ -36,10 +39,16 @@ export const routes: Routes = [
   {
     path: 'occasion/new',
     loadComponent: () => import('./features/occasions/occasion-editor.page').then(module => module.OccasionEditorPage),
+    canDeactivate: [unsavedChangesGuard],
+  },
+  {
+    path: 'occasion/:id',
+    loadComponent: () => import('./features/occasions/occasion-detail.page').then(module => module.OccasionDetailPage),
   },
   {
     path: 'occasion/:id/edit',
     loadComponent: () => import('./features/occasions/occasion-editor.page').then(module => module.OccasionEditorPage),
+    canDeactivate: [unsavedChangesGuard],
   },
   {
     path: 'settings',

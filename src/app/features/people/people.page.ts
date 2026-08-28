@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import {
   AlertController,
   IonBadge,
@@ -66,6 +66,9 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
       ><ion-toolbar
         ><ion-title>People</ion-title
         ><ion-buttons slot="end">
+          @if (store.activePeople().length > 1) {
+            <ion-button (click)="openMerge()">Merge</ion-button>
+          }
           @if (sync.available) {
             <ion-button (click)="syncContacts()" aria-label="Sync contacts" [disabled]="sync.syncing()"
               ><ion-icon name="sync-outline"></ion-icon
@@ -76,7 +79,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
           aria-label="Search people"
           placeholder="Search people"
           [debounce]="250"
-          (ionInput)="query.set($any($event.detail.value || ''))"></ion-searchbar></ion-toolbar
+          (ionInput)="query.set($any($event).detail.value || '')"></ion-searchbar></ion-toolbar
     ></ion-header>
     <ion-content fullscreen="true"
       ><main class="page-shell list-shell">
@@ -85,8 +88,8 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
             title="No people yet"
             message="Add someone manually or choose from your contacts."
             icon="people-outline"
-            actionLabel="Add a person"
-            actionLink="/person/new" />
+            actionLabel="Add person & occasions"
+            actionLink="/occasion/new" />
         } @else {
           <ion-list inset="true">
             @for (person of filtered(); track person.id) {
@@ -101,7 +104,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
                     </ion-badge></ion-label
                   >
                   @if (person.favorite) {
-                    <ion-icon slot="end" name="heart" color="primary" aria-label="Favorite"></ion-icon>
+                    <ion-icon slot="end" class="favorite-heart" name="heart" aria-label="Favorite"></ion-icon>
                   }</ion-item
                 ><ion-item-options side="end"
                   ><ion-item-option
@@ -118,10 +121,10 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
             }
           </ion-list>
         }
-        <ion-fab slot="fixed" vertical="bottom" horizontal="end"
-          ><ion-fab-button (click)="addPerson()" aria-label="Add person"
-            ><ion-icon name="add"></ion-icon></ion-fab-button
-        ></ion-fab></main
+      </main>
+      <ion-fab slot="fixed" vertical="bottom" horizontal="end"
+        ><ion-fab-button routerLink="/occasion/new" aria-label="Add person and occasions"
+          ><ion-icon name="add"></ion-icon></ion-fab-button></ion-fab
     ></ion-content>
     <ion-modal [isOpen]="previewOpen()" (didDismiss)="previewOpen.set(false)"
       ><ng-template
@@ -158,15 +161,15 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
                       <p>{{ candidateLabel(candidate.kind) }}</p>
                       @if (candidate.event) {
                         <ion-note
-                          >{{ OCCASION_LABELS[candidate.event.type] }} · {{ candidate.event.day }}/{{
-                            candidate.event.month
+                          >{{ candidate.event.customTypeName || OCCASION_LABELS[candidate.event.type] }} ·
+                          {{ candidate.event.day }}/{{ candidate.event.month
                           }}{{ candidate.event.year ? '/' + candidate.event.year : '' }}</ion-note
                         >
                       }</ion-label
                     ><ion-checkbox
                       slot="end"
                       [checked]="candidate.selected"
-                      (ionChange)="candidate.selected = $any($event.detail.checked)"
+                      (ionChange)="candidate.selected = $any($event).detail.checked"
                       [attr.aria-label]="'Apply change for ' + candidate.contact.displayName"></ion-checkbox
                   ></ion-item>
                   @if (
@@ -176,7 +179,7 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
                   ) {
                     <ion-radio-group
                       [value]="candidate.resolution"
-                      (ionChange)="candidate.resolution = $any($event.detail.value)"
+                      (ionChange)="candidate.resolution = $any($event).detail.value"
                       ><ion-item><ion-radio value="KEEP_APP">Keep app value</ion-radio></ion-item
                       ><ion-item
                         ><ion-radio value="USE_CONTACT">Use contact value</ion-radio></ion-item
@@ -189,6 +192,61 @@ import { PersonAvatarComponent } from '../../shared/components/person-avatar/per
           </div></ion-content
         ></ng-template
       ></ion-modal
+    ><ion-modal [isOpen]="mergeOpen()" (didDismiss)="closeMerge()"
+      ><ng-template
+        ><ion-header
+          ><ion-toolbar
+            ><ion-title>Merge people</ion-title
+            ><ion-buttons slot="end"><ion-button (click)="closeMerge()">Cancel</ion-button></ion-buttons></ion-toolbar
+          ></ion-header
+        ><ion-content
+          ><div class="modal-shell">
+            <p>
+              Select every entry that belongs to the same person. Their unique occasions and contact links will be kept.
+            </p>
+            <ion-list>
+              @for (person of store.activePeople(); track person.id) {
+                <ion-item
+                  ><app-person-avatar slot="start" [name]="person.name" [photoPath]="person.photoPath" />
+                  <ion-label
+                    ><h2>{{ person.name }}</h2>
+                    <p>{{ occasionSummary(person.id) }}</p></ion-label
+                  >
+                  <ion-checkbox
+                    slot="end"
+                    [checked]="mergeSelected().includes(person.id)"
+                    (ionChange)="toggleMerge(person.id, $any($event).detail.checked)"
+                    [attr.aria-label]="'Select ' + person.name"></ion-checkbox
+                ></ion-item>
+              }
+            </ion-list>
+            @if (mergePeople().length > 1) {
+              <h2>Keep this name</h2>
+              <ion-radio-group [value]="mergeNameId()" (ionChange)="mergeNameId.set($any($event).detail.value)">
+                @for (person of mergePeople(); track person.id) {
+                  <ion-item
+                    ><ion-radio [value]="person.id">{{ person.name }}</ion-radio></ion-item
+                  >
+                }
+              </ion-radio-group>
+              @if (mergePhotoPeople().length > 1) {
+                <h2>Keep this picture</h2>
+                <ion-radio-group [value]="mergePhotoId()" (ionChange)="mergePhotoId.set($any($event).detail.value)">
+                  @for (person of mergePhotoPeople(); track person.id) {
+                    <ion-item
+                      ><app-person-avatar slot="start" [name]="person.name" [photoPath]="person.photoPath" />
+                      <ion-radio [value]="person.id">{{ person.name }}</ion-radio></ion-item
+                    >
+                  }
+                </ion-radio-group>
+              }
+              <ion-button expand="block" (click)="confirmMerge()" [disabled]="!mergeNameId() || merging()"
+                >Merge selected people</ion-button
+              >
+            }
+          </div></ion-content
+        ></ng-template
+      ></ion-modal
     >`,
   styleUrl: 'people.page.scss',
 })
@@ -196,12 +254,22 @@ export class PeoplePage {
   readonly store = inject(BirthdayStoreService);
   readonly sync = inject(ContactSyncService);
   readonly OCCASION_LABELS = OCCASION_LABELS;
-  private readonly router = inject(Router);
   private readonly alerts = inject(AlertController);
   private readonly scheduler = inject(ReminderSchedulerService);
   private readonly toasts = inject(ToastController);
   readonly query = signal('');
   readonly previewOpen = signal(false);
+  readonly mergeOpen = signal(false);
+  readonly merging = signal(false);
+  readonly mergeSelected = signal<string[]>([]);
+  readonly mergeNameId = signal('');
+  readonly mergePhotoId = signal('');
+  readonly mergePeople = computed(() =>
+    this.mergeSelected()
+      .map(id => this.store.person(id))
+      .filter(person => person !== undefined),
+  );
+  readonly mergePhotoPeople = computed(() => this.mergePeople().filter(person => Boolean(person.photoPath)));
   readonly filtered = computed(() => {
     const query = this.query().trim().toLocaleLowerCase();
     return this.store
@@ -215,31 +283,36 @@ export class PeoplePage {
       ? `${occasions.length} ${occasions.length === 1 ? 'occasion' : 'occasions'}`
       : 'No occasions';
   }
-  async addPerson(): Promise<void> {
-    if (!this.sync.available) {
-      await this.router.navigate(['/person/new']);
-      return;
+  openMerge(): void {
+    this.mergeSelected.set([]);
+    this.mergeNameId.set('');
+    this.mergePhotoId.set('');
+    this.mergeOpen.set(true);
+  }
+  closeMerge(): void {
+    if (this.merging()) return;
+    this.mergeOpen.set(false);
+  }
+  toggleMerge(personId: string, checked: boolean): void {
+    this.mergeSelected.update(ids => (checked ? [...new Set([...ids, personId])] : ids.filter(id => id !== personId)));
+    const selected = this.mergeSelected();
+    if (!selected.includes(this.mergeNameId())) this.mergeNameId.set(selected[0] ?? '');
+    const photoIds = this.mergePhotoPeople().map(person => person.id);
+    if (!photoIds.includes(this.mergePhotoId())) this.mergePhotoId.set(photoIds[0] ?? '');
+  }
+  async confirmMerge(): Promise<void> {
+    if (this.mergeSelected().length < 2 || !this.mergeNameId() || this.merging()) return;
+    this.merging.set(true);
+    try {
+      const merged = await this.store.mergePeople(this.mergeSelected(), this.mergeNameId(), this.mergePhotoId());
+      await this.scheduler.reconcileAll(false);
+      this.mergeOpen.set(false);
+      await this.toast(`Merged as ${merged.name}`);
+    } catch (error: unknown) {
+      await this.toast(error instanceof Error ? error.message : 'People could not be merged');
+    } finally {
+      this.merging.set(false);
     }
-    const sheet = await this.alerts.create({
-      header: 'Add Person',
-      message: 'Choose how you would like to add someone.',
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Add Manually',
-          handler: () => {
-            void this.router.navigate(['/person/new']);
-          },
-        },
-        {
-          text: 'Add from Contacts',
-          handler: () => {
-            void this.pickContact();
-          },
-        },
-      ],
-    });
-    await sheet.present();
   }
   async pickContact(): Promise<void> {
     await this.sync.pickContact();
@@ -249,7 +322,7 @@ export class PeoplePage {
     const alert = await this.alerts.create({
       header: 'Sync Contacts',
       message:
-        'Contact access is used to find birthdays and anniversaries saved in your phone contacts. Your contacts stay on this device and are never uploaded.',
+        'Contact access is used to find birthdays, anniversaries, custom events, favorites, names, and photos saved in your phone contacts. Your contacts stay on this device and are never uploaded.',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -301,6 +374,7 @@ export class PeoplePage {
           NEW_OCCASION: 'New occasion',
           NAME_CHANGE: 'Name changed in Contacts',
           PHOTO_CHANGE: 'Profile picture changed',
+          FAVORITE_CHANGE: 'Favorite in Android Contacts',
           DATE_CONFLICT: 'Date differs from app',
           EVENT_LINK_CHANGE: 'Contact occasion link updated',
         } as Record<string, string>

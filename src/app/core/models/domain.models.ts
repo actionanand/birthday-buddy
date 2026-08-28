@@ -2,6 +2,7 @@ export type PersonSource = 'MANUAL' | 'ANDROID_CONTACT' | 'ANDROID_CONTACT_DELET
 export type PhotoSource = 'ANDROID_CONTACT' | 'MANUAL' | 'INITIALS';
 export type OccasionSource = 'MANUAL' | 'ANDROID_CONTACT';
 export type ReminderMode = 'DEFAULT' | 'CUSTOM';
+export type BirthdayEveReminderTime = '21:00' | '22:00' | '23:00' | '23:50';
 export type OccasionType =
   | 'BIRTHDAY'
   | 'WEDDING_ANNIVERSARY'
@@ -18,6 +19,7 @@ export interface Person {
   photoPath?: string;
   source: PersonSource;
   androidContactLookupKey?: string;
+  androidContactLookupKeys?: string[];
   favorite: boolean;
   nameUserModified: boolean;
   photoSource: PhotoSource;
@@ -41,6 +43,7 @@ export interface Occasion {
   androidEventReference?: string;
   userModified: boolean;
   reminderMode?: ReminderMode;
+  birthdayEveReminderTime?: BirthdayEveReminderTime;
   enabled: boolean;
   trashedAt?: string;
   deleteAfter?: string;
@@ -83,6 +86,7 @@ export interface AppSettings {
   defaultReminderOffsets: ReminderChoice[];
   defaultReminderHour: number;
   defaultReminderMinute: number;
+  defaultReminderTimeVersion?: number;
   notificationPrivacy: NotificationPrivacy;
   feb29Policy: Feb29Policy;
   showAge: boolean;
@@ -113,7 +117,8 @@ export interface ContactSyncIgnore {
 
 export interface AndroidContactEvent {
   reference: string;
-  type: 'BIRTHDAY' | 'WEDDING_ANNIVERSARY';
+  type: OccasionType;
+  customTypeName?: string;
   day: number;
   month: number;
   year?: number;
@@ -123,11 +128,18 @@ export interface AndroidContactSummary {
   lookupKey: string;
   displayName: string;
   photoData?: string;
+  favorite: boolean;
   events: AndroidContactEvent[];
 }
 
 export type SyncCandidateKind =
-  'NEW_PERSON' | 'NEW_OCCASION' | 'NAME_CHANGE' | 'PHOTO_CHANGE' | 'DATE_CONFLICT' | 'EVENT_LINK_CHANGE';
+  | 'NEW_PERSON'
+  | 'NEW_OCCASION'
+  | 'NAME_CHANGE'
+  | 'PHOTO_CHANGE'
+  | 'FAVORITE_CHANGE'
+  | 'DATE_CONFLICT'
+  | 'EVENT_LINK_CHANGE';
 
 export interface ContactSyncCandidate {
   id: string;
@@ -172,8 +184,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
     { unit: 'DAY', value: 1 },
     { unit: 'ON_DAY', value: 0 },
   ],
-  defaultReminderHour: 8,
+  defaultReminderHour: 6,
   defaultReminderMinute: 0,
+  defaultReminderTimeVersion: 1,
   notificationPrivacy: 'FULL',
   feb29Policy: 'FEB_28',
   showAge: true,

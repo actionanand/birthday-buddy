@@ -71,8 +71,10 @@ export class BirthdayStoreService {
       this.people.set(people);
       this.occasions.set(occasions);
       this.reminders.set(reminders);
-      if (settings) this.settings.set(settings);
-      else await this.updateSettings({ ...DEFAULT_SETTINGS, updatedAt: new Date().toISOString() });
+      if (settings) {
+        this.settings.set(settings);
+        await this.migrateDefaultReminderTime();
+      } else await this.updateSettings({ ...DEFAULT_SETTINGS, updatedAt: new Date().toISOString() });
       this.ignores.set(ignores);
       await this.migrateLegacyReminderModes();
       await this.purgeExpiredTrash();
@@ -100,6 +102,16 @@ export class BirthdayStoreService {
   async savePerson(input: Pick<Person, 'name' | 'favorite'> & Partial<Person>): Promise<Person> {
     const now = new Date().toISOString();
     const existing = input.id ? this.person(input.id) : undefined;
+    const lookupKeys = [
+      ...(input.androidContactLookupKeys ?? existing?.androidContactLookupKeys ?? []),
+      ...(('androidContactLookupKey' in input ? input.androidContactLookupKey : existing?.androidContactLookupKey)
+        ? [
+            ('androidContactLookupKey' in input
+              ? input.androidContactLookupKey
+              : existing?.androidContactLookupKey) as string,
+          ]
+        : []),
+    ].filter((value, index, values) => values.indexOf(value) === index);
     const person: Person = {
       id: existing?.id ?? createId(),
       name: input.name.trim(),
@@ -107,6 +119,7 @@ export class BirthdayStoreService {
       source: input.source ?? existing?.source ?? 'MANUAL',
       androidContactLookupKey:
         'androidContactLookupKey' in input ? input.androidContactLookupKey : existing?.androidContactLookupKey,
+      androidContactLookupKeys: lookupKeys.length ? lookupKeys : undefined,
       favorite: input.favorite,
       nameUserModified:
         'nameUserModified' in input
@@ -130,6 +143,90 @@ export class BirthdayStoreService {
     return person;
   }
 
+  async mergePeople(personIds: string[], namePersonId: string, photoPersonId?: string): Promise<Person> {
+    const selected = [...new Set(personIds)]
+      .map(id => this.person(id))
+      .filter((person): person is Person => Boolean(person));
+    if (selected.length < 2) throw new Error('Choose at least two people to merge.');
+    const namePerson = selected.find(person => person.id === namePersonId) ?? selected[0];
+    const photoPeople = selected.filter(person => Boolean(person.photoPath));
+    const photoPerson =
+      photoPeople.length === 1
+        ? photoPeople[0]
+        : (selected.find(person => person.id === photoPersonId && person.photoPath) ?? namePerson);
+    const target = namePerson;
+    const lookupKeys = selected
+      .flatMap(person => [person.androidContactLookupKey, ...(person.androidContactLookupKeys ?? [])])
+      .filter((value): value is string => Boolean(value))
+      .filter((value, index, values) => values.indexOf(value) === index);
+    const contactAvailable = lookupKeys.length ? selected.some(person => person.contactAvailable) : true;
+    const now = new Date().toISOString();
+    const mergedPerson: Person = {
+      ...target,
+      name: namePerson.name,
+      photoPath: photoPerson.photoPath,
+      photoSource: photoPerson.photoPath ? photoPerson.photoSource : 'INITIALS',
+      photoUserModified: photoPeople.length > 1 || selected.some(person => person.photoUserModified),
+      favorite: selected.some(person => person.favorite),
+      source: lookupKeys.length ? (contactAvailable ? 'ANDROID_CONTACT' : 'ANDROID_CONTACT_DELETED') : 'MANUAL',
+      androidContactLookupKey: lookupKeys[0],
+      androidContactLookupKeys: lookupKeys.length ? lookupKeys : undefined,
+      contactAvailable,
+      nameUserModified: true,
+      updatedAt: now,
+    };
+    const selectedIds = new Set(selected.map(person => person.id));
+    const targetOccasions = this.occasionsFor(target.id, true);
+    const identity = (occasion: Occasion) =>
+      `${occasion.type}:${occasion.customTypeName?.trim().toLocaleLowerCase() ?? ''}:${occasion.year ?? ''}-${occasion.month}-${occasion.day}`;
+    const targetByIdentity = new Map(targetOccasions.map(occasion => [identity(occasion), occasion]));
+    const linkedTargets = new Map<string, Occasion>();
+    const moved: Occasion[] = [];
+    const duplicateOccasionIds = new Set<string>();
+    for (const occasion of this.occasions().filter(
+      item => selectedIds.has(item.personId) && item.personId !== target.id,
+    )) {
+      const occasionIdentity = identity(occasion);
+      const duplicate = targetByIdentity.get(occasionIdentity);
+      if (duplicate) {
+        duplicateOccasionIds.add(occasion.id);
+        if (occasion.androidEventReference && !duplicate.androidEventReference) {
+          const linked: Occasion = {
+            ...duplicate,
+            source: 'ANDROID_CONTACT',
+            androidEventReference: occasion.androidEventReference,
+            userModified: duplicate.source === 'MANUAL' || duplicate.userModified,
+            updatedAt: now,
+          };
+          linkedTargets.set(linked.id, linked);
+          targetByIdentity.set(occasionIdentity, linked);
+        }
+      } else {
+        moved.push({ ...occasion, personId: target.id, updatedAt: now });
+        targetByIdentity.set(occasionIdentity, occasion);
+      }
+    }
+    const duplicateReminderIds = this.reminders()
+      .filter(reminder => duplicateOccasionIds.has(reminder.occasionId))
+      .map(reminder => reminder.id);
+    await this.repositories.adapter.batch([
+      { store: 'people', operation: 'PUT', value: mergedPerson },
+      ...[...linkedTargets.values()].map(value => ({
+        store: 'occasions' as const,
+        operation: 'PUT' as const,
+        value,
+      })),
+      ...moved.map(value => ({ store: 'occasions' as const, operation: 'PUT' as const, value })),
+      ...duplicateReminderIds.map(id => ({ store: 'occasion_reminders' as const, operation: 'DELETE' as const, id })),
+      ...[...duplicateOccasionIds].map(id => ({ store: 'occasions' as const, operation: 'DELETE' as const, id })),
+      ...selected
+        .filter(person => person.id !== target.id)
+        .map(person => ({ store: 'people' as const, operation: 'DELETE' as const, id: person.id })),
+    ]);
+    await this.refreshFromStorage();
+    return mergedPerson;
+  }
+
   async saveOccasion(
     input: Omit<Occasion, 'id' | 'createdAt' | 'updatedAt'> & Partial<Pick<Occasion, 'id'>>,
     choices: ReminderChoice[],
@@ -138,6 +235,8 @@ export class BirthdayStoreService {
   ): Promise<Occasion> {
     const now = new Date().toISOString();
     const existing = input.id ? this.occasion(input.id) : undefined;
+    const duplicate = this.findDuplicateOccasion(input, existing?.id);
+    if (duplicate) throw new Error('This person already has the same occasion on this date.');
     const reminderMode = input.reminderMode ?? existing?.reminderMode ?? 'DEFAULT';
     const occasion: Occasion = {
       ...input,
@@ -169,6 +268,23 @@ export class BirthdayStoreService {
     this.occasions.update(items => [...items.filter(item => item.id !== occasion.id), occasion]);
     this.reminders.update(items => [...items.filter(item => item.occasionId !== occasion.id), ...reminders]);
     return occasion;
+  }
+
+  findDuplicateOccasion(
+    input: Pick<Occasion, 'personId' | 'type' | 'customTypeName' | 'day' | 'month' | 'year'>,
+    excludeId?: string,
+  ): Occasion | undefined {
+    const customTypeName = input.customTypeName?.trim().toLocaleLowerCase() ?? '';
+    return this.activeOccasions().find(
+      occasion =>
+        occasion.id !== excludeId &&
+        occasion.personId === input.personId &&
+        occasion.type === input.type &&
+        (occasion.customTypeName?.trim().toLocaleLowerCase() ?? '') === customTypeName &&
+        occasion.day === input.day &&
+        occasion.month === input.month &&
+        occasion.year === input.year,
+    );
   }
 
   async deleteOccasion(id: string, ignoreImported = true): Promise<void> {
@@ -388,6 +504,7 @@ export class BirthdayStoreService {
       ...person,
       source: 'MANUAL',
       androidContactLookupKey: undefined,
+      androidContactLookupKeys: [],
       contactAvailable: true,
     });
   }
@@ -459,6 +576,19 @@ export class BirthdayStoreService {
     );
     const normalizedById = new Map(normalized.map(occasion => [occasion.id, occasion]));
     this.occasions.update(items => items.map(occasion => normalizedById.get(occasion.id) ?? occasion));
+  }
+
+  private async migrateDefaultReminderTime(): Promise<void> {
+    const settings = this.settings();
+    if (settings.defaultReminderTimeVersion === 1) return;
+    await this.updateSettings({
+      ...settings,
+      defaultReminderHour:
+        settings.defaultReminderHour === 8 && settings.defaultReminderMinute === 0
+          ? DEFAULT_SETTINGS.defaultReminderHour
+          : settings.defaultReminderHour,
+      defaultReminderTimeVersion: 1,
+    });
   }
 
   private remindersMatchDefaults(occasionId: string): boolean {
