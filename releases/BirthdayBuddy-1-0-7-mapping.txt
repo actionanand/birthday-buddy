@@ -3,8 +3,8 @@
 # min_api: 24
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: 14a4692cd221ef27fbce5197545b1f9696de1fb439a5397b9163b19cf6a2da7b
-# pg_map_hash: SHA-256 14a4692cd221ef27fbce5197545b1f9696de1fb439a5397b9163b19cf6a2da7b
+# pg_map_id: 649234576bc34f1586cd6d701af754454d8302e10575db553c55129828bad5fe
+# pg_map_hash: SHA-256 649234576bc34f1586cd6d701af754454d8302e10575db553c55129828bad5fe
 _COROUTINE.ArtificialStackFrames -> R8$$REMOVED$$CLASS$$0:
 # {"id":"sourceFile","fileName":"CoroutineDebugging.kt"}
 _COROUTINE.CoroutineDebuggingKt -> R8$$REMOVED$$CLASS$$1:
@@ -94544,12 +94544,26 @@ com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin -> com.actionanand
     1:4:void <init>():26:26 -> <init>
     1:4:void $r8$lambda$-fRfqqj3DIrFmWyPd_pO2frAVNc(com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin,java.lang.Boolean):0:0 -> c
       # {"id":"com.android.tools.r8.synthesized"}
-    1:2:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):98:98 -> contact
-      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lcom/getcapacitor/x;"}
+    1:2:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean):98:98 -> contact
+      # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)Lcom/getcapacitor/x;"}
     3:5:void com.getcapacitor.JSObject.<init>():18:18 -> contact
-    3:5:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):98 -> contact
-    6:28:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):98:98 -> contact
-    29:40:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String):99:99 -> contact
+    3:5:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean):98 -> contact
+    6:33:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean):98:98 -> contact
+    34:45:com.getcapacitor.JSObject contact(java.lang.String,java.lang.String,java.lang.String,java.lang.String,boolean):99:99 -> contact
+    2:8:java.lang.String contactEventType(int,java.lang.String):112:112 -> contactEventType
+    9:21:java.lang.String contactEventType(int,java.lang.String):113:113 -> contactEventType
+    22:47:java.lang.String contactEventType(int,java.lang.String):114:114 -> contactEventType
+    48:65:java.lang.String contactEventType(int,java.lang.String):115:115 -> contactEventType
+    66:90:java.lang.String contactEventType(int,java.lang.String):116:116 -> contactEventType
+    91:101:java.lang.String contactEventType(int,java.lang.String):117:117 -> contactEventType
+    102:126:java.lang.String contactEventType(int,java.lang.String):118:118 -> contactEventType
+    127:143:java.lang.String contactEventType(int,java.lang.String):119:119 -> contactEventType
+    144:182:java.lang.String contactEventType(int,java.lang.String):120:120 -> contactEventType
+    183:186:java.lang.String contactEventType(int,java.lang.String):122:122 -> contactEventType
+    187:189:java.lang.String contactEventType(int,java.lang.String):119:119 -> contactEventType
+    190:192:java.lang.String contactEventType(int,java.lang.String):118:118 -> contactEventType
+    193:195:java.lang.String contactEventType(int,java.lang.String):116:116 -> contactEventType
+    196:199:java.lang.String contactEventType(int,java.lang.String):115:115 -> contactEventType
     4:12:int androidx.activity.result.ActivityResult.getResultCode():32:32 -> contactPicked
     4:12:void contactPicked(com.getcapacitor.PluginCall,androidx.activity.result.ActivityResult):57 -> contactPicked
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
@@ -94574,7 +94588,7 @@ com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin -> com.actionanand
     6:8:void androidx.activity.result.contract.ActivityResultContracts$RequestPermission.<init>():210 -> load
     6:8:void load():32 -> load
     9:22:void load():32:32 -> load
-    5:73:int[] parseDate(java.lang.String):112:112 -> parseDate
+    5:73:int[] parseDate(java.lang.String):127:127 -> parseDate
     1:2:void permissionStatus(com.getcapacitor.PluginCall):45:45 -> permissionStatus
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
     3:5:void com.getcapacitor.JSObject.<init>():18:18 -> permissionStatus
@@ -94595,16 +94609,16 @@ com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin -> com.actionanand
     18:25:com.getcapacitor.JSArray com.getcapacitor.PluginCall.getArray(java.lang.String):296:296 -> readAll
     18:25:void readAll(com.getcapacitor.PluginCall):83 -> readAll
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    26:43:void readAll(com.getcapacitor.PluginCall):84:84 -> readAll
-    44:75:void readAll(com.getcapacitor.PluginCall):85:85 -> readAll
-    76:134:void readAll(com.getcapacitor.PluginCall):86:86 -> readAll
-    135:136:void readAll(com.getcapacitor.PluginCall):87:87 -> readAll
-    137:139:void com.getcapacitor.JSObject.<init>():18:18 -> readAll
-    137:139:void readAll(com.getcapacitor.PluginCall):87 -> readAll
-    140:153:void readAll(com.getcapacitor.PluginCall):87:87 -> readAll
-    154:156:void readAll(com.getcapacitor.PluginCall):88:88 -> readAll
-    157:160:void com.getcapacitor.PluginCall.reject(java.lang.String,java.lang.Exception):111:111 -> readAll
-    157:160:void readAll(com.getcapacitor.PluginCall):88 -> readAll
+    26:44:void readAll(com.getcapacitor.PluginCall):84:84 -> readAll
+    45:78:void readAll(com.getcapacitor.PluginCall):85:85 -> readAll
+    79:149:void readAll(com.getcapacitor.PluginCall):86:86 -> readAll
+    150:151:void readAll(com.getcapacitor.PluginCall):87:87 -> readAll
+    152:154:void com.getcapacitor.JSObject.<init>():18:18 -> readAll
+    152:154:void readAll(com.getcapacitor.PluginCall):87 -> readAll
+    155:168:void readAll(com.getcapacitor.PluginCall):87:87 -> readAll
+    169:171:void readAll(com.getcapacitor.PluginCall):88:88 -> readAll
+    172:175:void com.getcapacitor.PluginCall.reject(java.lang.String,java.lang.Exception):111:111 -> readAll
+    172:175:void readAll(com.getcapacitor.PluginCall):88 -> readAll
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     1:6:void readContacts(com.getcapacitor.PluginCall):65:65 -> readContacts
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Lcom/getcapacitor/f0;)V"}
@@ -94618,22 +94632,23 @@ com.actionanand.birthdaybuddy.app.BirthdayBuddyContactsPlugin -> com.actionanand
     24:27:void readContacts(com.getcapacitor.PluginCall):68 -> readContacts
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     28:31:void readContacts(com.getcapacitor.PluginCall):71:71 -> readContacts
-    1:2:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):103:103 -> readEvents
+    3:4:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):103:103 -> readEvents
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/String;Ljava/lang/String;)Lcom/getcapacitor/v;"}
-    3:5:void com.getcapacitor.JSArray.<init>():12:12 -> readEvents
-    3:5:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):103 -> readEvents
-    6:40:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):105:105 -> readEvents
-    41:83:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106:106 -> readEvents
-    84:86:void com.getcapacitor.JSObject.<init>():18:18 -> readEvents
-    84:86:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106 -> readEvents
-    87:147:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106:106 -> readEvents
-    4:10:java.lang.String readPhoto(java.lang.String):117:117 -> readPhoto
-    11:115:java.lang.String readPhoto(java.lang.String):118:118 -> readPhoto
-    1:30:com.getcapacitor.JSObject readSingle(android.net.Uri):92:92 -> readSingle
+    5:7:void com.getcapacitor.JSArray.<init>():12:12 -> readEvents
+    5:7:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):103 -> readEvents
+    8:12:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):104:104 -> readEvents
+    13:51:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):106:106 -> readEvents
+    52:182:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):107:107 -> readEvents
+    183:185:void com.getcapacitor.JSObject.<init>():18:18 -> readEvents
+    183:185:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):107 -> readEvents
+    186:284:com.getcapacitor.JSArray readEvents(java.lang.String,java.lang.String):107:107 -> readEvents
+    4:10:java.lang.String readPhoto(java.lang.String):132:132 -> readPhoto
+    11:115:java.lang.String readPhoto(java.lang.String):133:133 -> readPhoto
+    1:32:com.getcapacitor.JSObject readSingle(android.net.Uri):92:92 -> readSingle
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Landroid/net/Uri;)Lcom/getcapacitor/x;"}
-    31:37:com.getcapacitor.JSObject readSingle(android.net.Uri):93:93 -> readSingle
-    38:64:com.getcapacitor.JSObject readSingle(android.net.Uri):94:94 -> readSingle
-    65:72:com.getcapacitor.JSObject readSingle(android.net.Uri):93:93 -> readSingle
+    33:39:com.getcapacitor.JSObject readSingle(android.net.Uri):93:93 -> readSingle
+    40:78:com.getcapacitor.JSObject readSingle(android.net.Uri):94:94 -> readSingle
+    79:86:com.getcapacitor.JSObject readSingle(android.net.Uri):93:93 -> readSingle
 com.actionanand.birthdaybuddy.app.BirthdayBuddyFilesPlugin -> com.actionanand.birthdaybuddy.app.BirthdayBuddyFilesPlugin:
 # {"id":"sourceFile","fileName":"BirthdayBuddyFilesPlugin.java"}
     1:4:void <init>():18:18 -> <init>
