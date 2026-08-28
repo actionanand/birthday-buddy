@@ -637,6 +637,7 @@ export class SettingsPage {
     await loading.present();
     try {
       const restored = await this.backup.restore(payload, mode);
+      await this.scheduler.reconcileAll(false);
       await loading.dismiss();
       const message =
         mode === 'MERGE' && restored.people === 0 && restored.occasions === 0
@@ -644,8 +645,6 @@ export class SettingsPage {
           : `Backup restored: ${restored.people} people and ${restored.occasions} occasions.`;
       const toast = await this.toasts.create({ message, duration: 1800, position: 'bottom' });
       await toast.present();
-      await toast.onDidDismiss();
-      window.location.reload();
     } catch (error: unknown) {
       await loading.dismiss();
       await this.toast(error instanceof Error ? error.message : 'Restore failed');

@@ -54,25 +54,32 @@ export class BirthdayStoreService {
 
   async initialize(): Promise<void> {
     if (this.ready()) return;
+    await this.refreshFromStorage();
+  }
+
+  async refreshFromStorage(): Promise<void> {
     this.loading.set(true);
-    await this.repositories.initialize();
-    const [people, occasions, reminders, settings, ignores] = await Promise.all([
-      this.repositories.people.list(),
-      this.repositories.occasions.list(),
-      this.repositories.reminders.list(),
-      this.repositories.settings.get(),
-      this.repositories.contactSync.listIgnores(),
-    ]);
-    this.people.set(people);
-    this.occasions.set(occasions);
-    this.reminders.set(reminders);
-    if (settings) this.settings.set(settings);
-    else await this.updateSettings({ ...DEFAULT_SETTINGS, updatedAt: new Date().toISOString() });
-    this.ignores.set(ignores);
-    await this.migrateLegacyReminderModes();
-    await this.purgeExpiredTrash();
-    this.loading.set(false);
-    this.ready.set(true);
+    try {
+      await this.repositories.initialize();
+      const [people, occasions, reminders, settings, ignores] = await Promise.all([
+        this.repositories.people.list(),
+        this.repositories.occasions.list(),
+        this.repositories.reminders.list(),
+        this.repositories.settings.get(),
+        this.repositories.contactSync.listIgnores(),
+      ]);
+      this.people.set(people);
+      this.occasions.set(occasions);
+      this.reminders.set(reminders);
+      if (settings) this.settings.set(settings);
+      else await this.updateSettings({ ...DEFAULT_SETTINGS, updatedAt: new Date().toISOString() });
+      this.ignores.set(ignores);
+      await this.migrateLegacyReminderModes();
+      await this.purgeExpiredTrash();
+      this.ready.set(true);
+    } finally {
+      this.loading.set(false);
+    }
   }
 
   person(id: string): Person | undefined {

@@ -149,6 +149,7 @@ export class BackupService {
         ...payload.ignores.map(value => ({ store: 'contact_sync_ignores' as const, operation: 'PUT' as const, value })),
         { store: 'app_settings', operation: 'PUT', value: payload.settings },
       ]);
+      await this.store.refreshFromStorage();
       return {
         people: payload.people.length,
         occasions: payload.occasions.length,
@@ -187,6 +188,7 @@ export class BackupService {
       ...reminders.map(value => ({ store: 'occasion_reminders' as const, operation: 'PUT' as const, value })),
       ...payload.ignores.map(value => ({ store: 'contact_sync_ignores' as const, operation: 'PUT' as const, value })),
     ]);
+    await this.store.refreshFromStorage();
     return { people: people.length, occasions: occasions.length, reminders: reminders.length };
   }
 
