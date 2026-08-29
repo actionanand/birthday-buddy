@@ -646,12 +646,16 @@ export class SettingsPage {
     await loading.present();
     try {
       const restored = await this.backup.restore(payload, mode);
-      await this.scheduler.reconcileAll(false);
+      const reminderStatus = await this.scheduler.reconcileAll(true);
       await loading.dismiss();
-      const message =
+      const restoredMessage =
         mode === 'MERGE' && restored.people === 0 && restored.occasions === 0
           ? 'Backup checked. All people and occasions already exist.'
           : `Backup restored: ${restored.people} people and ${restored.occasions} occasions.`;
+      const message =
+        reminderStatus === 'denied'
+          ? `${restoredMessage} Allow notifications in Android settings to receive reminders.`
+          : `${restoredMessage} Upcoming reminders were scheduled.`;
       const toast = await this.toasts.create({ message, duration: 1800, position: 'bottom' });
       await toast.present();
     } catch (error: unknown) {
