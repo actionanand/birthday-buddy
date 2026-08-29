@@ -12,9 +12,28 @@ interface NativeNotificationPermissionPlugin {
   requestPermission(): Promise<{ granted: boolean }>;
 }
 
+interface NativeReminderOptions {
+  id: number;
+  title: string;
+  body: string;
+  atMillis: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  occasionId: string;
+  personId: string;
+}
+
+interface NativeReminderPlugin {
+  scheduleReminder(options: NativeReminderOptions): Promise<void>;
+  cancelReminders(options: { ids: number[] }): Promise<void>;
+}
+
 const NativeNotificationPermission = registerPlugin<NativeNotificationPermissionPlugin>(
   'BirthdayBuddyNotificationPermission',
 );
+const NativeReminder = registerPlugin<NativeReminderPlugin>('BirthdayBuddyReminder');
 
 @Service()
 export class ReminderSchedulerService {
@@ -51,9 +70,7 @@ export class ReminderSchedulerService {
       schedule => !activeIds.has(schedule.occasionId),
     );
     if (staleSchedules.length) {
-      await LocalNotifications.cancel({
-        notifications: staleSchedules.map(schedule => ({ id: schedule.notificationId })),
-      });
+      await this.cancelNotificationIds(staleSchedules.map(schedule => schedule.notificationId));
       for (const occasionId of new Set(staleSchedules.map(schedule => schedule.occasionId)))
         await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
     }
@@ -72,8 +89,7 @@ export class ReminderSchedulerService {
     const reminders = this.store.remindersFor(occasionId).filter(reminder => reminder.enabled);
     const birthdayEveTime = occasion.type === 'BIRTHDAY' ? occasion.birthdayEveReminderTime : undefined;
     const existing = await this.repositories.notificationSchedules.forOccasion(occasionId);
-    if (existing.length)
-      await LocalNotifications.cancel({ notifications: existing.map(item => ({ id: item.notificationId })) });
+    if (existing.length) await this.cancelNotificationIds(existing.map(item => item.notificationId));
     if (!occasion.enabled || (reminders.length === 0 && !birthdayEveTime)) {
       await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
       return 'scheduled';
@@ -82,6 +98,7 @@ export class ReminderSchedulerService {
     const occurrence = this.dates.nextOccurrence(occasion, this.store.settings().feb29Policy);
     if (!occurrence) return 'scheduled';
     const notifications: LocalNotificationSchema[] = [];
+    const nativeReminders: NativeReminderOptions[] = [];
     const schedules = [];
     for (const reminder of reminders) {
       const scheduledAt = this.subtractOffset(occurrence, reminder);
@@ -110,6 +127,18 @@ export class ReminderSchedulerService {
           allowWhileIdle: true,
         },
         extra: { occasionId, personId: person.id },
+      });
+      nativeReminders.push({
+        id: notificationId,
+        title: message.title,
+        body: message.body,
+        atMillis: nextFire.getTime(),
+        month: nextFire.getMonth() + 1,
+        day: nextFire.getDate(),
+        hour: nextFire.getHours(),
+        minute: nextFire.getMinutes(),
+        occasionId,
+        personId: person.id,
       });
       schedules.push({
         id: createId(),
@@ -155,6 +184,18 @@ export class ReminderSchedulerService {
         },
         extra: { occasionId, personId: person.id, birthdayEve: true },
       });
+      nativeReminders.push({
+        id: notificationId,
+        title: message.title,
+        body: message.body,
+        atMillis: nextFire.getTime(),
+        month: nextFire.getMonth() + 1,
+        day: nextFire.getDate(),
+        hour: nextFire.getHours(),
+        minute: nextFire.getMinutes(),
+        occasionId,
+        personId: person.id,
+      });
       schedules.push({
         id: createId(),
         occasionId,
@@ -164,7 +205,11 @@ export class ReminderSchedulerService {
         createdAt: new Date().toISOString(),
       });
     }
-    if (notifications.length) await LocalNotifications.schedule({ notifications });
+    if (Capacitor.getPlatform() === 'android') {
+      for (const reminder of nativeReminders) await NativeReminder.scheduleReminder(reminder);
+    } else if (notifications.length) {
+      await LocalNotifications.schedule({ notifications });
+    }
     await this.repositories.notificationSchedules.replaceForOccasion(occasionId, schedules);
     return 'scheduled';
   }
@@ -172,8 +217,7 @@ export class ReminderSchedulerService {
   async cancelOccasion(occasionId: string): Promise<void> {
     if (!Capacitor.isNativePlatform()) return;
     const schedules = await this.repositories.notificationSchedules.forOccasion(occasionId);
-    if (schedules.length)
-      await LocalNotifications.cancel({ notifications: schedules.map(item => ({ id: item.notificationId })) });
+    if (schedules.length) await this.cancelNotificationIds(schedules.map(item => item.notificationId));
     await this.repositories.notificationSchedules.replaceForOccasion(occasionId, []);
   }
 
@@ -202,6 +246,22 @@ export class ReminderSchedulerService {
       lightColor: '#397153',
       vibration: true,
     });
+  }
+
+  private async cancelNotificationIds(ids: number[]): Promise<void> {
+    if (ids.length === 0) return;
+    if (Capacitor.getPlatform() === 'android') {
+      await NativeReminder.cancelReminders({ ids });
+      // Remove alarms created by releases that used Capacitor Local Notifications.
+      // This can be removed after all supported installs have migrated.
+      try {
+        await LocalNotifications.cancel({ notifications: ids.map(id => ({ id })) });
+      } catch {
+        // The native AlarmManager cancellation above is the authoritative path.
+      }
+      return;
+    }
+    await LocalNotifications.cancel({ notifications: ids.map(id => ({ id })) });
   }
 
   private async notificationPermission(request: boolean): Promise<boolean> {

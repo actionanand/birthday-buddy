@@ -124,7 +124,7 @@ The final merged Android manifest uses these capabilities:
 - `POST_NOTIFICATIONS` is introduced with an in-app explanation after the app is ready and unlocked, then requested through Android only if the user chooses **Allow notifications**. Choosing **Not now** defers the explanation until a later app launch; saving an enabled reminder can also request it.
 - Camera access is optional and requested only after **Take Photo** in the person or Add Occasion editor. It lets the user capture a profile picture; Birthday Buddy does not access the camera in the background. Selected images must be 5 MB or smaller and are center-cropped, resized, and compressed locally before storage.
 - Android Photo Picker is used by the Capacitor Camera plugin for an existing image; broad media/storage permission is not requested.
-- `RECEIVE_BOOT_COMPLETED` lets Capacitor Local Notifications restore pending recurring reminders after reboot.
+- `RECEIVE_BOOT_COMPLETED` lets Birthday Buddy rebuild its persisted native Android alarms after reboot.
 - `WAKE_LOCK` lets the notification receiver finish delivery while the device is idle.
 - `VIBRATE` supports the standard vibration behavior of the occasion-reminder channel.
 - `USE_BIOMETRIC` is used only when the user enables biometric unlock.
@@ -139,7 +139,9 @@ Android Auto Backup and device-transfer extraction are disabled by the patch so 
 
 ## Notification lifecycle
 
-Each enabled reminder is registered as an annual calendar schedule on the private `occasion-reminders` Android channel. The default reminder time for new installations is 6:00 AM. A birthday can additionally have a birthday-eve reminder at 9:00 PM, 10:00 PM, 11:00 PM, or 11:50 PM on the previous calendar day; this option is intentionally unavailable for other occasion types. Delivery is allowed while idle but is intentionally inexact, so Android may defer it slightly under battery restrictions. Capacitor's native receivers persist and restore pending schedules after locked boot, normal boot and supported quick-boot events. The Birthday Buddy receiver invokes the same restore path after app replacement, device-time changes and timezone changes, matching Life Leaf's Android lifecycle coverage. Birthday Buddy also reconciles schedules on startup, foreground resume, reminder edits/deletes and after backup restore. Tapping a notification opens the related person, with Upcoming as a safe fallback when the record no longer exists.
+Each enabled reminder is converted to a concrete future timestamp and registered through Android `AlarmManager.setAndAllowWhileIdle()`, matching the working Flowra and Life Leaf delivery pattern. A dedicated native receiver posts the notification on the private `occasion-reminders` channel and schedules the next valid annual occurrence after delivery. The default reminder time for new installations is 6:00 AM. A birthday can additionally have a birthday-eve reminder at 9:00 PM, 10:00 PM, 11:00 PM, or 11:50 PM on the previous calendar day; this option is intentionally unavailable for other occasion types. Delivery is allowed while idle but is intentionally inexact, so Android may defer it slightly under battery restrictions.
+
+The native alarm records are persisted independently of the WebView. They are rebuilt after device boot, app replacement, device-time changes and timezone changes. Birthday Buddy also reconciles and replaces alarms on startup, foreground resume, reminder edits/deletes, and immediately after backup restore. Restore requests notification permission when necessary and confirms that upcoming reminders were scheduled. Existing alarms made by older releases through Capacitor Local Notifications are cancelled during migration.
 
 ## Troubleshooting
 

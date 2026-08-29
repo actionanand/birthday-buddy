@@ -47,15 +47,20 @@ manifest = manifest
   .replace(/android:fullBackupContent="[^"]*"/g, 'android:fullBackupContent="false"');
 if (!manifest.includes('android:usesCleartextTraffic='))
   manifest = manifest.replace('<application', '<application android:usesCleartextTraffic="false"');
-const notificationRestoreReceiver = `        <receiver android:name=".BirthdayBuddyNotificationRestoreReceiver" android:exported="false">
+const reminderReceiver = `        <receiver android:name=".BirthdayBuddyReminderReceiver" android:exported="false">
             <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>`;
-if (!manifest.includes('BirthdayBuddyNotificationRestoreReceiver'))
-  manifest = manifest.replace('</application>', `${notificationRestoreReceiver}\n    </application>`);
+manifest = manifest.replace(
+  /\s*<receiver android:name="\.BirthdayBuddyNotificationRestoreReceiver"[\s\S]*?<\/receiver>/g,
+  '',
+);
+if (!manifest.includes('BirthdayBuddyReminderReceiver'))
+  manifest = manifest.replace('</application>', `${reminderReceiver}\n    </application>`);
 await writeFile(manifestPath, manifest, 'utf8');
 
 const gradlePath = path.join(androidRoot, 'app', 'build.gradle');
@@ -134,6 +139,7 @@ public class MainActivity extends BridgeActivity {
   public void onCreate(Bundle savedInstanceState) {
     registerPlugin(BirthdayBuddyContactsPlugin.class);
     registerPlugin(BirthdayBuddyNotificationPermissionPlugin.class);
+    registerPlugin(BirthdayBuddyReminderPlugin.class);
     registerPlugin(BirthdayBuddyFilesPlugin.class);
     registerPlugin(BirthdayBuddySecurityPlugin.class);
     super.onCreate(savedInstanceState);
@@ -283,18 +289,243 @@ public class BirthdayBuddyFilesPlugin extends Plugin {
 );
 
 await writeFile(
-  path.join(packagePath, 'BirthdayBuddyNotificationRestoreReceiver.java'),
+  path.join(packagePath, 'BirthdayBuddyReminderPlugin.java'),
   `package com.actionanand.birthdaybuddy.app;
 
+import com.getcapacitor.JSArray;
+import com.getcapacitor.Plugin;
+import com.getcapacitor.PluginCall;
+import com.getcapacitor.PluginMethod;
+import com.getcapacitor.annotation.CapacitorPlugin;
+
+@CapacitorPlugin(name = "BirthdayBuddyReminder")
+public class BirthdayBuddyReminderPlugin extends Plugin {
+  @PluginMethod
+  public void scheduleReminder(PluginCall call) {
+    Integer id = call.getInt("id");
+    String title = call.getString("title");
+    String body = call.getString("body");
+    Long atMillis = call.getLong("atMillis");
+    Integer month = call.getInt("month");
+    Integer day = call.getInt("day");
+    Integer hour = call.getInt("hour");
+    Integer minute = call.getInt("minute");
+    if (id == null || title == null || body == null || atMillis == null || month == null || day == null || hour == null || minute == null) {
+      call.reject("Reminder details are incomplete.");
+      return;
+    }
+    try {
+      BirthdayBuddyReminderReceiver.schedule(
+        getContext(), id, title, body, atMillis, month, day, hour, minute,
+        call.getString("occasionId", ""), call.getString("personId", "")
+      );
+      call.resolve();
+    } catch (Exception error) {
+      call.reject("The Android reminder could not be scheduled.", error);
+    }
+  }
+
+  @PluginMethod
+  public void cancelReminders(PluginCall call) {
+    JSArray ids = call.getArray("ids");
+    if (ids == null) { call.reject("Reminder IDs are required."); return; }
+    try {
+      for (int index = 0; index < ids.length(); index++)
+        BirthdayBuddyReminderReceiver.cancel(getContext(), ids.getInt(index));
+      call.resolve();
+    } catch (Exception error) {
+      call.reject("Android reminders could not be cancelled.", error);
+    }
+  }
+}
+`,
+  'utf8',
+);
+
+await writeFile(
+  path.join(packagePath, 'BirthdayBuddyReminderReceiver.java'),
+  `package com.actionanand.birthdaybuddy.app;
+
+import android.Manifest;
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import com.capacitorjs.plugins.localnotifications.LocalNotificationRestoreReceiver;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
+import java.util.Calendar;
+import java.util.Map;
+import org.json.JSONObject;
 
-public class BirthdayBuddyNotificationRestoreReceiver extends BroadcastReceiver {
+public class BirthdayBuddyReminderReceiver extends BroadcastReceiver {
+  private static final String ACTION_ALARM = "com.actionanand.birthdaybuddy.app.REMINDER_ALARM";
+  private static final String CHANNEL_ID = "occasion-reminders";
+  private static final String STORE = "birthday_buddy_reminders";
+  private static final String KEY_PREFIX = "alarm_";
+
   @Override
   public void onReceive(Context context, Intent intent) {
-    new LocalNotificationRestoreReceiver().onReceive(context, intent);
+    if (ACTION_ALARM.equals(intent == null ? null : intent.getAction())) {
+      int id = intent.getIntExtra("id", -1);
+      if (id < 0) return;
+      JSONObject record = read(context, id);
+      if (record == null) return;
+      showNotification(context, record);
+      long next = nextAnnualMillis(
+        record.optInt("month"), record.optInt("day"), record.optInt("hour"), record.optInt("minute")
+      );
+      if (next > 0) {
+        try {
+          record.put("atMillis", next);
+          persist(context, id, record);
+          scheduleAlarm(context, id, next);
+        } catch (Exception ignored) { }
+      }
+      return;
+    }
+    rebuildAll(context);
+  }
+
+  public static void schedule(
+    Context context, int id, String title, String body, long atMillis,
+    int month, int day, int hour, int minute, String occasionId, String personId
+  ) throws Exception {
+    JSONObject record = new JSONObject();
+    record.put("id", id);
+    record.put("title", title);
+    record.put("body", body);
+    record.put("atMillis", atMillis);
+    record.put("month", month);
+    record.put("day", day);
+    record.put("hour", hour);
+    record.put("minute", minute);
+    record.put("occasionId", occasionId);
+    record.put("personId", personId);
+    persist(context, id, record);
+    ensureChannel(context);
+    scheduleAlarm(context, id, atMillis);
+  }
+
+  public static void cancel(Context context, int id) {
+    AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    PendingIntent pending = alarmIntent(context, id, PendingIntent.FLAG_NO_CREATE);
+    if (alarms != null && pending != null) alarms.cancel(pending);
+    preferences(context).edit().remove(KEY_PREFIX + id).commit();
+  }
+
+  private static void scheduleAlarm(Context context, int id, long atMillis) {
+    if (atMillis <= System.currentTimeMillis()) return;
+    AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+    if (alarms == null) throw new IllegalStateException("Android AlarmManager is unavailable.");
+    PendingIntent pending = alarmIntent(context, id, PendingIntent.FLAG_UPDATE_CURRENT);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+      alarms.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atMillis, pending);
+    else alarms.set(AlarmManager.RTC_WAKEUP, atMillis, pending);
+  }
+
+  private static PendingIntent alarmIntent(Context context, int id, int updateFlag) {
+    Intent intent = new Intent(context, BirthdayBuddyReminderReceiver.class);
+    intent.setAction(ACTION_ALARM);
+    intent.putExtra("id", id);
+    return PendingIntent.getBroadcast(context, id, intent, updateFlag | PendingIntent.FLAG_IMMUTABLE);
+  }
+
+  private static void showNotification(Context context, JSONObject record) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+      ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED)
+      return;
+    ensureChannel(context);
+    int id = record.optInt("id", -1);
+    if (id < 0) return;
+    Intent open = new Intent(context, MainActivity.class);
+    open.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    open.putExtra("occasionId", record.optString("occasionId"));
+    open.putExtra("personId", record.optString("personId"));
+    PendingIntent content = PendingIntent.getActivity(
+      context, id, open, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+    );
+    NotificationCompat.Builder notification = new NotificationCompat.Builder(context, CHANNEL_ID)
+      .setSmallIcon(R.drawable.ic_stat_birthday_buddy)
+      .setColor(Color.parseColor("#397153"))
+      .setContentTitle(record.optString("title", "Birthday Buddy"))
+      .setContentText(record.optString("body", "You have an occasion reminder."))
+      .setStyle(new NotificationCompat.BigTextStyle().bigText(record.optString("body")))
+      .setCategory(NotificationCompat.CATEGORY_REMINDER)
+      .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+      .setAutoCancel(true)
+      .setContentIntent(content);
+    NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    if (manager != null) manager.notify(id, notification.build());
+  }
+
+  private static void ensureChannel(Context context) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+    NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    if (manager == null) return;
+    NotificationChannel channel = new NotificationChannel(
+      CHANNEL_ID, "Occasion reminders", NotificationManager.IMPORTANCE_DEFAULT
+    );
+    channel.setDescription("Birthday, anniversary, and occasion reminders");
+    channel.enableLights(true);
+    channel.setLightColor(Color.parseColor("#397153"));
+    channel.enableVibration(true);
+    channel.setLockscreenVisibility(android.app.Notification.VISIBILITY_PRIVATE);
+    manager.createNotificationChannel(channel);
+  }
+
+  private static void rebuildAll(Context context) {
+    for (Map.Entry<String, ?> entry : preferences(context).getAll().entrySet()) {
+      if (!entry.getKey().startsWith(KEY_PREFIX) || !(entry.getValue() instanceof String)) continue;
+      try {
+        JSONObject record = new JSONObject((String) entry.getValue());
+        int id = record.getInt("id");
+        long next = nextAnnualMillis(
+          record.getInt("month"), record.getInt("day"), record.getInt("hour"), record.getInt("minute")
+        );
+        if (next <= 0) continue;
+        record.put("atMillis", next);
+        persist(context, id, record);
+        scheduleAlarm(context, id, next);
+      } catch (Exception ignored) { }
+    }
+  }
+
+  private static long nextAnnualMillis(int month, int day, int hour, int minute) {
+    Calendar now = Calendar.getInstance();
+    int firstYear = now.get(Calendar.YEAR);
+    for (int year = firstYear; year <= firstYear + 8; year++) {
+      Calendar candidate = Calendar.getInstance();
+      candidate.clear();
+      candidate.setLenient(false);
+      try {
+        candidate.set(year, month - 1, day, hour, minute, 0);
+        long result = candidate.getTimeInMillis();
+        if (result > System.currentTimeMillis()) return result;
+      } catch (IllegalArgumentException ignored) { }
+    }
+    return -1;
+  }
+
+  private static SharedPreferences preferences(Context context) {
+    return context.getSharedPreferences(STORE, Context.MODE_PRIVATE);
+  }
+
+  private static void persist(Context context, int id, JSONObject record) {
+    if (!preferences(context).edit().putString(KEY_PREFIX + id, record.toString()).commit())
+      throw new IllegalStateException("Reminder schedule could not be stored.");
+  }
+
+  private static JSONObject read(Context context, int id) {
+    String value = preferences(context).getString(KEY_PREFIX + id, null);
+    if (value == null) return null;
+    try { return new JSONObject(value); } catch (Exception ignored) { return null; }
   }
 }
 `,
@@ -675,5 +906,5 @@ await ensureThemes(stylesPath, false);
 await ensureThemes(nightStylesPath, true);
 
 console.log(
-  'Applied Birthday Buddy Android contacts, document backup, Keystore security, recurring notification, 168dp splash, privacy, system-bar and release patches.',
+  'Applied Birthday Buddy Android contacts, document backup, Keystore security, native alarm reminder, 168dp splash, privacy, system-bar and release patches.',
 );
